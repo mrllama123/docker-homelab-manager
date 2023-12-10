@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 3e572cf
+_src_path: gh:mrllama123/pyt2
+add_docs: false
+author: Bob Bruce
+email: piesrule123@gmail.com
+is_app: true
+is_py_package: false
+module_name: src
+project_description: a simple web app to manage homelab docker compose services
+project_name: docker homelab manager
+pypi_name: docker-homelab-manager
+username: mrllama123
