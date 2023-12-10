@@ -45,17 +45,20 @@ def get_volume(volume_name: str) -> docker.models.volumes.Volume | None:
 
 def backup_volume(volume_name: str, backup_folder: str):
     client = get_docker_client()
-    temp_dir = tempfile.mkdtemp()
-    backup_file = f"{volume_name}-{datetime.now().isoformat()}.tar.gz"
+    backup_file = f"{volume_name}.tar.gz"
+    # print(temp_dir)
+    #&& tar cvaf /dest/{backup_file} -C /source .
     client.containers.run(
         "busybox",
         command=f"tar cvaf /dest/{backup_file} -C /source .",
-        remove=True,
+        # remove=True,
         volumes={
             volume_name: {"bind": "/source", "mode": "rw"},
-            temp_dir: {"bind": "/dest", "mode": "rw"},
+            backup_folder: {"bind": "/dest", "mode": "rw"},
         },
+        stdout=True,
+    
     )
-    # move file to /backup folder
-    shutil.move(os.path.join(temp_dir, backup_file), backup_folder)
+        # move file to /backup folder
+        # shutil.copy(os.path.join(temp_dir,backup_file), backup_folder)
 
