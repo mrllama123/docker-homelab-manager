@@ -10,17 +10,16 @@ services:
       - 10000:80
     # command: uvicorn main:app --host 0.0.0.0 --reload
     volumes:
-      - ./backup:/backup
+      - backup_data:/backup
       - ./src:/code/src
       # for rootless docker
       # - /run/user/1000/docker.sock:/var/run/docker.sock
-    
+
       # non rootless docker
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - BACKUP_FOLDER=/backup
     depends_on:
       - redis
 
@@ -29,20 +28,24 @@ services:
       context: .
       dockerfile: src/celery/Dockerfile.celery-worker
     volumes:
-      - ./backup:/backup
+      - backup_data:/backup
       - ./src:/code/src
       # for rootless docker
       # - /run/user/1000/docker.sock:/var/run/docker.sock
-    
+
       # non rootless docker
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - BACKUP_FOLDER=/backup
+      - BACKUP_VOLUME_NAME=backup_data
     depends_on:
       - web
       - redis
 
   redis:
     image: redis:7
+volumes:
+  backup_data:
+    name: backup_data
+

@@ -19,13 +19,7 @@ def get_docker_client():
 
 def is_docker_rootless():
     return not os.path.exists('/var/run/docker.sock')
-    # try:
-    #     output = subprocess.check_output(
-    #         ["docker", "info", "--format", "{{.SecurityOptions}}"]
-    #     )
-    #     return "rootless" in output.decode("utf-8")
-    # except subprocess.CalledProcessError:
-    #     return False
+
 
 
 def get_volumes():
@@ -43,22 +37,18 @@ def get_volume(volume_name: str) -> docker.models.volumes.Volume | None:
     except Exception as e:
         raise e
 
-def backup_volume(volume_name: str, backup_folder: str):
+def backup_volume(volume_name: str, backup_vol_name: str):
     client = get_docker_client()
     backup_file = f"{volume_name}.tar.gz"
-    # print(temp_dir)
-    #&& tar cvaf /dest/{backup_file} -C /source .
-    client.containers.run(
+    output = client.containers.run(
         "busybox",
         command=f"tar cvaf /dest/{backup_file} -C /source .",
-        # remove=True,
+        remove=True,
         volumes={
             volume_name: {"bind": "/source", "mode": "rw"},
-            backup_folder: {"bind": "/dest", "mode": "rw"},
+            backup_vol_name: {"bind": "/dest", "mode": "rw"},
         },
         stdout=True,
-    
-    )
-        # move file to /backup folder
-        # shutil.copy(os.path.join(temp_dir,backup_file), backup_folder)
 
+    )
+    print(output.decode("utf-8"))
