@@ -53,12 +53,8 @@ celery-dev = { cmd = "celery -A src.celery.worker worker --loglevel=INFO", help 
 codebase = ["ruff", "mypy"]
 
 [tool.poe.tasks.format]
-cmd = "shed"
+shell = "shed && ruff check src --fix"
 help = "Format code"
-
-[tool.poe.tasks.fix-ruff]
-cmd = "ruff src --fix"
-help = "Ruff autofix"
 
 [tool.poe.tasks.lint]
 sequence = ["style", "codebase"]

@@ -1,10 +1,12 @@
-from typing import Any
-from fastapi import FastAPI, HTTPException
-from src.docker import backup_volume, get_volume, get_volumes
-from pydantic import BaseModel
 import os
+from typing import Any
 
-BACKUP_FOLDER = os.getenv("BACKUP_FOLDER", os.path.join(os.getcwd(), "backups"))
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+from src.docker import get_volume, get_volumes
+
+BACKUP_VOLUME_NAME = os.getenv("BACKUP_VOLUME_NAME", "backup_data")
 from src.celery.worker import create_volume_backup
 
 app = FastAPI()
@@ -20,6 +22,11 @@ class VolumeItem(BaseModel):
 class BackupVolumeResponse(BaseModel):
     message: str
     task_id: str
+
+
+class BackupStatusResponse(BaseModel):
+    status: str
+    result: Any
 
 
 @app.get("/volumes", description="Get a list of all Docker volumes")
@@ -38,13 +45,18 @@ async def api_volumes() -> list[VolumeItem]:
 
 
 @app.post("/backup/{volume_name}", description="Backup a Docker volume")
-def api_backup_volume(
-    volume_name: str
-) -> BackupVolumeResponse:
+def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     if not get_volume(volume_name):
         raise HTTPException(
-            status_code=404, detail=f"Volume {volume_name} does not exist"
+            status_code=404,
+            detail=f"Volume {volume_name} does not exist",
         )
-    
-    task = create_volume_backup.delay(volume_name, BACKUP_FOLDER)
+
+    task = create_volume_backup.delay(volume_name, BACKUP_VOLUME_NAME)
     return {"message": f"Backup of {volume_name} started", "task_id": task.id}
+
+
+@app.get("/backup/status/{task_id}", description="Get the status of a backup task")
+def api_backup_status(task_id: str) -> BackupStatusResponse:
+    task = create_volume_backup.AsyncResult(task_id)
+    return {"status": task.status, "result": task.result}
