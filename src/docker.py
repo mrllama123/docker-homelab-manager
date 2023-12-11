@@ -1,17 +1,16 @@
 import os
 from functools import lru_cache
 
-
 import docker
 
 BACKUP_DIR = os.getenv("BACKUP_DIR")
 
 
-@lru_cache()
+@lru_cache
 def get_docker_client():
     if is_docker_rootless():
         return docker.DockerClient(
-            base_url=f'unix://{os.getenv("XDG_RUNTIME_DIR")}/docker.sock'
+            base_url=f'unix://{os.getenv("XDG_RUNTIME_DIR")}/docker.sock',
         )
     return docker.DockerClient(base_url="unix://var/run/docker.sock")
 

@@ -43,7 +43,8 @@ async def api_volumes() -> list[VolumeItem]:
 def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     if not get_volume(volume_name):
         raise HTTPException(
-            status_code=404, detail=f"Volume {volume_name} does not exist"
+            status_code=404,
+            detail=f"Volume {volume_name} does not exist",
         )
 
     task = create_volume_backup.delay(volume_name, BACKUP_VOLUME_NAME)
