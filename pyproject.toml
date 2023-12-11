@@ -27,6 +27,7 @@ uvicorn = { extras = ["standard"], version = "^0.24.0.post1" }
 docker = "^7.0.0"
 redis = "^5.0.1"
 celery = {extras = ["redis"], version = "^5.3.6"}
+python-on-whales = "^0.67.0"
 
 
 [tool.poetry.group.dev.dependencies]
