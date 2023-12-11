@@ -1,8 +1,10 @@
-from typing import Any
-from fastapi import FastAPI, HTTPException
-from src.docker import backup_volume, get_volume, get_volumes
-from pydantic import BaseModel
 import os
+from typing import Any
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+from src.docker import get_volume, get_volumes
 
 BACKUP_VOLUME_NAME = os.getenv("BACKUP_VOLUME_NAME", "backup_data")
 from src.celery.worker import create_volume_backup
@@ -38,9 +40,7 @@ async def api_volumes() -> list[VolumeItem]:
 
 
 @app.post("/backup/{volume_name}", description="Backup a Docker volume")
-def api_backup_volume(
-    volume_name: str
-) -> BackupVolumeResponse:
+def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     if not get_volume(volume_name):
         raise HTTPException(
             status_code=404, detail=f"Volume {volume_name} does not exist"

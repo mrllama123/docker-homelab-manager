@@ -1,11 +1,10 @@
-import shutil
-import tempfile
-import docker
-from functools import lru_cache
 import os
-import subprocess
-from fastapi import HTTPException
-from datetime import datetime
+from functools import lru_cache
+
+
+import docker
+
+BACKUP_DIR = os.getenv("BACKUP_DIR")
 
 
 @lru_cache()
@@ -18,14 +17,14 @@ def get_docker_client():
 
 
 def is_docker_rootless():
-    return not os.path.exists('/var/run/docker.sock')
-
+    return not os.path.exists("/var/run/docker.sock")
 
 
 def get_volumes():
     client = get_docker_client()
     volumes = client.volumes.list()
     return volumes
+
 
 def get_volume(volume_name: str) -> docker.models.volumes.Volume | None:
     client = get_docker_client()
@@ -37,6 +36,7 @@ def get_volume(volume_name: str) -> docker.models.volumes.Volume | None:
     except Exception as e:
         raise e
 
+
 def backup_volume(volume_name: str, backup_vol_name: str):
     client = get_docker_client()
     backup_file = f"{volume_name}.tar.gz"
@@ -46,9 +46,8 @@ def backup_volume(volume_name: str, backup_vol_name: str):
         remove=True,
         volumes={
             volume_name: {"bind": "/source", "mode": "rw"},
-            backup_vol_name: {"bind": "/dest", "mode": "rw"},
+            BACKUP_DIR: {"bind": "/dest", "mode": "rw"},
         },
         stdout=True,
-
     )
     print(output.decode("utf-8"))
