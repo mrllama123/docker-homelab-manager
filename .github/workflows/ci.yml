@@ -47,18 +47,7 @@ jobs:
         run: poe ci
       - name: Upload to CodeCov
         uses: codecov/codecov-action@v2
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3
-      - name: Install Poetry $POETRY_VERSION
-        run: python3 -m pip install --upgrade pip poetry==$POETRY_VERSION
-      - name: Build project
-        run: poetry build
+
   lints:
     runs-on: ubuntu-latest
     steps:
