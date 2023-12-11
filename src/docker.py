@@ -20,7 +20,7 @@ def is_docker_rootless():
     return not os.path.exists("/var/run/docker.sock")
 
 
-def get_volumes():
+def get_volumes() -> list[docker.models.volumes.Volume]:
     client = get_docker_client()
     volumes = client.volumes.list()
     return volumes
