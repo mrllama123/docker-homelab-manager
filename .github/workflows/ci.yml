@@ -3,7 +3,6 @@ on:
   schedule:
     - cron: "0 0 1 * *" # Run every month
   # This way, we can make sure code doesn't break via external dependencies
-  push:
   pull_request:
 env:
   POETRY_VERSION: 1.7.1
