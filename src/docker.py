@@ -37,7 +37,7 @@ def get_volume(volume_name: str) -> docker.models.volumes.Volume | None:
         raise e
 
 
-def backup_volume(volume_name: str, backup_vol_name: str):
+def backup_volume(volume_name: str):
     client = get_docker_client()
     dt_now = datetime.now(tz=datetime.utcnow().astimezone().tzinfo)
     backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"

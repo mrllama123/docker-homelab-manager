@@ -13,5 +13,5 @@ celery.conf.result_backend = os.environ.get(
 
 
 @celery.task(name="create_volume_backup")
-def create_volume_backup(volume_name: str, backup_folder: str):
-    backup_volume(volume_name, backup_folder)
+def create_volume_backup(volume_name: str):
+    backup_volume(volume_name)
