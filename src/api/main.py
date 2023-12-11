@@ -1,13 +1,10 @@
-import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.docker import get_volume, get_volumes
-
-
 from src.celery.worker import create_volume_backup
+from src.docker import get_volume, get_volumes
 
 app = FastAPI()
 

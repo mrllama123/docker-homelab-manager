@@ -1,8 +1,8 @@
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
+
+from celery import states
 from docker.models.volumes import Volume
-from celery.result import AsyncResult
-from  celery import states 
 
 
 class MockAsyncResult:
@@ -75,7 +75,6 @@ def test_create_backup(mocker, client):
 
 
 def test_get_backup_status(mocker, client):
-
     mock_get_backup_status = mocker.patch(
         "src.api.main.create_volume_backup.AsyncResult",
         return_value=MockAsyncResult(status=states.SUCCESS),
