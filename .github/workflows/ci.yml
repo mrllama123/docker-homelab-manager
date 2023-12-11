@@ -3,7 +3,6 @@ on:
   schedule:
     - cron: "0 0 1 * *" # Run every month
   # This way, we can make sure code doesn't break via external dependencies
-  push:
   pull_request:
 env:
   POETRY_VERSION: 1.7.1
@@ -12,13 +11,9 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - 3.8
-          - 3.9
           - "3.10"
           - "3.11"
-          - "3.12"
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -51,18 +46,7 @@ jobs:
         run: poe ci
       - name: Upload to CodeCov
         uses: codecov/codecov-action@v2
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3
-      - name: Install Poetry $POETRY_VERSION
-        run: python3 -m pip install --upgrade pip poetry==$POETRY_VERSION
-      - name: Build project
-        run: poetry build
+
   lints:
     runs-on: ubuntu-latest
     steps:

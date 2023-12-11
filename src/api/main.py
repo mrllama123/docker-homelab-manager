@@ -1,13 +1,10 @@
-import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.docker import get_volume, get_volumes
-
-
 from src.celery.worker import create_volume_backup
+from src.docker import get_volume, get_volumes
 
 app = FastAPI()
 
@@ -26,6 +23,7 @@ class BackupVolumeResponse(BaseModel):
 
 class BackupStatusResponse(BaseModel):
     status: str
+    task_id: str
     result: Any
 
 
@@ -58,4 +56,4 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
 @app.get("/backup/status/{task_id}", description="Get the status of a backup task")
 def api_backup_status(task_id: str) -> BackupStatusResponse:
     task = create_volume_backup.AsyncResult(task_id)
-    return {"status": task.status, "result": task.result}
+    return {"status": task.status, "result": task.result, "task_id": task.id}
