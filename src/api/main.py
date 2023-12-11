@@ -24,6 +24,11 @@ class BackupVolumeResponse(BaseModel):
     task_id: str
 
 
+class BackupStatusResponse(BaseModel):
+    status: str
+    result: Any
+
+
 @app.get("/volumes", description="Get a list of all Docker volumes")
 async def api_volumes() -> list[VolumeItem]:
     volumes = get_volumes()
@@ -49,3 +54,9 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
 
     task = create_volume_backup.delay(volume_name, BACKUP_VOLUME_NAME)
     return {"message": f"Backup of {volume_name} started", "task_id": task.id}
+
+
+@app.get("/backup/status/{task_id}", description="Get the status of a backup task")
+def api_backup_status(task_id: str) -> BackupStatusResponse:
+    task = create_volume_backup.AsyncResult(task_id)
+    return {"status": task.status, "result": task.result}
