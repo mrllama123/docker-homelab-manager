@@ -47,7 +47,7 @@ pylint = "^3.0.3"
 mypy = { cmd = "mypy src --strict", help = "Run MyPy on codebase" }
 pylint = { cmd = "pylint src", help = "Run pylint on codebase" }
 check_black = { cmd = "black src --check" }
-check_imports = { cmd = "ruff check src --select I" }
+check_imports = { cmd = "isort --check-only --profile=black src" }
 lint = ["check_black", "check_imports", "pylint"]
 api-dev = { cmd = "uvicorn src.api.main:app --reload", help = "Run the API in dev mode" }
 celery-dev = { cmd = "celery -A src.celery.worker worker --loglevel=INFO", help = "Run the celery worker in dev mode" }
@@ -82,20 +82,18 @@ ignore = [
     "D203",
     "D213",
 ]
-target-version = "py38"
+target-version = ["py38"]
 
 [tool.pylint.messages_control]
 disable = [
     "arguments-differ",
     "attribute-defined-outside-init",
-    "bad-continuation",
     "blacklisted-name",
     "duplicate-code",
     "fixme",
     "import-error",
     "no-member",
     "no-name-in-module",
-    "no-self-use",
     "protected-access",
     "stop-iteration-return",
     "too-few-public-methods",
