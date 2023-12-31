@@ -2,18 +2,27 @@ import pytest
 from fastapi.testclient import TestClient
 
 from celery import states
-from docker.models.volumes import Volume
+
+
+class MockVolume:
+    def __init__(
+        self, name="test-volume", labels={}, mountpoint="/test-volume", options=None
+    ) -> None:
+        self.name = name
+        self.labels = labels
+        self.mountpoint = mountpoint
+        self.options = options
 
 
 class MockAsyncResult:
-    def __init__(self, status=states.PENDING, result="", id="test-task-id"):
+    def __init__(self, status=states.PENDING, result="", id="test-task-id") -> None:
         self.status = status
         self.result = result
         self.id = id
 
 
-@pytest.fixture
-def client():
+@pytest.fixture()
+def client() -> TestClient:
     from src.api.main import app
 
     return TestClient(app)
@@ -22,16 +31,16 @@ def client():
 def test_list_volumes(mocker, client):
     mock_get_volumes = mocker.patch(
         "src.api.main.get_volumes",
-        return_value=[Volume(attrs={"Name": "test-volume"})],
+        return_value=[MockVolume()],
     )
     response = client.get("/volumes")
     assert response.status_code == 200
     assert response.json() == [
         {
-            "id": "test-volume",
-            "shortId": "test-volume",
             "name": "test-volume",
-            "attrs": {"Name": "test-volume"},
+            "labels": {},
+            "mountpoint": "/test-volume",
+            "options": {},
         }
     ]
     mock_get_volumes.assert_called_once()
@@ -58,7 +67,7 @@ def test_create_backup_volume_not_found(mocker, client):
 def test_create_backup(mocker, client):
     mock_get_volume = mocker.patch(
         "src.api.main.get_volume",
-        return_value=Volume(attrs={"Name": "test-volume"}),
+        return_value=MockVolume(),
     )
     mock_create_volume_backup = mocker.patch(
         "src.api.main.create_volume_backup.delay",
