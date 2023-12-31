@@ -46,7 +46,7 @@ def backup_volume(volume_name: str) -> None:
     volume = get_volume(volume_name)
 
     if not volume:
-        raise Exception(f"Volume {volume_name} does not exist")
+        raise ValueError(f"Volume {volume_name} does not exist")
 
     output = client.run(
         image="busybox",
@@ -63,4 +63,4 @@ def backup_volume(volume_name: str) -> None:
     )
     print(output)
     if not os.path.exists(os.path.join("/backup", backup_file)):
-        raise Exception("Backup failed")
+        raise RuntimeError("Backup failed")
