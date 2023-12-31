@@ -8,7 +8,7 @@ BACKUP_DIR = os.getenv("BACKUP_DIR")
 
 
 @lru_cache
-def get_docker_client():
+def get_docker_client() -> DockerClient:
     if is_docker_rootless():
         return DockerClient(
             host=f'unix://{os.getenv("XDG_RUNTIME_DIR")}/docker.sock',
@@ -16,7 +16,7 @@ def get_docker_client():
     return DockerClient()
 
 
-def is_docker_rootless():
+def is_docker_rootless() -> bool:
     return not os.path.exists("/var/run/docker.sock")
 
 
@@ -37,7 +37,7 @@ def get_volume(volume_name: str) -> Volume | None:
         raise e
 
 
-def backup_volume(volume_name: str):
+def backup_volume(volume_name: str) -> None:
     client = get_docker_client()
 
     dt_now = datetime.now(tz=datetime.utcnow().astimezone().tzinfo)

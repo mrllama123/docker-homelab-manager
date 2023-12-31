@@ -7,7 +7,7 @@ from celery import states
 class MockVolume:
     def __init__(
         self, name="test-volume", labels={}, mountpoint="/test-volume", options=None
-    ):
+    ) -> None:
         self.name = name
         self.labels = labels
         self.mountpoint = mountpoint
@@ -15,14 +15,14 @@ class MockVolume:
 
 
 class MockAsyncResult:
-    def __init__(self, status=states.PENDING, result="", id="test-task-id"):
+    def __init__(self, status=states.PENDING, result="", id="test-task-id") -> None:
         self.status = status
         self.result = result
         self.id = id
 
 
-@pytest.fixture
-def client():
+@pytest.fixture()
+def client() -> TestClient:
     from src.api.main import app
 
     return TestClient(app)
