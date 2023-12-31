@@ -3,7 +3,8 @@ version: '3.8'
 services:
 
   web:
-    build: .
+    build: 
+      dockerfile: Dockerfile-Dev
     ports:
       - 10000:80
     volumes:
@@ -22,20 +23,21 @@ services:
 
 
   worker:
-    build: .
+    build: 
+      dockerfile: Dockerfile-Dev
     volumes:
       - ./src:/code/src
+      - ${BACKUP_DIR}:/backup
       # for rootless docker
       # - /run/user/1000/docker.sock:/var/run/docker.sock
 
       # non rootless docker
       - /var/run/docker.sock:/var/run/docker.sock
-    command:  celery -A src.celery.worker worker --loglevel=INFO -E
+    command:  watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A src.celery.worker worker --loglevel=INFO -E
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - BACKUP_VOLUME_NAME=backup_data
-      - BACKUP_DIR=/home/rowan/dev/docker-homelab-manager/backup
+      - BACKUP_DIR=${BACKUP_DIR}
     depends_on:
       - web
       - redis

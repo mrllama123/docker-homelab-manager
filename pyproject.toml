@@ -24,7 +24,6 @@ homepage = "https://github.com/mrllama123/docker-homelab-manager"
 python = "^3.8"
 fastapi = {extras = ["all"], version = "^0.104.1"}
 uvicorn = { extras = ["standard"], version = "^0.24.0.post1" }
-docker = "^7.0.0"
 redis = "^5.0.1"
 celery = {extras = ["redis"], version = "^5.3.6"}
 python-on-whales = "^0.67.0"
@@ -42,6 +41,7 @@ shed = "^0.10.9"
 
 toml = "^0.10.2"
 pytest-mock = "^3.12.0"
+watchdog = "^3.0.0"
 
 [tool.poe.tasks]
 # Code linting
@@ -52,6 +52,7 @@ check_imports = { cmd = "ruff check src --select I" }
 style = ["check_black", "check_imports"]
 api-dev = { cmd = "uvicorn src.api.main:app --reload", help = "Run the API in dev mode" }
 celery-dev = { cmd = "celery -A src.celery.worker worker --loglevel=INFO", help = "Run the celery worker in dev mode" }
+dev = "docker compose -f docker-compose-dev.yml  up  --build"
 codebase = ["ruff", "mypy"]
 
 [tool.poe.tasks.format]

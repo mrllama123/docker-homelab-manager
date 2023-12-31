@@ -10,10 +10,10 @@ app = FastAPI()
 
 
 class VolumeItem(BaseModel):
-    id: str
-    shortId: str
     name: str
-    attrs: dict[str, Any]
+    labels: dict[str, str]
+    mountpoint: str
+    options: dict[str, str]
 
 
 class BackupVolumeResponse(BaseModel):
@@ -32,10 +32,10 @@ async def api_volumes() -> list[VolumeItem]:
     volumes = get_volumes()
     return [
         {
-            "id": volume.id,
-            "shortId": volume.short_id,
             "name": volume.name,
-            "attrs": volume.attrs,
+            "labels": volume.labels or {},
+            "mountpoint": str(volume.mountpoint),
+            "options": volume.options or {},
         }
         for volume in volumes
     ]
