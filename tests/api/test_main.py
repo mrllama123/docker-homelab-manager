@@ -6,10 +6,10 @@ from celery import states
 
 class MockVolume:
     def __init__(
-        self, name="test-volume", labels={}, mountpoint="/test-volume", options=None
+        self, name="test-volume", labels=None, mountpoint="/test-volume", options=None
     ) -> None:
         self.name = name
-        self.labels = labels
+        self.labels = labels or {}
         self.mountpoint = mountpoint
         self.options = options
 

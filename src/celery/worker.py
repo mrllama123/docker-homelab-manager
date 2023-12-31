@@ -1,7 +1,6 @@
 import os
 
 from celery import Celery
-
 from src.docker import backup_volume
 
 celery = Celery(__name__)
