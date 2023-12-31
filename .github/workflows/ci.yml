@@ -43,9 +43,7 @@ jobs:
           poetry install
           poetry install  # Second time to install the project
       - name: Run test suite
-        run: poe ci
-      - name: Upload to CodeCov
-        uses: codecov/codecov-action@v2
+        run: poe test
 
   lints:
     runs-on: ubuntu-latest
@@ -70,10 +68,5 @@ jobs:
           poetry install
           poetry install  # Second time to install the project
 
-      - name: Run style lints
-        run: poe style
-      - name: Run ruff lints
-        run: poe codebase
-      - name: Run mypy lints
-        run: poe mypy
-
+      - name: Run lints
+        run: poe lint
