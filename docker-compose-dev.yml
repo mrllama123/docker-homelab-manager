@@ -9,6 +9,8 @@ services:
       - 10000:80
     volumes:
       - ./src:/code/src
+      - ${DB_DIR}:/db
+
       # for rootless docker
       # - /run/user/1000/docker.sock:/var/run/docker.sock
 
@@ -28,6 +30,7 @@ services:
     volumes:
       - ./src:/code/src
       - ${BACKUP_DIR}:/backup
+      - ${DB_DIR}:/db
       # for rootless docker
       # - /run/user/1000/docker.sock:/var/run/docker.sock
 

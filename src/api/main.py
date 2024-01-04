@@ -1,12 +1,22 @@
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from sqlmodel import Session, select
 
 from src.celery.worker import create_volume_backup
+from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 class VolumeItem(BaseModel):
@@ -39,6 +49,30 @@ async def api_volumes() -> list[VolumeItem]:
         }
         for volume in volumes
     ]
+
+
+@app.get(
+    "/backups", description="Get a list of all backups", response_model=list[Backups]
+)
+async def api_backups() -> list[Backups]:
+    with Session(engine) as session:
+        return session.exec(select(Backups)).all()
+
+
+@app.get(
+    "/backups/{backup_name}", description="Get a backup by name", response_model=Backups
+)
+async def api_backup(backup_name: str) -> Backups:
+    with Session(engine) as session:
+        backup = session.exec(
+            select(Backups).where(Backups.backup_name == backup_name)
+        ).first()
+        if not backup:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Backup {backup_name} does not exist",
+            )
+        return backup
 
 
 @app.post("/backup/{volume_name}", description="Backup a Docker volume")
