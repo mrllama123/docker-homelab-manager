@@ -11,8 +11,8 @@ class Backups(SQLModel, table=True):
     volume_name: str
 
 
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:////db/{sqlite_file_name}"
+SQLITE_FILE_NAME = "database.db"
+sqlite_url = f"sqlite:////db/{SQLITE_FILE_NAME}"
 
 engine = create_engine(sqlite_url, echo=True, connect_args={"check_same_thread": False})
 
