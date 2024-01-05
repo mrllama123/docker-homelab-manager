@@ -3,6 +3,9 @@ from datetime import datetime
 from functools import lru_cache
 
 from python_on_whales import DockerClient, DockerException, Volume
+from sqlmodel import Session
+
+from src.db import Backups, engine
 
 BACKUP_DIR = os.getenv("BACKUP_DIR")
 
@@ -64,3 +67,13 @@ def backup_volume(volume_name: str) -> None:
     print(output)
     if not os.path.exists(os.path.join("/backup", backup_file)):
         raise RuntimeError("Backup failed")
+
+    with Session(engine) as session:
+        backup = Backups(
+            backup_name=backup_file,
+            backup_created=dt_now.isoformat(),
+            backup_path=os.path.join(BACKUP_DIR, volume_name, backup_file),
+            volume_name=volume_name,
+        )
+        session.add(backup)
+        session.commit()
