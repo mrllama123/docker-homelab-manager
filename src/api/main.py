@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
-from typing import Any
-
-from fastapi import FastAPI, HTTPException
+from typing import Any, Annotated
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
@@ -39,7 +38,7 @@ class BackupStatusResponse(BaseModel):
     result: Any
 
 
-class RestoreBody(BaseModel):
+class BackupVolume(BaseModel):
     volume_name: str
     backup_filename: str
 
@@ -101,12 +100,20 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     return {"message": f"Backup of {volume_name} started", "task_id": task.id}
 
 
-@app.post("/restore", description="Restore a Docker volume")
+@app.post(
+    "/restore",
+    description="Restore a Docker volume",
+)
 def api_restore_volume(
-    body: RestoreBody,
+    backup_volume: BackupVolume,
 ) -> BackupVolumeResponse:
-    task = restore_volume_task.delay(body.volume_name, body.backup_filename)
-    return {"message": f"restore of {body.volume_name} started", "task_id": task.id}
+    task = restore_volume_task.delay(
+        backup_volume.volume_name, backup_volume.backup_filename
+    )
+    return {
+        "message": f"restore of {backup_volume.volume_name} started",
+        "task_id": task.id,
+    }
 
 
 @app.get("/backup/status/{task_id}", description="Get the status of a backup task")
