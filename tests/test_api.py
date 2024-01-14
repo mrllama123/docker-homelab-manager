@@ -1,8 +1,9 @@
+from datetime import datetime
+
 import pytest
 from fastapi.testclient import TestClient
 
 from celery import states
-from datetime import datetime
 
 
 class MockVolume:
@@ -123,7 +124,10 @@ def test_restore_backup(mocker, client):
     )
     response = client.post(
         "/restore",
-        json={"volume_name": "test-volume", "backup_filename": "test-backup-name.tar.gz"},
+        json={
+            "volume_name": "test-volume",
+            "backup_filename": "test-backup-name.tar.gz",
+        },
     )
     assert response.status_code == 200
     assert response.json() == {

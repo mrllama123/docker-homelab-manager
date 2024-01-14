@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
-from typing import Any, Annotated
-from fastapi import FastAPI, HTTPException, Request
+from typing import Any
+
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
