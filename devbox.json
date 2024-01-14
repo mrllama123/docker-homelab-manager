@@ -1,6 +1,7 @@
 {
   "packages": [
-    "poetry@latest"
+    "poetry@latest",
+    "python@3.12"
   ],
   "shell": {
     "init_hook": [
