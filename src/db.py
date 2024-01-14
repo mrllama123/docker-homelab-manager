@@ -9,6 +9,8 @@ class Backups(SQLModel, table=True):
     backup_created: str
     backup_path: str
     volume_name: str
+    restored: Optional[bool] = Field(default=False)
+    restored_date: Optional[str] = Field(default=None)
 
 
 SQLITE_FILE_NAME = "database.db"

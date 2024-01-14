@@ -3,7 +3,7 @@ from datetime import datetime
 from functools import lru_cache
 
 from python_on_whales import DockerClient, DockerException, Volume
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from src.db import Backups, engine
 
@@ -38,6 +38,12 @@ def get_volume(volume_name: str) -> Volume | None:
         return None
     except Exception as e:
         raise e
+
+
+def is_volume_attached(volume_name: str) -> bool:
+    client = get_docker_client()
+
+    return len(client.volume.list(filters={"name": volume_name, "dangling": 0})) == 0
 
 
 def backup_volume(volume_name: str) -> None:
@@ -75,5 +81,37 @@ def backup_volume(volume_name: str) -> None:
             backup_path=os.path.join(BACKUP_DIR, volume_name, backup_file),
             volume_name=volume_name,
         )
+        session.add(backup)
+        session.commit()
+
+
+def restore_volume(volume_name: str, filename: str) -> None:
+    client = get_docker_client()
+    output = client.run(
+        image="busybox",
+        command=[
+            "tar",
+            "xvf",
+            f"/source/{filename}",
+            "-C",
+            "/dest",
+        ],
+        remove=True,
+        volumes=[(volume_name, "/dest"), (BACKUP_DIR, "/source")],
+    )
+    print(output)
+    if not os.path.exists(os.path.join("/backup", filename)):
+        raise RuntimeError("Restore failed")
+
+    with Session(engine) as session:
+        backup = session.exec(
+            select(Backups).where(Backups.backup_name == filename)
+        ).first()
+        if not backup:
+            raise ValueError(f"Backup {filename} does not exist")
+        backup.restored = True
+        backup.restored_date = datetime.now(
+            tz=datetime.utcnow().astimezone().tzinfo
+        ).isoformat()
         session.add(backup)
         session.commit()
