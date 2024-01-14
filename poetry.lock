@@ -1502,20 +1502,6 @@ tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
-name = "pytest-celery"
-version = "0.0.0"
-description = "pytest-celery a shim pytest plugin to enable celery.contrib.pytest"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pytest-celery-0.0.0.tar.gz", hash = "sha256:cfd060fc32676afa1e4f51b2938f903f7f75d952186b8c6cf631628c4088f406"},
-    {file = "pytest_celery-0.0.0-py2.py3-none-any.whl", hash = "sha256:63dec132df3a839226ecb003ffdbb0c2cb88dd328550957e979c942766578060"},
-]
-
-[package.dependencies]
-celery = ">=4.4.0"
-
-[[package]]
 name = "pytest-clarity"
 version = "1.0.1"
 description = "A plugin providing an alternative, colourful diff output for failing assertions."
@@ -2435,4 +2421,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "1f5208f63689e5e4bc0fea2594285157208ff565323ea40321b847406fa39a90"
+content-hash = "8b512ba2435c8569447686e2083206ca9aa499a6225953e43510d9ab1135fb58"
