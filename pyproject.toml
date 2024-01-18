@@ -28,8 +28,6 @@ redis = "^5.0.1"
 celery = {extras = ["redis"], version = "^5.3.6"}
 python-on-whales = "^0.67.0"
 sqlmodel = "^0.0.14"
-pytest-celery = "^0.0.0"
-pytest-redis = "^3.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -44,6 +42,8 @@ toml = "^0.10.2"
 pytest-mock = "^3.12.0"
 watchdog = "^3.0.0"
 pylint = "^3.0.3"
+pytest-celery = "^0.0.0"
+pytest-redis = "^3.0.2"
 
 [tool.poe.tasks]
 # Code linting
