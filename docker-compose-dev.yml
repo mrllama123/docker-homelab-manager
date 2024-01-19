@@ -19,7 +19,7 @@ services:
     command:  uvicorn src.api.main:app --host 0.0.0.0 --port 80 --reload
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
     depends_on:
       - redis
 
@@ -39,7 +39,7 @@ services:
     command:  watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A src.celery.worker worker --loglevel=INFO -E
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
       - BACKUP_DIR=${BACKUP_DIR}
     depends_on:
       - web
