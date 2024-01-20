@@ -1,5 +1,5 @@
-
 from typing import Any
+
 from pydantic import BaseModel
 
 
@@ -26,4 +26,3 @@ class BackupStatusResponse(BaseModel):
 class BackupVolume(BaseModel):
     volume_name: str
     backup_filename: str
-
