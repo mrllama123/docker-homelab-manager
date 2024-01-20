@@ -27,7 +27,7 @@ class MockAsyncResult:
 
 @pytest.fixture()
 def client() -> TestClient:
-    from src.api.main import app
+    from src.api import app
 
     return TestClient(app)
 
