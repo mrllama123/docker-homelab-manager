@@ -11,7 +11,7 @@ from src.models import (
     BackupVolumeResponse,
     VolumeItem,
 )
-from src.worker import create_volume_backup, restore_volume_task
+from src.celery import create_volume_backup, restore_volume_task
 
 
 @asynccontextmanager

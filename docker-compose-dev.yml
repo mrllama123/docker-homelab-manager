@@ -36,7 +36,7 @@ services:
 
       # non rootless docker
       - /var/run/docker.sock:/var/run/docker.sock
-    command:  watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A src.celery.worker worker --loglevel=INFO -E
+    command:  watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A src.celery worker --loglevel=INFO -E
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
