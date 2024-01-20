@@ -2,16 +2,16 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from sqlmodel import Session, select
-from src.models import (
-    VolumeItem,
-    BackupVolumeResponse,
-    BackupStatusResponse,
-    BackupVolume,
-)
 
-from src.celery.worker import create_volume_backup, restore_volume_task
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
+from src.models import (
+    BackupStatusResponse,
+    BackupVolume,
+    BackupVolumeResponse,
+    VolumeItem,
+)
+from src.worker import create_volume_backup, restore_volume_task
 
 
 @asynccontextmanager
