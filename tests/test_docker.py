@@ -17,7 +17,7 @@ def session_fixture():
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
-def test_backup_volume(monkeypatch, mocker, session):
+def test_backup_volume(mocker, session):
     mocker.patch(
         "src.docker.Session", **{"return_value.__enter__.return_value": session}
     )
@@ -66,3 +66,6 @@ def test_backup_volume(monkeypatch, mocker, session):
     assert backup_db.backup_created == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/{backup_file}"
     assert backup_db.volume_name == volume_name
+
+
+
