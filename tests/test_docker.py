@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from freezegun import freeze_time
 import pytest
+from freezegun import freeze_time
 from sqlmodel import select
 
 from src.db import Backups
@@ -250,8 +250,6 @@ def test_restore_volume_not_found(mocker, session):
     assert backup_db
     assert not backup_db.restored
     assert not backup_db.restored_date
-
-
 
 
 def test_get_volumes(mocker):

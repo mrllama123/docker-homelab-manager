@@ -1,7 +1,6 @@
 import pytest
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
-from src.db import Backups
 
 
 @pytest.fixture(name="session")
