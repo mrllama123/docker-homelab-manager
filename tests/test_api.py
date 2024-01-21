@@ -2,15 +2,21 @@ import pytest
 from fastapi.testclient import TestClient
 
 from celery import states
+from src.db import Backups
 
 from tests.fixtures import MockAsyncResult, MockVolume
 
 
 @pytest.fixture()
-def client() -> TestClient:
-    from src.api import app
+def client(session) -> TestClient:
+    from src.api import app, get_session
 
-    return TestClient(app)
+    def get_session_override():
+        return session
+
+    app.dependency_overrides[get_session] = get_session_override
+    yield TestClient(app)
+    app.dependency_overrides.clear()
 
 
 def test_list_volumes(mocker, client):
@@ -31,6 +37,75 @@ def test_list_volumes(mocker, client):
         }
     ]
     mock_get_volumes.assert_called_once()
+
+
+def test_get_backups(client, session):
+    for backup_name in ["test-backup-name-1.tar.gz", "test-backup-name-2.tar.gz"]:
+        session.add(
+            Backups(
+                backup_name=backup_name,
+                backup_created="2021-01-01T00:00:00+00:00",
+                backup_path="/backup/test-backup-name.tar.gz",
+                volume_name="test-volume",
+            )
+        )
+    session.commit()
+    response = client.get("/backups")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "backup_name": "test-backup-name-1.tar.gz",
+            "backup_created": "2021-01-01T00:00:00+00:00",
+            "backup_path": "/backup/test-backup-name.tar.gz",
+            "volume_name": "test-volume",
+            "restored": False,
+            "restored_date": None,
+        },
+        {
+            "backup_name": "test-backup-name-2.tar.gz",
+            "backup_created": "2021-01-01T00:00:00+00:00",
+            "backup_path": "/backup/test-backup-name.tar.gz",
+            "volume_name": "test-volume",
+            "restored": False,
+            "restored_date": None,
+        },
+    ]
+
+
+def test_get_no_backups(client):
+    response = client.get("/backups")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_get_backup(client, session):
+    session.add(
+        Backups(
+            backup_name="test-backup-name.tar.gz",
+            backup_created="2021-01-01T00:00:00+00:00",
+            backup_path="/backup/test-backup-name.tar.gz",
+            volume_name="test-volume",
+        )
+    )
+    session.commit()
+    response = client.get("/backups/test-backup-name.tar.gz")
+    assert response.status_code == 200
+    assert response.json() == {
+        "backup_name": "test-backup-name.tar.gz",
+        "backup_created": "2021-01-01T00:00:00+00:00",
+        "backup_path": "/backup/test-backup-name.tar.gz",
+        "volume_name": "test-volume",
+        "restored": False,
+        "restored_date": None,
+    }
+
+
+def test_get_backup_not_found(client):
+    response = client.get("/backups/test-backup-name.tar.gz")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Backup test-backup-name.tar.gz does not exist",
+    }
 
 
 def test_create_backup_volume_not_found(mocker, client):
