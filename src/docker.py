@@ -110,8 +110,6 @@ def restore_volume(volume_name: str, filename: str) -> None:
         if not backup:
             raise ValueError(f"Backup {filename} does not exist")
         backup.restored = True
-        backup.restored_date = datetime.now(
-            tz=datetime.utcnow().astimezone().tzinfo
-        ).isoformat()
+        backup.restored_date = datetime.now(tz=timezone.utc).isoformat()
         session.add(backup)
         session.commit()

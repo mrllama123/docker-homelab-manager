@@ -10,7 +10,7 @@ class MockVolume:
         self.name = name
         self.labels = labels or {}
         self.mountpoint = mountpoint
-        self.options = options
+        self.options = options or {}
         self.status = {}
         self.created_at = datetime.fromisoformat("2021-01-01T00:00:00.000000+00:00")
 
