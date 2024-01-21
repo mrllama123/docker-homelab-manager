@@ -43,9 +43,7 @@ def get_volume(volume_name: str) -> Volume | None:
 def is_volume_attached(volume_name: str) -> bool:
     client = get_docker_client()
 
-    return (
-        len(client.volume.list(filters={"name": volume_name, "dangling": 0})) == 0
-    )
+    return len(client.volume.list(filters={"name": volume_name, "dangling": 0})) == 0
 
 
 def backup_volume(volume_name: str) -> None:
