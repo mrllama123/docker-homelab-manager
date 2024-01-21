@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import lru_cache
 
 from python_on_whales import DockerClient, DockerException, Volume
@@ -49,7 +49,7 @@ def is_volume_attached(volume_name: str) -> bool:
 def backup_volume(volume_name: str) -> None:
     client = get_docker_client()
 
-    dt_now = datetime.now(tz=datetime.utcnow().astimezone().tzinfo)
+    dt_now = datetime.now(tz=timezone.utc)
     backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
 
     volume = get_volume(volume_name)
@@ -78,7 +78,7 @@ def backup_volume(volume_name: str) -> None:
         backup = Backups(
             backup_name=backup_file,
             backup_created=dt_now.isoformat(),
-            backup_path=os.path.join(BACKUP_DIR, volume_name, backup_file),
+            backup_path=os.path.join(BACKUP_DIR, backup_file),
             volume_name=volume_name,
         )
         session.add(backup)
@@ -110,8 +110,6 @@ def restore_volume(volume_name: str, filename: str) -> None:
         if not backup:
             raise ValueError(f"Backup {filename} does not exist")
         backup.restored = True
-        backup.restored_date = datetime.now(
-            tz=datetime.utcnow().astimezone().tzinfo
-        ).isoformat()
+        backup.restored_date = datetime.now(tz=timezone.utc).isoformat()
         session.add(backup)
         session.commit()
