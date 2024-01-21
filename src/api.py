@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
 
 from src.celery import create_volume_backup, restore_volume_task
@@ -18,6 +18,11 @@ from src.models import (
 async def lifespan(_: FastAPI):
     create_db_and_tables()
     yield
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
 
 
 app = FastAPI(lifespan=lifespan)
@@ -42,25 +47,25 @@ async def api_volumes() -> list[VolumeItem]:
 @app.get(
     "/backups", description="Get a list of all backups", response_model=list[Backups]
 )
-async def api_backups() -> list[Backups]:
-    with Session(engine) as session:
-        return session.exec(select(Backups)).all()
+async def api_backups(session: Session = Depends(get_session)) -> list[Backups]:
+    return session.exec(select(Backups)).all()
 
 
 @app.get(
     "/backups/{backup_name}", description="Get a backup by name", response_model=Backups
 )
-async def api_backup(backup_name: str) -> Backups:
-    with Session(engine) as session:
-        backup = session.exec(
-            select(Backups).where(Backups.backup_name == backup_name)
-        ).first()
-        if not backup:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Backup {backup_name} does not exist",
-            )
-        return backup
+async def api_backup(
+    backup_name: str, session: Session = Depends(get_session)
+) -> Backups:
+    backup = session.exec(
+        select(Backups).where(Backups.backup_name == backup_name)
+    ).first()
+    if not backup:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Backup {backup_name} does not exist",
+        )
+    return backup
 
 
 @app.post("/backup/{volume_name}", description="Backup a Docker volume")
