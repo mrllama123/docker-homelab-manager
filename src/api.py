@@ -8,9 +8,10 @@ from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
     BackupStatusResponse,
-    BackupVolume,
+    BackupVolumeRestore,
     BackupVolumeResponse,
     VolumeItem,
+    BackScheduleInput,
 )
 
 
@@ -90,7 +91,7 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     description="Restore a Docker volume",
 )
 def api_restore_volume(
-    backup_volume: BackupVolume,
+    backup_volume: BackupVolumeRestore,
 ) -> BackupVolumeResponse:
     task = restore_volume_task.delay(
         backup_volume.volume_name, backup_volume.backup_filename
@@ -105,3 +106,9 @@ def api_restore_volume(
 def api_backup_status(task_id: str) -> BackupStatusResponse:
     task = create_volume_backup.AsyncResult(task_id)
     return {"status": task.status, "result": task.result, "task_id": task.id}
+
+
+@app.post("/backup/schedule", description="Schedule a backup")
+def api_create_backup_schedule(schedule_info: BackScheduleInput) -> str:
+    
+    return "Not implemented"
