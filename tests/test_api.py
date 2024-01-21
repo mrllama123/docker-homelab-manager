@@ -1,11 +1,10 @@
-from datetime import datetime
-
 import pytest
 from fastapi.testclient import TestClient
 
 from celery import states
 
 from tests.fixtures import MockAsyncResult, MockVolume
+
 
 @pytest.fixture()
 def client() -> TestClient:

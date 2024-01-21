@@ -1,8 +1,10 @@
+from datetime import datetime, timezone
+
 import pytest
+from freezegun import freeze_time
 from sqlmodel import Session, SQLModel, create_engine, select
 from sqlmodel.pool import StaticPool
-from datetime import datetime, timezone
-from freezegun import freeze_time
+
 from src.db import Backups
 
 
@@ -66,6 +68,3 @@ def test_backup_volume(mocker, session):
     assert backup_db.backup_created == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/{backup_file}"
     assert backup_db.volume_name == volume_name
-
-
-

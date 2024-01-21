@@ -1,5 +1,7 @@
-from celery import states
 from datetime import datetime
+
+from celery import states
+
 
 class MockVolume:
     def __init__(
@@ -18,4 +20,3 @@ class MockAsyncResult:
         self.status = status
         self.result = result
         self.id = id
-
