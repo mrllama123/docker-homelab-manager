@@ -20,6 +20,7 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
+      - CELERY_BEAT_DBURI=sqlite:////db/schedule-database.db
     depends_on:
       - redis
 
@@ -40,10 +41,31 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
+      - CELERY_BEAT_DBURI=sqlite:////db/schedule-database.db
       - BACKUP_DIR=${BACKUP_DIR}
     depends_on:
       - web
       - redis
+  worker-scheduler:
+    build: 
+      dockerfile: Dockerfile-Dev
+    volumes:
+      - ./src:/code/src
+      - ${BACKUP_DIR}:/backup
+      - ${DB_DIR}:/db
+      # for rootless docker
+      # - /run/user/1000/docker.sock:/var/run/docker.sock
 
+      # non rootless docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:  watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A src.celery:celery beat -S src.celery:DatabaseScheduler -l info
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
+      - CELERY_BEAT_DBURI=sqlite:////db/schedule-database.db
+      - BACKUP_DIR=${BACKUP_DIR}
+    depends_on:
+      - web
+      - redis
   redis:
     image: redis:7
