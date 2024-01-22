@@ -3,7 +3,7 @@ import os
 import src.docker as docker
 from celery import Celery
 from sqlalchemy_celery_beat.schedulers import DatabaseScheduler
-from sqlalchemy_celery_beat.models import PeriodicTask, IntervalSchedule
+
 
 celery = Celery(__name__)
 celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")

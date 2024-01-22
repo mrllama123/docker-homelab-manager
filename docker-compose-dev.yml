@@ -20,7 +20,7 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
-      - CELERY_BEAT_DBURI=sqlite:////db/schedule-database.db
+      - CELERY_BEAT_DBURI=sqlite:////db/database.db
     depends_on:
       - redis
 
@@ -41,7 +41,7 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
-      - CELERY_BEAT_DBURI=sqlite:////db/schedule-database.db
+      - CELERY_BEAT_DBURI=sqlite:////db/database.db
       - BACKUP_DIR=${BACKUP_DIR}
     depends_on:
       - web
@@ -62,7 +62,7 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
-      - CELERY_BEAT_DBURI=sqlite:////db/schedule-database.db
+      - CELERY_BEAT_DBURI=sqlite:////db/database.db
       - BACKUP_DIR=${BACKUP_DIR}
     depends_on:
       - web

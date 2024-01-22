@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel, ValidationError, model_validator
@@ -42,9 +43,12 @@ class BackScheduleInput(BaseModel):
     schedule_name: str
     crontab: ScheduleContab
     periodic: str
+    timezone: str
 
     @model_validator(mode="after")
     def check_fields(self):
         if self.crontab and self.periodic:
-            raise ValidationError('Only one of "crontab" or "periodic" must be provided')
+            raise ValidationError(
+                'Only one of "crontab" or "periodic" must be provided'
+            )
         return self
