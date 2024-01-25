@@ -1,23 +1,21 @@
+import json
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy_celery_beat.models import PeriodicTask
 from sqlmodel import Session, select
 
 from src.celery import create_volume_backup, restore_volume_task
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
-from sqlalchemy_celery_beat.models import (
-    PeriodicTask,
-    IntervalSchedule,
-    CrontabSchedule,
-)
 from src.models import (
+    BackupScheduleInput,
     BackupStatusResponse,
-    BackupVolumeRestore,
     BackupVolumeResponse,
+    BackupVolumeRestore,
     VolumeItem,
-    BackScheduleInput,
 )
+from src.schedule import get_schedule
 
 
 @asynccontextmanager
@@ -115,13 +113,16 @@ def api_backup_status(task_id: str) -> BackupStatusResponse:
 
 @app.post("/backup/schedule", description="Schedule a backup")
 def api_create_backup_schedule(
-    schedule_info: BackScheduleInput, session: Session = Depends(get_session)
-) -> str:
-    # if schedule_info.crontab:
-    # schedule = IntervalSchedule(
-    #     crontab=schedule_info.crontab, timezone=schedule_info.timezone,
-    # )
-    # session.add(schedule)
-    # session.commit()
+    schedule_info: BackupScheduleInput, session: Session = Depends(get_session)
+) -> PeriodicTask:
+    schedule = get_schedule(schedule_info, session)
+    periodic_task = PeriodicTask(
+        name=schedule_info.schedule_name,
+        task="src.celery.create_volume_backup",
+        interval=schedule,
+        args=json.dumps([schedule_info.volume_name]),
+    )
+    session.add(periodic_task)
+    session.commit()
 
-    return "Not implemented"
+    return periodic_task

@@ -29,7 +29,7 @@ class BackupVolumeRestore(BaseModel):
     backup_filename: str
 
 
-class ScheduleContab(BaseModel):
+class ScheduleCrontab(BaseModel):
     minute: str
     hour: str
     day: str
@@ -38,12 +38,25 @@ class ScheduleContab(BaseModel):
     month_of_year: str
 
 
-class BackScheduleInput(BaseModel):
+class SchedulePeriod(str, Enum):
+    DAYS = "days"
+    HOURS = "hours"
+    MINUTES = "minutes"
+    SECONDS = "seconds"
+    MICROSECONDS = "microseconds"
+
+
+class SchedulePeriodic(BaseModel):
+    every: int
+    period: SchedulePeriod
+
+
+class BackupScheduleInput(BaseModel):
     volume_name: str
     schedule_name: str
-    crontab: ScheduleContab
-    periodic: str
-    timezone: str
+    crontab: ScheduleCrontab
+    periodic: SchedulePeriodic
+    timezone: str = "UTC"
 
     @model_validator(mode="after")
     def check_fields(self):
@@ -52,3 +65,7 @@ class BackScheduleInput(BaseModel):
                 'Only one of "crontab" or "periodic" must be provided'
             )
         return self
+
+
+class BackupScheduleResponse(BaseModel):
+    pass
