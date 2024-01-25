@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, ValidationError, model_validator
 
@@ -54,12 +54,14 @@ class SchedulePeriodic(BaseModel):
 class BackupScheduleInput(BaseModel):
     volume_name: str
     schedule_name: str
-    crontab: ScheduleCrontab
-    periodic: SchedulePeriodic
+    crontab: ScheduleCrontab | None = None
+    periodic: SchedulePeriodic | None = None
     timezone: str = "UTC"
 
     @model_validator(mode="after")
     def check_fields(self):
+        if not self.crontab and not self.periodic:
+            raise ValidationError('crontab" or "periodic" must be provided')
         if self.crontab and self.periodic:
             raise ValidationError(
                 'Only one of "crontab" or "periodic" must be provided'

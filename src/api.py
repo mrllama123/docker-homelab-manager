@@ -111,11 +111,19 @@ def api_backup_status(task_id: str) -> BackupStatusResponse:
     return {"status": task.status, "result": task.result, "task_id": task.id}
 
 
-@app.post("/backup/schedule", description="Schedule a backup")
+@app.post("/backup/test/schedule", description="Schedule a backup")
 def api_create_backup_schedule(
     schedule_info: BackupScheduleInput, session: Session = Depends(get_session)
-) -> PeriodicTask:
+) -> str:
     schedule = get_schedule(schedule_info, session)
+    # task = session.exec(
+    #     select(PeriodicTask).where(PeriodicTask.name == schedule_info.schedule_name)
+    # ).first()
+    # if task:
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail=f"Schedule {schedule_info.schedule_name} already exists",
+    #     )
     periodic_task = PeriodicTask(
         name=schedule_info.schedule_name,
         task="src.celery.create_volume_backup",
@@ -125,4 +133,4 @@ def api_create_backup_schedule(
     session.add(periodic_task)
     session.commit()
 
-    return periodic_task
+    return "OK"
