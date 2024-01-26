@@ -2,8 +2,10 @@ from sqlmodel import Session, select
 from sqlalchemy_celery_beat.models import (
     IntervalSchedule,
     CrontabSchedule,
+    PeriodicTask,
 )
 from src.models import BackupScheduleInput
+import json
 
 
 def get_schedule(
@@ -46,3 +48,24 @@ def get_schedule(
             session.add(schedule)
             session.commit()
     return schedule
+
+
+def get_periodic_task(
+    schedule_info: BackupScheduleInput, session: Session
+) -> PeriodicTask | None:
+    task = session.exec(
+        select(PeriodicTask).where(PeriodicTask.name == schedule_info.schedule_name)
+    ).first()
+
+    return task
+
+
+def create_periodic_task(schedule_info, session, schedule):
+    periodic_task = PeriodicTask(
+        name=schedule_info.schedule_name,
+        task="src.celery.create_volume_backup",
+        interval=schedule,
+        args=json.dumps([schedule_info.volume_name]),
+    )
+    session.add(periodic_task)
+    session.commit()

@@ -1,8 +1,6 @@
-import json
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy_celery_beat.models import PeriodicTask
 from sqlmodel import Session, select
 
 from src.celery import create_volume_backup, restore_volume_task
@@ -15,7 +13,7 @@ from src.models import (
     BackupVolumeRestore,
     VolumeItem,
 )
-from src.schedule import get_schedule
+from src.schedule import get_schedule, create_periodic_task, get_periodic_task
 
 
 @asynccontextmanager
@@ -115,34 +113,8 @@ def api_backup_status(task_id: str) -> BackupStatusResponse:
 def api_create_backup_schedule(
     schedule_info: BackupScheduleInput, session: Session = Depends(get_session)
 ) -> str:
-    schedule = get_schedule(schedule_info, session)
-    task = get_periodic_task(schedule_info, session)
-    if task:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Schedule {schedule_info.schedule_name} already exists",
-        )
-    create_periodic_task(schedule_info, session, schedule)
+    
 
     return "OK"
 
 
-def get_periodic_task(
-    schedule_info: BackupScheduleInput, session: Session
-) -> PeriodicTask | None:
-    task = session.exec(
-        select(PeriodicTask).where(PeriodicTask.name == schedule_info.schedule_name)
-    ).first()
-
-    return task
-
-
-def create_periodic_task(schedule_info, session, schedule):
-    periodic_task = PeriodicTask(
-        name=schedule_info.schedule_name,
-        task="src.celery.create_volume_backup",
-        interval=schedule,
-        args=json.dumps([schedule_info.volume_name]),
-    )
-    session.add(periodic_task)
-    session.commit()
