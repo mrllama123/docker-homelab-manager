@@ -3,7 +3,13 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
 
-from src.celery import create_volume_backup, restore_volume_task
+from src.celery import (
+    create_periodic_task,
+    create_volume_backup,
+    get_beat_session,
+    get_schedule,
+    restore_volume_task,
+)
 from src.db import Backups, create_db_and_tables, get_session
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
@@ -19,8 +25,6 @@ from src.models import (
 async def lifespan(_: FastAPI):
     create_db_and_tables()
     yield
-
-
 
 
 app = FastAPI(lifespan=lifespan)
@@ -107,6 +111,11 @@ def api_backup_status(task_id: str) -> BackupStatusResponse:
 
 @app.post("/backup/test/schedule", description="Schedule a backup")
 def api_create_backup_schedule(
-    schedule_info: BackupScheduleInput, session: Session = Depends(get_session)
+    schedule_info: BackupScheduleInput, session: Session = Depends(get_beat_session)
 ) -> str:
+    schedule = get_schedule(schedule_info, session)
+    task = create_periodic_task(
+        schedule_info.schedule_name, schedule_info.volume_name, session, schedule
+    )
+
     return "OK"

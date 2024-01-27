@@ -28,7 +28,6 @@ redis = "^5.0.1"
 celery = {extras = ["redis"], version = "^5.3.6"}
 python-on-whales = "^0.67.0"
 sqlmodel = "^0.0.14"
-sqlalchemy-celery-beat = "^0.7.1"
 
 
 [tool.poetry.group.dev.dependencies]

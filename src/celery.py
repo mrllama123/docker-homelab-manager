@@ -1,7 +1,5 @@
 import os
 
-from sqlalchemy_celery_beat.schedulers import DatabaseScheduler
-
 import src.docker as docker
 from celery import Celery
 
@@ -11,13 +9,7 @@ celery.conf.result_backend = os.environ.get(
     "CELERY_RESULT_BACKEND",
     "db+sqlite://",
 )
-celery.conf.beat_dburi = os.environ.get(
-    "CELERY_BEAT_DBURI",
-    "db+sqlite://",
-)
 
-celery.conf.beat_scheduler = DatabaseScheduler
-celery.conf.beat_schema = None
 
 beat = celery.Beat(loglevel="debug")
 
