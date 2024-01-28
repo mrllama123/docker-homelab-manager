@@ -10,6 +10,7 @@ from src.apschedule import (
     setup_scheduler,
     add_backup_interval_job,
     add_backup_crontab_job,
+    add_backup_job,
 )
 from src.models import (
     BackupStatusResponse,
@@ -21,6 +22,7 @@ from src.models import (
 )
 import logging
 from apscheduler.jobstores.base import ConflictingIdError
+import uuid
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -94,13 +96,16 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
             status_code=404,
             detail=f"Volume {volume_name} does not exist",
         )
-    if is_volume_attached(volume_name):
+    if not is_volume_attached(volume_name):
         raise HTTPException(
             status_code=409,
             detail=f"Volume {volume_name} is attached to a container",
         )
 
-    task = create_volume_backup.delay(volume_name)
+    task = add_backup_job(
+        schedule, f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
+    )  
+
     return {"message": f"Backup of {volume_name} started", "task_id": task.id}
 
 
@@ -138,22 +143,14 @@ async def api_create_backup_schedule(
         )
 
     try:
-        job = (
-            add_backup_crontab_job(
-                schedule,
-                schedule_body.schedule_name,
-                schedule_body.volume_name,
-                schedule_body.crontab,
-            )
-            if schedule_body.crontab
-            else add_backup_interval_job(
-                schedule,
-                schedule_body.schedule_name,
-                schedule_body.volume_name,
-                schedule_body.periodic.every,
-                schedule_body.periodic.period,
-            )
+        job = add_backup_job(
+            schedule,
+            schedule_body.schedule_name,
+            schedule_body.volume_name,
+            schedule_body.crontab,
+            schedule_body.periodic,
         )
+
     except ConflictingIdError as e:
         raise HTTPException(
             status_code=409,
