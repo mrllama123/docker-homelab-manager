@@ -105,6 +105,6 @@ def api_backup_status(task_id: str) -> BackupStatusResponse:
 
 @app.post("/backup/test/schedule", description="Schedule a backup")
 def api_create_backup_schedule(
-    schedule_info: BackupScheduleInput, session: Session = Depends(get_beat_session)
+    schedule_info: BackupScheduleInput
 ) -> str:
     return "OK"
