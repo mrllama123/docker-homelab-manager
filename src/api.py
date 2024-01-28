@@ -90,7 +90,6 @@ async def api_backup(
 
 @app.post("/backup/{volume_name}", description="Backup a Docker volume")
 def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
-    # TODO: change to use apschedule
     if not get_volume(volume_name):
         raise HTTPException(
             status_code=404,
