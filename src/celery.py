@@ -11,9 +11,6 @@ celery.conf.result_backend = os.environ.get(
 )
 
 
-beat = celery.Beat(loglevel="debug")
-
-
 @celery.task(name="create_volume_backup")
 def create_volume_backup(volume_name: str):
     docker.backup_volume(volume_name)
