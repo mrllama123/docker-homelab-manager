@@ -28,6 +28,7 @@ redis = "^5.0.1"
 celery = {extras = ["redis"], version = "^5.3.6"}
 python-on-whales = "^0.67.0"
 sqlmodel = "^0.0.14"
+apscheduler = "^3.10.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -43,6 +44,7 @@ pytest-mock = "^3.12.0"
 watchdog = "^3.0.0"
 pylint = "^3.0.3"
 freezegun = "^1.4.0"
+ipykernel = "^6.29.0"
 
 [tool.poe.tasks]
 # Code linting
