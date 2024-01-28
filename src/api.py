@@ -6,18 +6,36 @@ from sqlmodel import Session, select
 from src.celery import create_volume_backup, restore_volume_task
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
+from src.apschedule import (
+    setup_scheduler,
+    add_backup_interval_job,
+    add_backup_crontab_job,
+)
 from src.models import (
     BackupStatusResponse,
     BackupVolume,
     BackupVolumeResponse,
     VolumeItem,
+    CreateBackupSchedule,
+    BackupScheduleJob,
 )
+import logging
+from apscheduler.jobstores.base import ConflictingIdError
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+
+
+schedule = None
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    global schedule
     create_db_and_tables()
+    schedule = setup_scheduler()
     yield
+    schedule.shutdown(wait=False)
 
 
 def get_session():
@@ -105,3 +123,46 @@ def api_restore_volume(
 def api_backup_status(task_id: str) -> BackupStatusResponse:
     task = create_volume_backup.AsyncResult(task_id)
     return {"status": task.status, "result": task.result, "task_id": task.id}
+
+
+@app.post("/volumes/backup/schedule", description="Create a backup schedule")
+async def api_create_backup_schedule(
+    schedule_body: CreateBackupSchedule,
+) -> BackupScheduleJob:
+    if not get_volume(schedule_body.volume_name):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Volume {schedule_body.volume_name} does not exist",
+        )
+
+    try:
+        job = (
+            add_backup_crontab_job(
+                schedule,
+                schedule_body.schedule_name,
+                schedule_body.volume_name,
+                schedule_body.crontab,
+            )
+            if schedule_body.crontab
+            else add_backup_interval_job(
+                schedule,
+                schedule_body.schedule_name,
+                schedule_body.volume_name,
+                schedule_body.periodic.every,
+                schedule_body.periodic.period,
+            )
+        )
+    except ConflictingIdError as e:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Schedule job {schedule_body.schedule_name} already exists",
+        ) from e
+    except Exception:
+        raise
+
+    return BackupScheduleJob(
+        job_id=job.id,
+        volume_name=schedule_body.volume_name,
+        crontab=schedule_body.crontab,
+        periodic=schedule_body.periodic,
+    )
