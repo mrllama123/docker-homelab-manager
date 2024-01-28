@@ -3,7 +3,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
 import os
-from src.docker import backup_volume
+from src.docker import backup_volume, restore_volume
 
 from src.models import SchedulePeriod, ScheduleCrontab, SchedulePeriodic
 
@@ -57,36 +57,40 @@ def add_backup_job(
     )
 
 
-def add_backup_interval_job(
+def add_restore_job(
     schedule: AsyncIOScheduler,
     job_name: str,
     volume_name: str,
-    interval: int,
-    period: SchedulePeriod,
+    backup_filename: str,
+    crontab: ScheduleCrontab = None,
+    interval: SchedulePeriodic = None,
 ):
-    trigger = IntervalTrigger(**{period: interval})
+    if crontab:
+        return schedule.add_job(
+            func=restore_volume,
+            trigger=CronTrigger(**crontab),
+            id=job_name,
+            name=job_name,
+            args=[volume_name, backup_filename],
+            replace_existing=False,
+        )
+
+    if interval:
+        return schedule.add_job(
+            func=restore_volume,
+            trigger=IntervalTrigger(**{interval.period: interval.every}),
+            id=job_name,
+            name=job_name,
+            args=[volume_name, backup_filename],
+            replace_existing=False,
+        )
+
     return schedule.add_job(
-        func=backup_volume,
-        trigger=trigger,
+        func=restore_volume,
         id=job_name,
         name=job_name,
-        args=[volume_name],
+        args=[volume_name, backup_filename],
         replace_existing=False,
+        coalesce=True,
     )
 
-
-def add_backup_crontab_job(
-    schedule: AsyncIOScheduler,
-    job_name: str,
-    volume_name: str,
-    crontab: ScheduleCrontab,
-):
-    trigger = CronTrigger(**crontab)
-    return schedule.add_job(
-        func=backup_volume,
-        trigger=trigger,
-        id=job_name,
-        name=job_name,
-        args=[volume_name],
-        replace_existing=False,
-    )

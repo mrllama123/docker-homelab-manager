@@ -6,12 +6,7 @@ from sqlmodel import Session, select
 from src.celery import create_volume_backup, restore_volume_task
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
-from src.apschedule import (
-    setup_scheduler,
-    add_backup_interval_job,
-    add_backup_crontab_job,
-    add_backup_job,
-)
+from src.apschedule import setup_scheduler, add_backup_job, add_restore_job
 from src.models import (
     BackupStatusResponse,
     BackupVolume,
@@ -103,7 +98,7 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
 
     task = add_backup_job(
         schedule, f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
-    )  
+    )
 
     return {"message": f"Backup of {volume_name} started", "task_id": task.id}
 
@@ -115,9 +110,11 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
 def api_restore_volume(
     backup_volume: BackupVolume,
 ) -> BackupVolumeResponse:
-    # TODO: change to use apschedule
-    task = restore_volume_task.delay(
-        backup_volume.volume_name, backup_volume.backup_filename
+    task = add_restore_job(
+        schedule,
+        f"restore-{backup_volume.volume_name}-{str(uuid.uuid4())}",
+        backup_volume.volume_name,
+        backup_volume.backup_filename,
     )
     return {
         "message": f"restore of {backup_volume.volume_name} started",
