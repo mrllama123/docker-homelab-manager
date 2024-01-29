@@ -21,16 +21,16 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 
-schedule = None
+SCHEDULE = None
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    global schedule
+    global SCHEDULE
     create_db_and_tables()
-    schedule = setup_scheduler()
+    SCHEDULE = setup_scheduler()
     yield
-    schedule.shutdown(wait=False)
+    SCHEDULE.shutdown(wait=False)
 
 
 def get_session():
@@ -95,7 +95,7 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
         )
 
     task = add_backup_job(
-        schedule, f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
+        SCHEDULE, f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
     )
 
     return {"message": f"Backup of {volume_name} started", "task_id": task.id}
@@ -109,7 +109,7 @@ def api_restore_volume(
     backup_volume: BackupVolume,
 ) -> BackupVolumeResponse:
     task = add_restore_job(
-        schedule,
+        SCHEDULE,
         f"restore-{backup_volume.volume_name}-{str(uuid.uuid4())}",
         backup_volume.volume_name,
         backup_volume.backup_filename,
@@ -132,7 +132,7 @@ async def api_create_backup_schedule(
 
     try:
         job = add_backup_job(
-            schedule,
+            SCHEDULE,
             schedule_body.schedule_name,
             schedule_body.volume_name,
             schedule_body.crontab,
