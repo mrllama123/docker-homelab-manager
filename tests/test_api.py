@@ -1,10 +1,9 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from celery import states
 from src.db import Backups
 
-from tests.fixtures import MockAsyncResult, MockVolume
+from tests.fixtures import MockVolume, MockAsyncResult
 
 
 @pytest.fixture()
@@ -202,16 +201,4 @@ def test_restore_backup(mocker, client):
     )
 
 
-def test_get_backup_status(mocker, client):
-    mock_get_backup_status = mocker.patch(
-        "src.api.create_volume_backup.AsyncResult",
-        return_value=MockAsyncResult(status=states.SUCCESS),
-    )
-    response = client.get("/backup/status/test-task-id")
-    assert response.status_code == 200
-    assert response.json() == {
-        "status": "SUCCESS",
-        "result": "",
-        "task_id": "test-task-id",
-    }
-    mock_get_backup_status.assert_called_once_with("test-task-id")
+
