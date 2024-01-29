@@ -119,6 +119,7 @@ disable = [
     "reimported",
     "too-many-ancestors",
     "unexpected-special-method-signature",
-    "consider-using-from-import"
+    "consider-using-from-import",
+    "try-except-raise"
 ]
 
