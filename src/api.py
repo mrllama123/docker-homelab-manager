@@ -119,6 +119,21 @@ def api_restore_volume(
         "task_id": task.id,
     }
 
+@app.get("/volumes/backup/schedule/{schedule_name}", description="Get a backup schedule")
+def api_get_backup_schedule(schedule_name: str) -> BackupScheduleJob:
+    job = SCHEDULE.get_job(schedule_name)
+    if not job:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Schedule job {schedule_name} does not exist",
+        )
+    
+    return BackupScheduleJob(
+        job_id=job.id,
+        volume_name=job.args[0],
+        crontab=job.trigger.fields,
+        periodic=job.trigger.interval,
+    )
 
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")
 async def api_create_backup_schedule(
@@ -153,3 +168,5 @@ async def api_create_backup_schedule(
         crontab=schedule_body.crontab,
         periodic=schedule_body.periodic,
     )
+
+
