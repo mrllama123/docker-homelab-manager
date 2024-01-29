@@ -52,8 +52,8 @@ check_black = { cmd = "black src --check" }
 check_imports = { cmd = "isort --check-only --profile=black src" }
 lint = ["check_black", "check_imports", "pylint"]
 api-dev = { cmd = "uvicorn src.api.main:app --reload", help = "Run the API in dev mode" }
-celery-dev = { cmd = "celery -A src.celery.worker worker --loglevel=INFO", help = "Run the celery worker in dev mode" }
 dev = "docker compose -f docker-compose-dev.yml  up  --build"
+clear-cache= { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
 
 [tool.poe.tasks.format]
 shell = "shed"
