@@ -114,7 +114,7 @@ def test_create_backup_volume_not_found(mocker, client):
         return_value=None,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.api.create_volume_backup.delay",
+        "src.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post("/backup/test-volume")
@@ -133,10 +133,10 @@ def test_create_backup(mocker, client):
     )
     mock_is_volume_attached = mocker.patch(
         "src.api.is_volume_attached",
-        return_value=False,
+        return_value=True,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.api.create_volume_backup.delay",
+        "src.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post("/backup/test-volume")
@@ -160,7 +160,7 @@ def test_create_backup_volume_attached(mocker, client):
         return_value=True,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.api.create_volume_backup.delay",
+        "src.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post("/backup/test-volume")
@@ -175,7 +175,7 @@ def test_create_backup_volume_attached(mocker, client):
 
 def test_restore_backup(mocker, client):
     mock_create_volume_backup = mocker.patch(
-        "src.api.restore_volume_task.delay",
+        "src.api.add_restore_job",
         return_value=MockAsyncResult(),
     )
     response = client.post(
