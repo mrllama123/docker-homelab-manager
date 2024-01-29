@@ -1,11 +1,12 @@
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.triggers.interval import IntervalTrigger
-from apscheduler.triggers.cron import CronTrigger
 import os
-from src.docker import backup_volume, restore_volume
 
-from src.models import SchedulePeriod, ScheduleCrontab, SchedulePeriodic
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
+
+from src.docker import backup_volume, restore_volume
+from src.models import ScheduleCrontab, SchedulePeriodic
 
 APSCHEDULE_JOBSTORE_URL = os.environ.get(
     "APSCHEDULE_JOBSTORE_URL", "sqlite:///example.sqlite"
@@ -93,4 +94,3 @@ def add_restore_job(
         replace_existing=False,
         coalesce=True,
     )
-

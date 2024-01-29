@@ -67,8 +67,9 @@ class CreateBackupSchedule(BaseModel):
             )
         return self
 
+
 class BackupScheduleJob(BaseModel):
-    job_id: str 
+    job_id: str
     volume_name: str
     crontab: ScheduleCrontab | None = None
     periodic: SchedulePeriodic | None = None

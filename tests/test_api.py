@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 
 from src.db import Backups
 
-from tests.fixtures import MockVolume, MockAsyncResult
+from tests.fixtures import MockAsyncResult, MockVolume
 
 
 @pytest.fixture()
@@ -199,6 +199,3 @@ def test_restore_backup(mocker, client):
     mock_create_volume_backup.assert_called_once_with(
         None, "restore-test-volume-test-uuid", "test-volume", "test-backup-name.tar.gz"
     )
-
-
-

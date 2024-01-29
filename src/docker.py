@@ -1,10 +1,10 @@
+import logging
 import os
 from datetime import datetime, timezone
 from functools import lru_cache
 
 from python_on_whales import DockerClient, DockerException, Volume
 from sqlmodel import Session, select
-import logging
 
 from src.db import Backups, engine
 
@@ -12,6 +12,7 @@ BACKUP_DIR = os.getenv("BACKUP_DIR")
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
+
 
 @lru_cache
 def get_docker_client() -> DockerClient:
