@@ -10,6 +10,7 @@ services:
     volumes:
       - ./src:/code/src
       - ${DB_DIR}:/db
+      - ${BACKUP_DIR}:/backup
 
       # for rootless docker
       # - /run/user/1000/docker.sock:/var/run/docker.sock
@@ -18,32 +19,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command:  uvicorn src.api:app --host 0.0.0.0 --port 80 --reload
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
-    depends_on:
-      - redis
-
-
-  worker:
-    build: 
-      dockerfile: Dockerfile-Dev
-    volumes:
-      - ./src:/code/src
-      - ${BACKUP_DIR}:/backup
-      - ${DB_DIR}:/db
-      # for rootless docker
-      # - /run/user/1000/docker.sock:/var/run/docker.sock
-
-      # non rootless docker
-      - /var/run/docker.sock:/var/run/docker.sock
-    command:  watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A src.celery worker --loglevel=INFO -E
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=db+sqlite:////db/database.db
+      - APSCHEDULE_JOBSTORE_URL=sqlite:////db/scheduler.db
+      - TZ=Pacific/Auckland
       - BACKUP_DIR=${BACKUP_DIR}
-    depends_on:
-      - web
-      - redis
-
-  redis:
-    image: redis:7

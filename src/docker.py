@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime, timezone
 from functools import lru_cache
@@ -8,6 +9,9 @@ from sqlmodel import Session, select
 from src.db import Backups, engine
 
 BACKUP_DIR = os.getenv("BACKUP_DIR")
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
 
 @lru_cache
@@ -57,6 +61,7 @@ def backup_volume(volume_name: str) -> None:
     if not volume:
         raise ValueError(f"Volume {volume_name} does not exist")
 
+    logger.info("Backing up volume %s to %s", volume_name, backup_file)
     output = client.run(
         image="busybox",
         command=[
@@ -70,7 +75,7 @@ def backup_volume(volume_name: str) -> None:
         remove=True,
         volumes=[(volume, "/source"), (BACKUP_DIR, "/dest")],
     )
-    print(output)
+    logger.info(output)
     if not os.path.exists(os.path.join("/backup", backup_file)):
         raise RuntimeError("Backup failed")
 

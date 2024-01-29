@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from celery import states
-
 
 class MockVolume:
     def __init__(
@@ -16,7 +14,6 @@ class MockVolume:
 
 
 class MockAsyncResult:
-    def __init__(self, status=states.PENDING, result="", id="test-task-id") -> None:
-        self.status = status
+    def __init__(self, result="", id="test-task-id") -> None:
         self.result = result
         self.id = id
