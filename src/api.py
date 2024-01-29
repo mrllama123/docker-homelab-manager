@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
 
-from src.celery import create_volume_backup, restore_volume_task
+
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.apschedule import setup_scheduler, add_backup_job, add_restore_job
@@ -120,12 +120,6 @@ def api_restore_volume(
         "message": f"restore of {backup_volume.volume_name} started",
         "task_id": task.id,
     }
-
-
-@app.get("/backup/status/{task_id}", description="Get the status of a backup task")
-def api_backup_status(task_id: str) -> BackupStatusResponse:
-    task = create_volume_backup.AsyncResult(task_id)
-    return {"status": task.status, "result": task.result, "task_id": task.id}
 
 
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")
