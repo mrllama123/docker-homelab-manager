@@ -10,7 +10,7 @@ from src.apschedule import add_backup_job, add_restore_job, setup_scheduler
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
-    BackupScheduleJob,
+    BackupSchedule,
     BackupVolume,
     BackupVolumeResponse,
     CreateBackupSchedule,
@@ -120,15 +120,15 @@ def api_restore_volume(
     }
 
 @app.get("/volumes/backup/schedule/{schedule_name}", description="Get a backup schedule")
-def api_get_backup_schedule(schedule_name: str) -> BackupScheduleJob:
+def api_get_backup_schedule(schedule_name: str) -> BackupSchedule:
     job = SCHEDULE.get_job(schedule_name)
     if not job:
         raise HTTPException(
             status_code=404,
             detail=f"Schedule job {schedule_name} does not exist",
         )
-    
-    return BackupScheduleJob(
+
+    return BackupSchedule(
         job_id=job.id,
         volume_name=job.args[0],
         crontab=job.trigger.fields,
@@ -138,7 +138,7 @@ def api_get_backup_schedule(schedule_name: str) -> BackupScheduleJob:
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")
 async def api_create_backup_schedule(
     schedule_body: CreateBackupSchedule,
-) -> BackupScheduleJob:
+) -> BackupSchedule:
     if not get_volume(schedule_body.volume_name):
         raise HTTPException(
             status_code=404,
@@ -162,7 +162,7 @@ async def api_create_backup_schedule(
     except Exception:
         raise
 
-    return BackupScheduleJob(
+    return BackupSchedule(
         job_id=job.id,
         volume_name=schedule_body.volume_name,
         crontab=schedule_body.crontab,
