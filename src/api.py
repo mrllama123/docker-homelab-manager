@@ -17,7 +17,6 @@ from src.models import (
     VolumeItem,
 )
 
-logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 
@@ -83,6 +82,7 @@ async def api_backup(
 
 @app.post("/backup/{volume_name}", description="Backup a Docker volume")
 def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
+    logger.info("backing up volume: %s", volume_name)
     if not get_volume(volume_name):
         raise HTTPException(
             status_code=404,
@@ -97,6 +97,12 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     task = add_backup_job(
         SCHEDULE, f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
     )
+    logger.info(
+        "backup %s started task id: %s",
+        volume_name,
+        task.id,
+        extra={"task_id": task.id},
+    )
 
     return {"message": f"Backup of {volume_name} started", "task_id": task.id}
 
@@ -108,11 +114,22 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
 def api_restore_volume(
     backup_volume: BackupVolume,
 ) -> BackupVolumeResponse:
+    logger.info(
+        "restoring volume: %s from backup: %s",
+        backup_volume.volume_name,
+        backup_volume.backup_filename,
+    )
     task = add_restore_job(
         SCHEDULE,
         f"restore-{backup_volume.volume_name}-{str(uuid.uuid4())}",
         backup_volume.volume_name,
         backup_volume.backup_filename,
+    )
+    logger.info(
+        "restore of %s started task id: %s",
+        backup_volume.volume_name,
+        task.id,
+        extra={"task_id": task.id},
     )
     return {
         "message": f"restore of {backup_volume.volume_name} started",
