@@ -1,4 +1,3 @@
-import logging
 import uuid
 from contextlib import asynccontextmanager
 
@@ -6,10 +5,14 @@ from apscheduler.jobstores.base import ConflictingIdError
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
 
-from src.apschedule import add_backup_job, add_restore_job, get_backup_schedule, setup_scheduler
+from src.apschedule import (
+    add_backup_job,
+    add_restore_job,
+    get_backup_schedule,
+    setup_scheduler,
+)
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
-from apscheduler.job import Job
 from src.models import (
     BackupSchedule,
     BackupVolume,
@@ -18,7 +21,8 @@ from src.models import (
     VolumeItem,
 )
 
-logging.basicConfig()
+import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,6 +34,7 @@ async def lifespan(_: FastAPI):
     global SCHEDULER
     create_db_and_tables()
     SCHEDULER = setup_scheduler()
+
     yield
     SCHEDULER.shutdown(wait=False)
 
@@ -37,6 +42,7 @@ async def lifespan(_: FastAPI):
 def get_session():
     with Session(engine) as session:
         yield session
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -119,16 +125,19 @@ def api_restore_volume(
         "task_id": task.id,
     }
 
-@app.get("/volumes/backup/schedule/{schedule_name}", description="Get a backup schedule")
+
+@app.get(
+    "/volumes/backup/schedule/{schedule_name}", description="Get a backup schedule"
+)
 def api_get_backup_schedule(schedule_name: str) -> BackupSchedule:
-    schedule = get_backup_schedule(schedule_name)
+    logger.info("Getting schedule %s", schedule_name)
+    schedule = get_backup_schedule(SCHEDULER, schedule_name)
     if not schedule:
         raise HTTPException(
             status_code=404,
             detail=f"Schedule job {schedule_name} does not exist",
         )
     return schedule
-
 
 
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")
@@ -164,5 +173,3 @@ async def api_create_backup_schedule(
         crontab=schedule_body.crontab,
         periodic=schedule_body.periodic,
     )
-
-

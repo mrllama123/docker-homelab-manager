@@ -1,4 +1,3 @@
-from functools import reduce
 import os
 
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -121,27 +120,21 @@ def map_job_to_backup_schedule(job: Job):
                 day_of_week=job.trigger.day_of_week,
             ),
         )
-    elif isinstance(job.trigger, IntervalTrigger):
-        trigger = [
-            { "period":interval, "every":getattr(job.trigger, interval)}
-            for interval in SchedulePeriod
-            if getattr(job.trigger, interval) > 0
-        ]
-        if not trigger:
-            raise ValueError("trigger not properly configured")
 
-        if len(trigger) > 1:
-            raise ValueError("More than one trigger config found")
+    if isinstance(job.trigger, IntervalTrigger):
+
+        period_info = {
+            "period": job.trigger.interval,
+            "every": job.trigger.interval_length,
+        }
 
         return BackupSchedule(
             job_id=job.id,
             volume_name=job.args[0],
-            periodic=SchedulePeriodic(
-                **trigger[0]
-            ),
+            periodic=SchedulePeriodic(**period_info),
         )
-    else:
-        return BackupSchedule(
-            job_id=job.id,
-            volume_name=job.args[0],
-        )
+
+    return BackupSchedule(
+        job_id=job.id,
+        volume_name=job.args[0],
+    )
