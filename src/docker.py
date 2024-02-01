@@ -62,7 +62,7 @@ def backup_volume(volume_name: str) -> None:
         raise ValueError(f"Volume {volume_name} does not exist")
 
     logger.info("Backing up volume %s to %s", volume_name, backup_file)
-    output = client.run(
+    client.run(
         image="busybox",
         command=[
             "tar",
@@ -75,7 +75,6 @@ def backup_volume(volume_name: str) -> None:
         remove=True,
         volumes=[(volume, "/source"), (BACKUP_DIR, "/dest")],
     )
-    logger.info(output)
     if not os.path.exists(os.path.join("/backup", backup_file)):
         raise RuntimeError("Backup failed")
 
@@ -92,7 +91,7 @@ def backup_volume(volume_name: str) -> None:
 
 def restore_volume(volume_name: str, filename: str) -> None:
     client = get_docker_client()
-    output = client.run(
+    client.run(
         image="busybox",
         command=[
             "tar",
@@ -104,7 +103,6 @@ def restore_volume(volume_name: str, filename: str) -> None:
         remove=True,
         volumes=[(volume_name, "/dest"), (BACKUP_DIR, "/source")],
     )
-    print(output)
     if not os.path.exists(os.path.join("/backup", filename)):
         raise RuntimeError("Restore failed")
 
