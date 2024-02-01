@@ -1,7 +1,6 @@
-from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ValidationError, model_validator
+from pydantic import BaseModel
 
 
 class VolumeItem(BaseModel):
@@ -30,47 +29,14 @@ class BackupVolume(BaseModel):
 
 
 class ScheduleCrontab(BaseModel):
-    minute: str
-    hour: str
-    day: str
-    month: str
-    day_of_week: str
-    month_of_year: str
+    minute: str = "*"
+    hour: str = "*"
+    day: str = "*"
+    month: str = "*"
+    day_of_week: str = "*"
 
 
-class SchedulePeriod(str, Enum):
-    DAYS = "days"
-    HOURS = "hours"
-    MINUTES = "minutes"
-    SECONDS = "seconds"
-
-
-class SchedulePeriodic(BaseModel):
-    every: int
-    period: SchedulePeriod
-
-
-class CreateBackupSchedule(BaseModel):
-    volume_name: str
+class BackupSchedule(BaseModel):
     schedule_name: str
-    crontab: ScheduleCrontab | None = None
-    periodic: SchedulePeriodic | None = None
-    timezone: str = "UTC"
-
-    @model_validator(mode="after")
-    def check_fields(self):
-        if not self.crontab and not self.periodic:
-            raise ValidationError('crontab" or "periodic" must be provided')
-        if self.crontab and self.periodic:
-            raise ValidationError(
-                'Only one of "crontab" or "periodic" must be provided'
-            )
-        return self
-
-
-class BackupScheduleJob(BaseModel):
-    job_id: str
     volume_name: str
-    crontab: ScheduleCrontab | None = None
-    periodic: SchedulePeriodic | None = None
-    timezone: str = "UTC"
+    crontab: ScheduleCrontab = None

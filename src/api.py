@@ -9,13 +9,7 @@ from sqlmodel import Session, select
 from src.apschedule import add_backup_job, add_restore_job, setup_scheduler
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
-from src.models import (
-    BackupScheduleJob,
-    BackupVolume,
-    BackupVolumeResponse,
-    CreateBackupSchedule,
-    VolumeItem,
-)
+from src.models import BackupSchedule, BackupVolume, BackupVolumeResponse, VolumeItem
 
 logger = logging.getLogger(__name__)
 
@@ -139,8 +133,8 @@ def api_restore_volume(
 
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")
 async def api_create_backup_schedule(
-    schedule_body: CreateBackupSchedule,
-) -> BackupScheduleJob:
+    schedule_body: BackupSchedule,
+) -> BackupSchedule:
     if not get_volume(schedule_body.volume_name):
         raise HTTPException(
             status_code=404,
@@ -153,7 +147,6 @@ async def api_create_backup_schedule(
             schedule_body.schedule_name,
             schedule_body.volume_name,
             schedule_body.crontab,
-            schedule_body.periodic,
         )
 
     except ConflictingIdError as e:
@@ -164,9 +157,8 @@ async def api_create_backup_schedule(
     except Exception:
         raise
 
-    return BackupScheduleJob(
-        job_id=job.id,
+    return BackupSchedule(
+        schedule_name=job.id,
         volume_name=schedule_body.volume_name,
         crontab=schedule_body.crontab,
-        periodic=schedule_body.periodic,
     )
