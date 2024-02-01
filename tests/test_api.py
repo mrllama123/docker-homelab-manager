@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.db import Backups
+from src.models import ScheduleCrontab
 
 from tests.fixtures import MockAsyncResult, MockVolume
 
@@ -198,4 +199,48 @@ def test_restore_backup(mocker, client):
     }
     mock_create_volume_backup.assert_called_once_with(
         None, "restore-test-volume-test-uuid", "test-volume", "test-backup-name.tar.gz"
+    )
+
+
+def test_create_schedule(mocker, client):
+    mocker.patch("src.api.uuid", **{"uuid4.return_value": "test-uuid"})
+    mock_get_volume = mocker.patch(
+        "src.api.get_volume",
+    )
+    mock_create_volume_backup = mocker.patch(
+        "src.api.add_backup_job",
+        return_value=MockAsyncResult(),
+    )
+    response = client.post(
+        "/volumes/backup/schedule",
+        json={
+            "schedule_name": "test-schedule",
+            "volume_name": "test-volume",
+            "crontab": {
+                "minute": "1",
+                "hour": "2",
+                "day": "*",
+                "month": "*",
+                "day_of_week": "*",
+            },
+        },
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "schedule_name": "test-task-id",
+        "volume_name": "test-volume",
+        "crontab": {
+            "minute": "1",
+            "hour": "2",
+            "day": "*",
+            "month": "*",
+            "day_of_week": "*",
+        },
+    }
+    mock_get_volume.assert_called_once_with("test-volume")
+    mock_create_volume_backup.assert_called_once_with(
+        None,
+        "test-schedule",
+        "test-volume",
+        ScheduleCrontab(minute="1", hour="2", day="*", month="*", day_of_week="*"),
     )
