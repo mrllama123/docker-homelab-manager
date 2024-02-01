@@ -1,3 +1,4 @@
+# copied form https://gist.github.com/liviaerxin/d320e33cbcddcc5df76dd92948e5be3b
 version: 1
 disable_existing_loggers: False
 formatters:
