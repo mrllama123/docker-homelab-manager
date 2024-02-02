@@ -2,9 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.db import Backups
-from src.models import ScheduleCrontab
+from src.models import BackupSchedule, ScheduleCrontab
 
 from tests.fixtures import MockAsyncResult, MockVolume
+from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 
 
 @pytest.fixture()
@@ -244,3 +245,91 @@ def test_create_schedule(mocker, client):
         "test-volume",
         ScheduleCrontab(minute="1", hour="2", day="*", month="*", day_of_week="*"),
     )
+
+
+def test_get_schedule(mocker, client):
+    mock_get_schedule = mocker.patch(
+        "src.api.get_backup_schedule",
+        return_value=BackupSchedule(
+            volume_name="test-volume",
+            schedule_name="test-schedule",
+            crontab=ScheduleCrontab(
+                minute="1", hour="2", day="*", month="*", day_of_week="*"
+            ),
+        ),
+    )
+    response = client.get("/volumes/backup/schedule/test-schedule")
+    assert response.status_code == 200
+    assert response.json() == {
+        "schedule_name": "test-schedule",
+        "volume_name": "test-volume",
+        "crontab": {
+            "minute": "1",
+            "hour": "2",
+            "day": "*",
+            "month": "*",
+            "day_of_week": "*",
+        },
+    }
+    mock_get_schedule.assert_called_once_with(None, "test-schedule")
+
+def test_get_schedule_not_found(mocker, client):
+    mock_get_schedule = mocker.patch(
+        "src.api.get_backup_schedule",
+        return_value=None,
+    )
+    response = client.get("/volumes/backup/schedule/test-schedule")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
+    mock_get_schedule.assert_called_once_with(None, "test-schedule")
+
+
+def test_list_schedule(mocker, client):
+    mock_list_schedule = mocker.patch(
+        "src.api.list_backup_schedules",
+        return_value=[
+            BackupSchedule(
+                volume_name="test-volume",
+                schedule_name="test-schedule",
+                crontab=ScheduleCrontab(
+                    minute="1", hour="2", day="*", month="*", day_of_week="*"
+                ),
+            )
+        ],
+    )
+    response = client.get("/volumes/backup/schedule")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "schedule_name": "test-schedule",
+            "volume_name": "test-volume",
+            "crontab": {
+                "minute": "1",
+                "hour": "2",
+                "day": "*",
+                "month": "*",
+                "day_of_week": "*",
+            },
+        }
+    ]
+    mock_list_schedule.assert_called_once_with(None)
+
+
+def test_remove_schedule(mocker, client):
+    mock_remove_schedule = mocker.patch(
+        "src.api.delete_backup_schedule",
+    )
+    response = client.delete("/volumes/backup/schedule/test-schedule")
+    assert response.status_code == 200
+    assert response.json() == "Schedule test-schedule removed"
+    mock_remove_schedule.assert_called_once_with(None, "test-schedule")
+
+def test_remove_schedule_not_found(mocker, client):
+    mock_remove_schedule = mocker.patch(
+        "src.api.delete_backup_schedule",
+        side_effect=JobLookupError("test-schedule"),
+    )
+    response = client.delete("/volumes/backup/schedule/test-schedule")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
+    mock_remove_schedule.assert_called_once_with(None, "test-schedule")

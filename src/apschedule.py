@@ -98,6 +98,10 @@ def list_backup_schedules(scheduler: AsyncIOScheduler) -> list[BackupSchedule]:
     return [map_job_to_backup_schedule(job) for job in scheduler.get_jobs()]
 
 
+def delete_backup_schedule(scheduler: AsyncIOScheduler, schedule_name: str):
+    return scheduler.remove_job(schedule_name)
+
+
 def map_job_to_backup_schedule(job: Job):
     if isinstance(job.trigger, CronTrigger):
         logger.debug("felids: %s", job.trigger.fields)
