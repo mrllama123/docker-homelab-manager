@@ -1,3 +1,4 @@
+import logging
 import uuid
 from contextlib import asynccontextmanager
 
@@ -9,12 +10,12 @@ from src.apschedule import (
     add_backup_job,
     add_restore_job,
     get_backup_schedule,
+    list_backup_schedules,
     setup_scheduler,
 )
 from src.db import Backups, create_db_and_tables, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import BackupSchedule, BackupVolume, BackupVolumeResponse, VolumeItem
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -149,6 +150,12 @@ def api_get_backup_schedule(schedule_name: str) -> BackupSchedule:
             detail=f"Schedule job {schedule_name} does not exist",
         )
     return schedule
+
+
+@app.get("/volumes/backup/schedule", description="Get a list of backup schedules")
+def api_list_backup_schedules() -> list[BackupSchedule]:
+    # TODO: add filters e.g volume_name, cron schedule
+    return list_backup_schedules(SCHEDULER)
 
 
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")

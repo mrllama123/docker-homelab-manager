@@ -1,13 +1,13 @@
+import logging
 import os
 
+from apscheduler.job import Job
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger, BaseField,
+from apscheduler.triggers.cron import CronTrigger
 
 from src.docker import backup_volume, restore_volume
 from src.models import BackupSchedule, ScheduleCrontab
-from apscheduler.job import Job
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -94,19 +94,24 @@ def get_backup_schedule(
     return job
 
 
+def list_backup_schedules(scheduler: AsyncIOScheduler) -> list[BackupSchedule]:
+    return [map_job_to_backup_schedule(job) for job in scheduler.get_jobs()]
+
+
 def map_job_to_backup_schedule(job: Job):
     if isinstance(job.trigger, CronTrigger):
-        logger.info("felids: %s", job.trigger.fields)
-        cron_fields= { field.name: field.get_value for field in job.trigger.fields }
+        logger.debug("felids: %s", job.trigger.fields)
+        cron_fields = {field.name: str(field) for field in job.trigger.fields}
+        logger.info("cron_fields: %s", cron_fields)
         return BackupSchedule(
             schedule_name=job.id,
             volume_name=job.args[0],
             crontab=ScheduleCrontab(
-                minute=cron_fields.minute,
-                hour=cron_fields.hour,
-                day=cron_fields.day,
-                month=cron_fields.month,
-                day_of_week=cron_fields.day_of_week,
+                minute=cron_fields["minute"],
+                hour=cron_fields["hour"],
+                day=cron_fields["day"],
+                month=cron_fields["month"],
+                day_of_week=cron_fields["day_of_week"],
             ),
         )
 
