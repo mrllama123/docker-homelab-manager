@@ -2,13 +2,14 @@ import logging
 import uuid
 from contextlib import asynccontextmanager
 
-from apscheduler.jobstores.base import ConflictingIdError
+from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
 
 from src.apschedule import (
     add_backup_job,
     add_restore_job,
+    delete_backup_schedule,
     get_backup_schedule,
     list_backup_schedules,
     setup_scheduler,
@@ -156,6 +157,23 @@ def api_get_backup_schedule(schedule_name: str) -> BackupSchedule:
 def api_list_backup_schedules() -> list[BackupSchedule]:
     # TODO: add filters e.g volume_name, cron schedule
     return list_backup_schedules(SCHEDULER)
+
+
+@app.delete(
+    "/volumes/backup/schedule/{schedule_name}", description="Remove a backup schedule"
+)
+def api_remove_backup_schedule(schedule_name: str) -> str:
+    logger.info("Removing schedule %s", schedule_name)
+    try:
+        delete_backup_schedule(SCHEDULER, schedule_name)
+    except JobLookupError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Schedule job {schedule_name} does not exist",
+        ) from e
+    except Exception:
+        raise
+    return f"Schedule {schedule_name} removed"
 
 
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")
