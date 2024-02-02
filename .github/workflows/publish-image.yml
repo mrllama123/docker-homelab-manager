@@ -29,6 +29,7 @@ jobs:
     - name: Build and push Docker image
       uses: mr-smithers-excellent/docker-build-push@v6
       with:
+        image: docker-homelab-manager
         registry: ghcr.io
         githubOrg: mrllama123 # optional
         username: ${{ github.actor }}
