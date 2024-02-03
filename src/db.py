@@ -1,8 +1,6 @@
-from typing import Optional
 import os
-from sqlmodel import Field, SQLModel, create_engine
-from src.models import *
 
+from sqlmodel import SQLModel, create_engine
 
 sqlite_url = os.environ.get("DATABASE_URL", f"sqlite://")
 

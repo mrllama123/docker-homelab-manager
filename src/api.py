@@ -14,7 +14,7 @@ from src.apschedule import (
     list_backup_schedules,
     setup_scheduler,
 )
-from src.db import Backups, create_db_and_tables, engine
+from src.db import Backups, engine
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import BackupSchedule, BackupVolume, BackupVolumeResponse, VolumeItem
 

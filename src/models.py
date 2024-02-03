@@ -42,6 +42,7 @@ class BackupSchedule(BaseModel):
     volume_name: str
     crontab: ScheduleCrontab = None
 
+
 class Backups(SQLModel, table=True):
     backup_name: Optional[str] = Field(default=None, primary_key=True)
     backup_path: Optional[str] = Field(default=None)
@@ -50,4 +51,3 @@ class Backups(SQLModel, table=True):
     volume_name: str
     restored: Optional[bool] = Field(default=False)
     restored_date: Optional[str] = Field(default=None)
-
