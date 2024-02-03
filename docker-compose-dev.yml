@@ -3,12 +3,14 @@ version: '3.8'
 services:
 
   web:
-    build: 
+    build:
       dockerfile: Dockerfile-Dev
     ports:
       - 10000:80
     volumes:
       - ./src:/code/src
+      - ./migrations:/code/migrations
+      - ./alembic.ini:/code/alembic.ini
       - ${DB_DIR}:/db
       - ${BACKUP_DIR}:/backup
 
@@ -17,8 +19,11 @@ services:
 
       # non rootless docker
       - /var/run/docker.sock:/var/run/docker.sock
-    command:  uvicorn src.api:app --host 0.0.0.0 --port 80 --reload --log-config=src/config/log_config.yaml
+    #command:  uvicorn src.api:app --host 0.0.0.0 --port 80 --reload --log-config=src/config/log_config.yaml
+    # run this when there is a database table change
+    command: "sh -c 'alembic upgrade head && uvicorn src.api:app --host 0.0.0.0 --port 80 --reload --log-config=src/config/log_config.yaml'"
     environment:
       - APSCHEDULE_JOBSTORE_URL=sqlite:////db/scheduler.db
+      - DATABASE_URL=sqlite:////db/database.db
       - TZ=Pacific/Auckland
       - BACKUP_DIR=${BACKUP_DIR}

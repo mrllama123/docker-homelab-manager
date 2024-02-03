@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel
+from sqlmodel import Field, SQLModel
 
 
 class VolumeItem(BaseModel):
@@ -40,3 +41,13 @@ class BackupSchedule(BaseModel):
     schedule_name: str
     volume_name: str
     crontab: ScheduleCrontab = None
+
+class Backups(SQLModel, table=True):
+    backup_name: Optional[str] = Field(default=None, primary_key=True)
+    backup_path: Optional[str] = Field(default=None)
+    backup_created: str
+    backup_path: str
+    volume_name: str
+    restored: Optional[bool] = Field(default=False)
+    restored_date: Optional[str] = Field(default=None)
+

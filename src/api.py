@@ -27,7 +27,6 @@ SCHEDULER = None
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     global SCHEDULER
-    create_db_and_tables()
     SCHEDULER = setup_scheduler()
 
     yield
