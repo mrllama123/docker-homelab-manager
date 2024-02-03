@@ -62,6 +62,13 @@ help = "Run alembic migration on ${revision}"
 envfile = ".env"
 args = [{ name = "revision", positional = true, default = "head"}]
 
+[tool.poe.tasks.revision]
+cmd = "alembic revision -m ${message}"
+help = "Create a new alembic migration revision"
+envfile = ".env"
+args = [{ name = "message", positional = true}]
+
+
 [tool.poe.tasks.format]
 shell = "shed"
 help = "Format code"
