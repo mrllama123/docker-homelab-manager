@@ -63,10 +63,10 @@ envfile = ".env"
 args = [{ name = "revision", positional = true, default = "head"}]
 
 [tool.poe.tasks.revision]
-cmd = "alembic revision -m ${message}"
+cmd = 'alembic revision --autogenerate  -m "${message}"'
 help = "Create a new alembic migration revision"
 envfile = ".env"
-args = [{ name = "message", positional = true}]
+args = [{ name = "message", positional = true,  multiple = true, type = "string"}]
 
 
 [tool.poe.tasks.format]
@@ -134,6 +134,7 @@ disable = [
     "too-many-ancestors",
     "unexpected-special-method-signature",
     "consider-using-from-import",
-    "try-except-raise"
+    "try-except-raise",
+    "line-too-long"
 ]
 
