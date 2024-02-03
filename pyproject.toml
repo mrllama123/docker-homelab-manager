@@ -27,6 +27,7 @@ uvicorn = { extras = ["standard"], version = "^0.24.0.post1" }
 python-on-whales = "^0.67.0"
 sqlmodel = "^0.0.14"
 apscheduler = "^3.10.4"
+alembic = "^1.13.1"
 
 
 [tool.poetry.group.dev.dependencies]
