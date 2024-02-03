@@ -56,6 +56,12 @@ api-dev = { cmd = "uvicorn src.api.main:app --reload", help = "Run the API in de
 dev = "docker compose -f docker-compose-dev.yml  up  --build"
 clear-cache= { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
 
+[tool.poe.tasks.migrate]
+cmd = "alembic upgrade ${revision}"
+help = "Run alembic migration on ${revision}"
+envfile = ".env"
+args = [{ name = "revision", positional = true, default = "head"}]
+
 [tool.poe.tasks.format]
 shell = "shed"
 help = "Format code"
