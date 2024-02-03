@@ -1,11 +1,11 @@
 import pytest
+from apscheduler.jobstores.base import JobLookupError
 from fastapi.testclient import TestClient
 
 from src.db import Backups
 from src.models import BackupSchedule, ScheduleCrontab
 
 from tests.fixtures import MockAsyncResult, MockVolume
-from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 
 
 @pytest.fixture()
@@ -273,6 +273,7 @@ def test_get_schedule(mocker, client):
     }
     mock_get_schedule.assert_called_once_with(None, "test-schedule")
 
+
 def test_get_schedule_not_found(mocker, client):
     mock_get_schedule = mocker.patch(
         "src.api.get_backup_schedule",
@@ -323,6 +324,7 @@ def test_remove_schedule(mocker, client):
     assert response.status_code == 200
     assert response.json() == "Schedule test-schedule removed"
     mock_remove_schedule.assert_called_once_with(None, "test-schedule")
+
 
 def test_remove_schedule_not_found(mocker, client):
     mock_remove_schedule = mocker.patch(

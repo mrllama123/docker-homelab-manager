@@ -123,3 +123,7 @@ def map_job_to_backup_schedule(job: Job):
         schedule_name=job.id,
         volume_name=job.args[0],
     )
+
+
+def on_job_started(event):
+    logger.info("Job %s started", event.job_id)

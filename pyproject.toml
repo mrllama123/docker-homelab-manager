@@ -27,6 +27,7 @@ uvicorn = { extras = ["standard"], version = "^0.24.0.post1" }
 python-on-whales = "^0.67.0"
 sqlmodel = "^0.0.14"
 apscheduler = "^3.10.4"
+alembic = "^1.13.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -54,6 +55,19 @@ lint = ["check_black", "check_imports", "pylint"]
 api-dev = { cmd = "uvicorn src.api.main:app --reload", help = "Run the API in dev mode" }
 dev = "docker compose -f docker-compose-dev.yml  up  --build"
 clear-cache= { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
+
+[tool.poe.tasks.migrate]
+cmd = "alembic upgrade ${revision}"
+help = "Run alembic migration on ${revision}"
+envfile = ".env"
+args = [{ name = "revision", positional = true, default = "head"}]
+
+[tool.poe.tasks.revision]
+cmd = "alembic revision -m ${message}"
+help = "Create a new alembic migration revision"
+envfile = ".env"
+args = [{ name = "message", positional = true}]
+
 
 [tool.poe.tasks.format]
 shell = "shed"
