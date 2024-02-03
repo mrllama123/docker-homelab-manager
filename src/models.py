@@ -15,12 +15,12 @@ class VolumeItem(BaseModel):
 
 class BackupVolumeResponse(BaseModel):
     message: str
-    task_id: str
+    backup_id: str
 
 
 class BackupStatusResponse(BaseModel):
     status: str
-    task_id: str
+    backup_id: str
     result: Any
 
 
@@ -44,10 +44,20 @@ class BackupSchedule(BaseModel):
 
 
 class Backups(SQLModel, table=True):
-    backup_name: Optional[str] = Field(default=None, primary_key=True)
+    backup_id: Optional[str] = Field(default=None, primary_key=True)
+    backup_file_name: Optional[str] = Field(default=None, index=True)
     backup_path: Optional[str] = Field(default=None)
     backup_created: str
     backup_path: str
     volume_name: str
-    restored: Optional[bool] = Field(default=False)
+    success: Optional[bool] = Field(default=None)
+    errorMessage: Optional[str] = Field(default=None)
+
+
+class RestoredBackups(SQLModel, table=True):
+    restore_id: Optional[str] = Field(default=None, primary_key=True)
+    backup_file_name: Optional[str] = Field(default=None, index=True)
+    volume_name: str
     restored_date: Optional[str] = Field(default=None)
+    success: Optional[bool] = Field(default=None)
+    errorMessage: Optional[str] = Field(default=None)

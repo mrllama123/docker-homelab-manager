@@ -105,7 +105,9 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
         extra={"task_id": task.id},
     )
 
-    return {"message": f"Backup of {volume_name} started", "task_id": task.id}
+    return BackupVolumeResponse(
+        message=f"Backup of {volume_name} started", backup_id=task.id
+    )
 
 
 @app.post(
