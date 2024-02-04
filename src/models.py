@@ -56,8 +56,22 @@ class Backups(SQLModel, table=True):
 
 class RestoredBackups(SQLModel, table=True):
     restore_id: Optional[str] = Field(default=None, primary_key=True)
-    backup_file_name: Optional[str] = Field(default=None, index=True)
+    backup_file_name: Optional[str] = Field(
+        default=None, index=True, foreign_key="backups.backup_file_name"
+    )
+    backup_file_name_schedule: Optional[str] = Field(
+        default=None, index=True, foreign_key="schedulebackups.backup_file_name"
+    )
     volume_name: str
     restored_date: Optional[str] = Field(default=None)
+    success: Optional[bool] = Field(default=None)
+    errorMessage: Optional[str] = Field(default=None)
+
+
+class ScheduleBackups(SQLModel, table=True):
+    schedule_id: Optional[str] = Field(default=None, primary_key=True)
+    backup_file_name: Optional[str] = Field(default=None, primary_key=True)
+    volume_name: str
+    crontab: str
     success: Optional[bool] = Field(default=None)
     errorMessage: Optional[str] = Field(default=None)
