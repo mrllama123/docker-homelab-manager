@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    SCHEDULER = setup_scheduler()
+    scheduler = setup_scheduler()
 
     yield
-    SCHEDULER.shutdown(wait=False)
+    scheduler.shutdown(wait=False)
 
 
 def get_session():
