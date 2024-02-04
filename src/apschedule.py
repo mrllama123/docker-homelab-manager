@@ -19,6 +19,7 @@ TZ = os.environ.get("TZ", "UTC")
 
 SCHEDULER = None
 
+
 def setup_scheduler() -> AsyncIOScheduler:
     global SCHEDULER
     jobstores = {"default": SQLAlchemyJobStore(url=APSCHEDULE_JOBSTORE_URL)}

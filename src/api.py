@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-
     SCHEDULER = setup_scheduler()
 
     yield
