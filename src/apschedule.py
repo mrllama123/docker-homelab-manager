@@ -85,9 +85,7 @@ def add_restore_job(
     )
 
 
-def get_backup_schedule(
-    scheduler: AsyncIOScheduler, schedule_name: str
-) -> BackupSchedule | None:
+def get_backup_schedule(schedule_name: str) -> BackupSchedule | None:
     job = SCHEDULER.get_job(schedule_name)
     if job:
         return map_job_to_backup_schedule(job)
@@ -95,11 +93,11 @@ def get_backup_schedule(
     return job
 
 
-def list_backup_schedules(scheduler: AsyncIOScheduler) -> list[BackupSchedule]:
+def list_backup_schedules() -> list[BackupSchedule]:
     return [map_job_to_backup_schedule(job) for job in SCHEDULER.get_jobs()]
 
 
-def delete_backup_schedule(scheduler: AsyncIOScheduler, schedule_name: str):
+def delete_backup_schedule(schedule_name: str):
     return SCHEDULER.remove_job(schedule_name)
 
 
