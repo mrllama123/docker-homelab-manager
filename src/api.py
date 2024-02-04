@@ -21,16 +21,12 @@ from src.models import BackupSchedule, BackupVolume, BackupVolumeResponse, Volum
 logger = logging.getLogger(__name__)
 
 
-SCHEDULER = None
-
-
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    global SCHEDULER
-    SCHEDULER = setup_scheduler()
+    scheduler = setup_scheduler()
 
     yield
-    SCHEDULER.shutdown(wait=False)
+    scheduler.shutdown(wait=False)
 
 
 def get_session():
@@ -95,9 +91,7 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
             detail=f"Volume {volume_name} is attached to a container",
         )
 
-    task = add_backup_job(
-        SCHEDULER, f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
-    )
+    task = add_backup_job(f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name)
     logger.info(
         "backup %s started task id: %s",
         volume_name,
@@ -121,7 +115,6 @@ def api_restore_volume(
         backup_volume.backup_filename,
     )
     task = add_restore_job(
-        SCHEDULER,
         f"restore-{backup_volume.volume_name}-{str(uuid.uuid4())}",
         backup_volume.volume_name,
         backup_volume.backup_filename,
@@ -143,7 +136,7 @@ def api_restore_volume(
 )
 def api_get_backup_schedule(schedule_name: str) -> BackupSchedule:
     logger.info("Getting schedule %s", schedule_name)
-    schedule = get_backup_schedule(SCHEDULER, schedule_name)
+    schedule = get_backup_schedule(schedule_name)
     if not schedule:
         raise HTTPException(
             status_code=404,
@@ -155,7 +148,7 @@ def api_get_backup_schedule(schedule_name: str) -> BackupSchedule:
 @app.get("/volumes/backup/schedule", description="Get a list of backup schedules")
 def api_list_backup_schedules() -> list[BackupSchedule]:
     # TODO: add filters e.g volume_name, cron schedule
-    return list_backup_schedules(SCHEDULER)
+    return list_backup_schedules()
 
 
 @app.delete(
@@ -164,7 +157,7 @@ def api_list_backup_schedules() -> list[BackupSchedule]:
 def api_remove_backup_schedule(schedule_name: str) -> str:
     logger.info("Removing schedule %s", schedule_name)
     try:
-        delete_backup_schedule(SCHEDULER, schedule_name)
+        delete_backup_schedule(schedule_name)
     except JobLookupError as e:
         raise HTTPException(
             status_code=404,
@@ -187,7 +180,6 @@ async def api_create_backup_schedule(
 
     try:
         job = add_backup_job(
-            SCHEDULER,
             schedule_body.schedule_name,
             schedule_body.volume_name,
             schedule_body.crontab,
