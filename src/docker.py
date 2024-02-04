@@ -48,7 +48,7 @@ def is_volume_attached(volume_name: str) -> bool:
     return len(client.volume.list(filters={"name": volume_name, "dangling": 0})) == 0
 
 
-def backup_volume(volume_name: str) -> None:
+def backup_volume(volume_name: str) -> tuple[str, str]:
     client = get_docker_client()
 
     dt_now = datetime.now(tz=timezone.utc)
@@ -76,6 +76,8 @@ def backup_volume(volume_name: str) -> None:
     if not os.path.exists(os.path.join("/backup", backup_file)):
         raise RuntimeError("Backup failed")
 
+    return volume_name, backup_file
+
     # with Session(engine) as session:
     #     backup = Backups(
     #         backup_name=backup_file,
@@ -87,7 +89,7 @@ def backup_volume(volume_name: str) -> None:
     #     session.commit()
 
 
-def restore_volume(volume_name: str, filename: str) -> None:
+def restore_volume(volume_name: str, filename: str) -> tuple[str, str]:
     client = get_docker_client()
     client.run(
         image="busybox",
@@ -104,6 +106,7 @@ def restore_volume(volume_name: str, filename: str) -> None:
     if not os.path.exists(os.path.join("/backup", filename)):
         raise RuntimeError("Restore failed")
 
+    return volume_name, filename
     # with Session(engine) as session:
     #     backup = session.exec(
     #         select(Backups).where(Backups.backup_name == filename)

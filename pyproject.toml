@@ -62,6 +62,13 @@ help = "Run alembic migration on ${revision}"
 envfile = ".env"
 args = [{ name = "revision", positional = true, default = "head"}]
 
+[tool.poe.tasks.downgrade]
+cmd = "alembic downgrade ${revision}"
+help = "Run alembic migration on ${revision}"
+envfile = ".env"
+args = [{ name = "revision", positional = true, default = "-1"}]
+
+
 [tool.poe.tasks.revision]
 cmd = 'alembic revision --autogenerate  -m "${message}"'
 help = "Create a new alembic migration revision"

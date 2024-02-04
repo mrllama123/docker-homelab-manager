@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from src.docker import backup_volume, restore_volume
 from src.models import BackupSchedule, ScheduleCrontab
+from apscheduler.events import JobExecutionEvent
 
 logger = logging.getLogger(__name__)
 
@@ -17,12 +18,15 @@ APSCHEDULE_JOBSTORE_URL = os.environ.get(
 )
 TZ = os.environ.get("TZ", "UTC")
 
+SCHEDULER = None
+
 
 def setup_scheduler() -> AsyncIOScheduler:
+    global SCHEDULER
     jobstores = {"default": SQLAlchemyJobStore(url=APSCHEDULE_JOBSTORE_URL)}
-    scheduler = AsyncIOScheduler(jobstores=jobstores, timezone=TZ)
-    scheduler.start()
-    return scheduler
+    SCHEDULER = AsyncIOScheduler(jobstores=jobstores, timezone=TZ)
+    SCHEDULER.start()
+    return SCHEDULER
 
 
 def add_backup_job(
@@ -125,5 +129,6 @@ def map_job_to_backup_schedule(job: Job):
     )
 
 
-def on_job_started(event):
-    logger.info("Job %s started", event.job_id)
+# def on_job_ended(event: JobExecutionEvent):
+#     event.job_id
+

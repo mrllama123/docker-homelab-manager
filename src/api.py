@@ -26,7 +26,7 @@ SCHEDULER = None
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    global SCHEDULER
+    # global SCHEDULER
     SCHEDULER = setup_scheduler()
 
     yield
@@ -65,18 +65,18 @@ async def api_backups(session: Session = Depends(get_session)) -> list[Backups]:
 
 
 @app.get(
-    "/backups/{backup_name}", description="Get a backup by name", response_model=Backups
+    "/backups/{backup_id}", description="Get a backup by name", response_model=Backups
 )
 async def api_backup(
-    backup_name: str, session: Session = Depends(get_session)
+    backup_id: str, session: Session = Depends(get_session)
 ) -> Backups:
     backup = session.exec(
-        select(Backups).where(Backups.backup_name == backup_name)
+        select(Backups).where(Backups.backup_id == backup_id)
     ).first()
     if not backup:
         raise HTTPException(
             status_code=404,
-            detail=f"Backup {backup_name} does not exist",
+            detail=f"Backup {backup_id} does not exist",
         )
     return backup
 
