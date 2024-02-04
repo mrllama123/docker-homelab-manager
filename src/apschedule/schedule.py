@@ -7,6 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from src.docker import backup_volume, restore_volume
+from src.apschedule.tasks import task_create_backup
 from src.models import BackupSchedule, ScheduleCrontab
 from apscheduler.events import JobExecutionEvent
 
@@ -36,7 +37,7 @@ def add_backup_job(
 ):
     if crontab:
         return SCHEDULER.add_job(
-            func=backup_volume,
+            func=task_create_backup,
             trigger=CronTrigger(
                 minute=crontab.minute,
                 hour=crontab.hour,
@@ -46,15 +47,15 @@ def add_backup_job(
             ),
             id=job_name,
             name=job_name,
-            args=[volume_name],
+            args=[volume_name, job_name],
             replace_existing=False,
         )
 
     return SCHEDULER.add_job(
-        func=backup_volume,
+        func=task_create_backup,
         id=job_name,
         name=job_name,
-        args=[volume_name],
+        args=[volume_name, job_name],
         replace_existing=False,
         coalesce=True,
     )

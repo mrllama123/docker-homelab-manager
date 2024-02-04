@@ -48,7 +48,7 @@ def is_volume_attached(volume_name: str) -> bool:
     return len(client.volume.list(filters={"name": volume_name, "dangling": 0})) == 0
 
 
-def backup_volume(volume_name: str) -> tuple[str, str]:
+def backup_volume(volume_name: str, backup_dir: str) -> None:
     client = get_docker_client()
 
     dt_now = datetime.now(tz=timezone.utc)
@@ -71,12 +71,12 @@ def backup_volume(volume_name: str) -> tuple[str, str]:
             ".",
         ],  # f"tar cvaf /dest/{backup_file} -C /source .",
         remove=True,
-        volumes=[(volume, "/source"), (BACKUP_DIR, "/dest")],
+        volumes=[(volume, "/source"), (backup_dir, "/dest")],
     )
     if not os.path.exists(os.path.join("/backup", backup_file)):
         raise RuntimeError("Backup failed")
 
-    return volume_name, backup_file
+
 
     # with Session(engine) as session:
     #     backup = Backups(
@@ -89,7 +89,7 @@ def backup_volume(volume_name: str) -> tuple[str, str]:
     #     session.commit()
 
 
-def restore_volume(volume_name: str, filename: str) -> tuple[str, str]:
+def restore_volume(volume_name: str, filename: str) -> None:
     client = get_docker_client()
     client.run(
         image="busybox",
@@ -106,7 +106,7 @@ def restore_volume(volume_name: str, filename: str) -> tuple[str, str]:
     if not os.path.exists(os.path.join("/backup", filename)):
         raise RuntimeError("Restore failed")
 
-    return volume_name, filename
+
     # with Session(engine) as session:
     #     backup = session.exec(
     #         select(Backups).where(Backups.backup_name == filename)

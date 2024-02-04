@@ -6,7 +6,7 @@ from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
 
-from src.apschedule import (
+from src.apschedule.schedule import (
     add_backup_job,
     add_restore_job,
     delete_backup_schedule,
@@ -14,7 +14,7 @@ from src.apschedule import (
     list_backup_schedules,
     setup_scheduler,
 )
-from src.db import Backups, engine
+from src.db import Backups, engine, get_session
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import BackupSchedule, BackupVolume, BackupVolumeResponse, VolumeItem
 
@@ -24,14 +24,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     scheduler = setup_scheduler()
-
     yield
     scheduler.shutdown(wait=False)
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session
 
 
 app = FastAPI(lifespan=lifespan)
@@ -66,9 +60,7 @@ async def api_backups(session: Session = Depends(get_session)) -> list[Backups]:
 async def api_backup(
     backup_id: str, session: Session = Depends(get_session)
 ) -> Backups:
-    backup = session.exec(
-        select(Backups).where(Backups.backup_id == backup_id)
-    ).first()
+    backup = session.exec(select(Backups).where(Backups.backup_id == backup_id)).first()
     if not backup:
         raise HTTPException(
             status_code=404,
