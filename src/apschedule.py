@@ -30,13 +30,12 @@ def setup_scheduler() -> AsyncIOScheduler:
 
 
 def add_backup_job(
-    schedule: AsyncIOScheduler,
     job_name: str,
     volume_name: str,
     crontab: ScheduleCrontab = None,
 ):
     if crontab:
-        return schedule.add_job(
+        return SCHEDULER.add_job(
             func=backup_volume,
             trigger=CronTrigger(
                 minute=crontab.minute,
@@ -51,7 +50,7 @@ def add_backup_job(
             replace_existing=False,
         )
 
-    return schedule.add_job(
+    return SCHEDULER.add_job(
         func=backup_volume,
         id=job_name,
         name=job_name,
@@ -62,14 +61,13 @@ def add_backup_job(
 
 
 def add_restore_job(
-    schedule: AsyncIOScheduler,
     job_name: str,
     volume_name: str,
     backup_filename: str,
     crontab: ScheduleCrontab = None,
 ):
     if crontab:
-        return schedule.add_job(
+        return SCHEDULER.add_job(
             func=restore_volume,
             trigger=CronTrigger(**crontab),
             id=job_name,
@@ -78,7 +76,7 @@ def add_restore_job(
             replace_existing=False,
         )
 
-    return schedule.add_job(
+    return SCHEDULER.add_job(
         func=restore_volume,
         id=job_name,
         name=job_name,
@@ -88,22 +86,20 @@ def add_restore_job(
     )
 
 
-def get_backup_schedule(
-    scheduler: AsyncIOScheduler, schedule_name: str
-) -> BackupSchedule | None:
-    job = scheduler.get_job(schedule_name)
+def get_backup_schedule(schedule_name: str) -> BackupSchedule | None:
+    job = SCHEDULER.get_job(schedule_name)
     if job:
         return map_job_to_backup_schedule(job)
 
     return job
 
 
-def list_backup_schedules(scheduler: AsyncIOScheduler) -> list[BackupSchedule]:
-    return [map_job_to_backup_schedule(job) for job in scheduler.get_jobs()]
+def list_backup_schedules() -> list[BackupSchedule]:
+    return [map_job_to_backup_schedule(job) for job in SCHEDULER.get_jobs()]
 
 
-def delete_backup_schedule(scheduler: AsyncIOScheduler, schedule_name: str):
-    return scheduler.remove_job(schedule_name)
+def delete_backup_schedule(schedule_name: str):
+    return SCHEDULER.remove_job(schedule_name)
 
 
 def map_job_to_backup_schedule(job: Job):

@@ -151,7 +151,6 @@ def test_create_backup(mocker, client):
     mock_get_volume.assert_called_once_with("test-volume")
     mock_is_volume_attached.assert_called_once_with("test-volume")
     mock_create_volume_backup.assert_called_once_with(
-        None,
         "backup-test-volume-test-uuid",
         "test-volume",
     )
@@ -199,7 +198,7 @@ def test_restore_backup(mocker, client):
         "task_id": "test-task-id",
     }
     mock_create_volume_backup.assert_called_once_with(
-        None, "restore-test-volume-test-uuid", "test-volume", "test-backup-name.tar.gz"
+        "restore-test-volume-test-uuid", "test-volume", "test-backup-name.tar.gz"
     )
 
 
@@ -240,7 +239,6 @@ def test_create_schedule(mocker, client):
     }
     mock_get_volume.assert_called_once_with("test-volume")
     mock_create_volume_backup.assert_called_once_with(
-        None,
         "test-schedule",
         "test-volume",
         ScheduleCrontab(minute="1", hour="2", day="*", month="*", day_of_week="*"),
@@ -271,7 +269,7 @@ def test_get_schedule(mocker, client):
             "day_of_week": "*",
         },
     }
-    mock_get_schedule.assert_called_once_with(None, "test-schedule")
+    mock_get_schedule.assert_called_once_with("test-schedule")
 
 
 def test_get_schedule_not_found(mocker, client):
@@ -282,7 +280,7 @@ def test_get_schedule_not_found(mocker, client):
     response = client.get("/volumes/backup/schedule/test-schedule")
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
-    mock_get_schedule.assert_called_once_with(None, "test-schedule")
+    mock_get_schedule.assert_called_once_with("test-schedule")
 
 
 def test_list_schedule(mocker, client):
@@ -313,7 +311,7 @@ def test_list_schedule(mocker, client):
             },
         }
     ]
-    mock_list_schedule.assert_called_once_with(None)
+    mock_list_schedule.assert_called_once_with()
 
 
 def test_remove_schedule(mocker, client):
@@ -323,7 +321,7 @@ def test_remove_schedule(mocker, client):
     response = client.delete("/volumes/backup/schedule/test-schedule")
     assert response.status_code == 200
     assert response.json() == "Schedule test-schedule removed"
-    mock_remove_schedule.assert_called_once_with(None, "test-schedule")
+    mock_remove_schedule.assert_called_once_with("test-schedule")
 
 
 def test_remove_schedule_not_found(mocker, client):
@@ -334,4 +332,4 @@ def test_remove_schedule_not_found(mocker, client):
     response = client.delete("/volumes/backup/schedule/test-schedule")
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
-    mock_remove_schedule.assert_called_once_with(None, "test-schedule")
+    mock_remove_schedule.assert_called_once_with("test-schedule")
