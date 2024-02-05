@@ -16,7 +16,13 @@ from src.apschedule.schedule import (
 )
 from src.db import Backups, engine, get_session
 from src.docker import get_volume, get_volumes, is_volume_attached
-from src.models import BackupSchedule, BackupVolume, BackupVolumeResponse, VolumeItem
+from src.models import (
+    BackupSchedule,
+    BackupVolume,
+    BackupVolumeResponse,
+    RestoreVolumeResponse,
+    VolumeItem,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +108,7 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
 )
 def api_restore_volume(
     backup_volume: BackupVolume,
-) -> BackupVolumeResponse:
+) -> RestoreVolumeResponse:
     logger.info(
         "restoring volume: %s from backup: %s",
         backup_volume.volume_name,
@@ -119,10 +125,9 @@ def api_restore_volume(
         task.id,
         extra={"task_id": task.id},
     )
-    return {
-        "message": f"restore of {backup_volume.volume_name} started",
-        "task_id": task.id,
-    }
+    return RestoreVolumeResponse(
+        message=f"restore of {backup_volume.volume_name} started", restore_id=task.id
+    )
 
 
 @app.get(

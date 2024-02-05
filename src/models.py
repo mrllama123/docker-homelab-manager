@@ -18,6 +18,11 @@ class BackupVolumeResponse(BaseModel):
     backup_id: str
 
 
+class RestoreVolumeResponse(BaseModel):
+    message: str
+    restore_id: str
+
+
 class BackupStatusResponse(BaseModel):
     status: str
     backup_id: str
@@ -45,20 +50,15 @@ class BackupSchedule(BaseModel):
 
 # db models
 
-class BackupVolumes(SQLModel, table=True):
-    volume_name: Optional[str] = Field(default=None, primary_key=True)
-    backup_id: Optional[str] = Field(default=None, foreign_key="backups.backup_id")
-
-
-class RestoreBackupVolumes(SQLModel, table=True):
-    volume_name: Optional[str] = Field(default=None, primary_key=True)
-    restore_id: Optional[str] = Field(
-        default=None, foreign_key="restoredbackups.restore_id"
-    )
-
 
 class Backups(SQLModel, table=True):
     backup_id: Optional[str] = Field(default=None, primary_key=True)
+    schedule_id: Optional[str] = Field(
+        default=None, foreign_key="scheduledbackups.schedule_id"
+    )
+    volume_name: Optional[str] = Field(
+        default=None, foreign_key="backupvolumes.volume_name"
+    )
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
     backup_created: str
@@ -76,6 +76,9 @@ class BackupFilenames(SQLModel, table=True):
 
 class RestoredBackups(SQLModel, table=True):
     restore_id: Optional[str] = Field(default=None, primary_key=True)
+    volume_name: Optional[str] = Field(
+        default=None, foreign_key="restorebackupvolumes.volume_name"
+    )
     backup_filename: Optional[str] = Field(
         default=None, foreign_key="backupfilenames.backup_filename"
     )
@@ -85,8 +88,25 @@ class RestoredBackups(SQLModel, table=True):
 
 
 class ScheduledBackups(SQLModel, table=True):
-    schedule_id: Optional[str] = Field(default=None, primary_key=True)
-    backup_id: Optional[str] = Field(default=None, foreign_key="backups.backup_id")
+    backup_id: Optional[str] = Field(
+        default=None, foreign_key="backups.backup_id", primary_key=True
+    )
+    schedule_id: Optional[str] = Field(default=None)
+    schedule_name: str
+
+
+class BackupVolumes(SQLModel, table=True):
+    backup_id: Optional[str] = Field(
+        default=None, primary_key=True, foreign_key="backups.backup_id"
+    )
+    volume_name: str
+
+
+class RestoreBackupVolumes(SQLModel, table=True):
+    restore_id: Optional[str] = Field(
+        default=None, primary_key=True, foreign_key="restoredbackups.restore_id"
+    )
+    volume_name: str
 
 
 # class Backups(SQLModel, table=True):

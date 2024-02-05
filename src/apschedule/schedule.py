@@ -7,9 +7,10 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from src.docker import backup_volume, restore_volume
-from src.apschedule.tasks import task_create_backup
+from src.apschedule.tasks import task_create_backup, task_restore_backup
 from src.models import BackupSchedule, ScheduleCrontab
 from apscheduler.events import JobExecutionEvent
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +35,9 @@ def add_backup_job(
     job_name: str,
     volume_name: str,
     crontab: ScheduleCrontab = None,
+    is_schedule: bool = False,
 ):
-    # TODO: make job id uuid
+    job_id = str(uuid.uuid4())
     if crontab:
         return SCHEDULER.add_job(
             func=task_create_backup,
@@ -46,17 +48,17 @@ def add_backup_job(
                 month=crontab.month,
                 day_of_week=crontab.day_of_week,
             ),
-            id=job_name,
+            id=job_id,
             name=job_name,
-            args=[volume_name, job_name],
+            args=[volume_name, job_id, is_schedule],
             replace_existing=False,
         )
 
     return SCHEDULER.add_job(
         func=task_create_backup,
-        id=job_name,
+        id=job_id,
         name=job_name,
-        args=[volume_name, job_name],
+        args=[volume_name, job_id],
         replace_existing=False,
         coalesce=True,
     )
@@ -68,22 +70,22 @@ def add_restore_job(
     backup_filename: str,
     crontab: ScheduleCrontab = None,
 ):
-    # TODO: make job id uuid
+    job_id = str(uuid.uuid4())
     if crontab:
         return SCHEDULER.add_job(
             func=restore_volume,
             trigger=CronTrigger(**crontab),
-            id=job_name,
+            id=job_id,
             name=job_name,
-            args=[volume_name, backup_filename],
+            args=[volume_name, backup_filename, job_id],
             replace_existing=False,
         )
 
     return SCHEDULER.add_job(
-        func=restore_volume,
-        id=job_name,
+        func=task_restore_backup,
+        id=job_id,
         name=job_name,
-        args=[volume_name, backup_filename],
+        args=[volume_name, backup_filename, job_id],
         replace_existing=False,
         coalesce=True,
     )
@@ -130,4 +132,3 @@ def map_job_to_backup_schedule(job: Job):
 
 # def on_job_ended(event: JobExecutionEvent):
 #     event.job_id
-

@@ -14,9 +14,12 @@ from src.models import (
 import pytz
 import os
 import uuid
+import logging
 
 TZ = os.environ.get("TZ", "UTC")
 BACKUP_DIR = os.getenv("BACKUP_DIR")
+
+logger = logging.getLogger(__name__)
 
 
 def task_create_backup(
@@ -31,7 +34,7 @@ def task_create_backup(
 
         backup = Backups(
             backup_id=backup_id,
-            backup_file_name=backup_file,
+            backup_filename=backup_file,
             backup_created=dt_now.isoformat(),
             backup_path=os.path.join(BACKUP_DIR, backup_file),
             volume_name=volume_name,
@@ -57,8 +60,8 @@ def task_restore_backup(volume_name: str, backup_file: str, job_id: str) -> None
 
         backup = RestoredBackups(
             restore_id=job_id,
-            backup_file_name=backup_file,
-            restore_created=dt_now.isoformat(),
+            backup_filename=backup_file,
+            restored_date=dt_now.isoformat(),
             restore_path=os.path.join(BACKUP_DIR, backup_file),
             volume_name=volume_name,
             success=True,
