@@ -62,6 +62,11 @@ class ScheduleVolumes(SQLModel, table=True):
     )
 
 
+class BackupFilenames(SQLModel, table=True):
+    backup_filename: Optional[str] = Field(default=None, primary_key=True)
+    backup_id = Optional[str] = Field(default=None, foreign_key="backups.backup_id")
+
+
 class Backups(SQLModel, table=True):
     backup_id: Optional[str] = Field(default=None, primary_key=True)
     backup_filename: Optional[str] = Field(default=None)
@@ -74,7 +79,7 @@ class Backups(SQLModel, table=True):
 class RestoredBackups(SQLModel, table=True):
     restore_id: Optional[str] = Field(default=None, primary_key=True)
     backup_filename: Optional[str] = Field(
-        default=None, foreign_key="backups.backup_filename"
+        default=None, foreign_key="backupfilenames.backup_filename"
     )
     restored_date: Optional[str] = Field(default=None)
     success: Optional[bool] = Field(default=None)
