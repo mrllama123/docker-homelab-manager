@@ -43,28 +43,18 @@ class BackupSchedule(BaseModel):
     crontab: ScheduleCrontab = None
 
 
+# db models
+
 class BackupVolumes(SQLModel, table=True):
     volume_name: Optional[str] = Field(default=None, primary_key=True)
     backup_id: Optional[str] = Field(default=None, foreign_key="backups.backup_id")
 
 
-class RestoreBackupsVolumes(SQLModel, table=True):
+class RestoreBackupVolumes(SQLModel, table=True):
     volume_name: Optional[str] = Field(default=None, primary_key=True)
     restore_id: Optional[str] = Field(
         default=None, foreign_key="restoredbackups.restore_id"
     )
-
-
-class ScheduleVolumes(SQLModel, table=True):
-    volume_name: Optional[str] = Field(default=None, primary_key=True)
-    schedule_id: Optional[str] = Field(
-        default=None, foreign_key="schedulebackups.schedule_id"
-    )
-
-
-class BackupFilenames(SQLModel, table=True):
-    backup_filename: Optional[str] = Field(default=None, primary_key=True)
-    backup_id = Optional[str] = Field(default=None, foreign_key="backups.backup_id")
 
 
 class Backups(SQLModel, table=True):
@@ -74,6 +64,14 @@ class Backups(SQLModel, table=True):
     backup_created: str
     success: Optional[bool] = Field(default=None)
     errorMessage: Optional[str] = Field(default=None)
+
+
+class BackupFilenames(SQLModel, table=True):
+    backup_filename: Optional[str] = Field(default=None, primary_key=True)
+    backup_id: Optional[str] = Field(
+        default=None,
+        foreign_key="backups.backup_id",
+    )
 
 
 class RestoredBackups(SQLModel, table=True):
