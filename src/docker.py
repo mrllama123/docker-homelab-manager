@@ -77,19 +77,7 @@ def backup_volume(volume_name: str, backup_dir: str) -> None:
         raise RuntimeError("Backup failed")
 
 
-
-    # with Session(engine) as session:
-    #     backup = Backups(
-    #         backup_name=backup_file,
-    #         backup_created=dt_now.isoformat(),
-    #         backup_path=os.path.join(BACKUP_DIR, backup_file),
-    #         volume_name=volume_name,
-    #     )
-    #     session.add(backup)
-    #     session.commit()
-
-
-def restore_volume(volume_name: str, filename: str) -> None:
+def restore_volume(volume_name: str, backup_dir: str, filename: str) -> None:
     client = get_docker_client()
     client.run(
         image="busybox",
@@ -101,19 +89,7 @@ def restore_volume(volume_name: str, filename: str) -> None:
             "/dest",
         ],
         remove=True,
-        volumes=[(volume_name, "/dest"), (BACKUP_DIR, "/source")],
+        volumes=[(volume_name, "/dest"), (backup_dir, "/source")],
     )
     if not os.path.exists(os.path.join("/backup", filename)):
         raise RuntimeError("Restore failed")
-
-
-    # with Session(engine) as session:
-    #     backup = session.exec(
-    #         select(Backups).where(Backups.backup_name == filename)
-    #     ).first()
-    #     if not backup:
-    #         raise ValueError(f"Backup {filename} does not exist")
-    #     backup.restored = True
-    #     backup.restored_date = datetime.now(tz=timezone.utc).isoformat()
-    #     session.add(backup)
-    #     session.commit()
