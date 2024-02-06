@@ -41,13 +41,15 @@ def test_list_volumes(mocker, client):
 
 
 def test_get_backups(client, session):
-    for backup_name in ["test-backup-name-1.tar.gz", "test-backup-name-2.tar.gz"]:
+    for backup_id in ["test-backup-id-1", "test-backup-id-2"]:
         session.add(
             Backups(
-                backup_name=backup_name,
+                backup_id=backup_id,
                 backup_created="2021-01-01T00:00:00+00:00",
+                backup_filename=f"{backup_id}.tar.gz",
                 backup_path="/backup/test-backup-name.tar.gz",
                 volume_name="test-volume",
+                success=True,
             )
         )
     session.commit()
@@ -55,20 +57,24 @@ def test_get_backups(client, session):
     assert response.status_code == 200
     assert response.json() == [
         {
-            "backup_name": "test-backup-name-1.tar.gz",
-            "backup_created": "2021-01-01T00:00:00+00:00",
+            "schedule_id": None,
+            "backup_filename": "test-backup-id-1.tar.gz",
+            "backup_id": "test-backup-id-1",
             "backup_path": "/backup/test-backup-name.tar.gz",
+            "success": True,
             "volume_name": "test-volume",
-            "restored": False,
-            "restored_date": None,
+            "backup_created": "2021-01-01T00:00:00+00:00",
+            "errorMessage": None,
         },
         {
-            "backup_name": "test-backup-name-2.tar.gz",
-            "backup_created": "2021-01-01T00:00:00+00:00",
+            "schedule_id": None,
+            "backup_filename": "test-backup-id-2.tar.gz",
+            "backup_id": "test-backup-id-2",
             "backup_path": "/backup/test-backup-name.tar.gz",
+            "success": True,
             "volume_name": "test-volume",
-            "restored": False,
-            "restored_date": None,
+            "backup_created": "2021-01-01T00:00:00+00:00",
+            "errorMessage": None,
         },
     ]
 
@@ -82,22 +88,25 @@ def test_get_no_backups(client):
 def test_get_backup(client, session):
     session.add(
         Backups(
-            backup_name="test-backup-name.tar.gz",
+            backup_id="test-backup-id",
+            backup_filename="test-backup-name.tar.gz",
             backup_created="2021-01-01T00:00:00+00:00",
             backup_path="/backup/test-backup-name.tar.gz",
             volume_name="test-volume",
         )
     )
     session.commit()
-    response = client.get("/backups/test-backup-name.tar.gz")
+    response = client.get("/backups/test-backup-id")
     assert response.status_code == 200
     assert response.json() == {
-        "backup_name": "test-backup-name.tar.gz",
+        "backup_id": "test-backup-id",
+        "backup_filename": "test-backup-name.tar.gz",
         "backup_created": "2021-01-01T00:00:00+00:00",
         "backup_path": "/backup/test-backup-name.tar.gz",
         "volume_name": "test-volume",
-        "restored": False,
-        "restored_date": None,
+        "errorMessage": None,
+        "schedule_id": None,
+        "success": None,
     }
 
 
@@ -146,7 +155,7 @@ def test_create_backup(mocker, client):
     assert response.status_code == 200
     assert response.json() == {
         "message": "Backup of test-volume started",
-        "task_id": "test-task-id",
+        "backup_id": "test-task-id",
     }
     mock_get_volume.assert_called_once_with("test-volume")
     mock_is_volume_attached.assert_called_once_with("test-volume")
@@ -195,7 +204,7 @@ def test_restore_backup(mocker, client):
     assert response.status_code == 200
     assert response.json() == {
         "message": "restore of test-volume started",
-        "task_id": "test-task-id",
+        "restore_id": "test-task-id",
     }
     mock_create_volume_backup.assert_called_once_with(
         "restore-test-volume-test-uuid", "test-volume", "test-backup-name.tar.gz"
@@ -221,6 +230,7 @@ def test_create_schedule(mocker, client):
                 "hour": "2",
                 "day": "*",
                 "month": "*",
+                "seconds": "*",
                 "day_of_week": "*",
             },
         },
@@ -234,6 +244,7 @@ def test_create_schedule(mocker, client):
             "hour": "2",
             "day": "*",
             "month": "*",
+            "seconds": "*",
             "day_of_week": "*",
         },
     }
@@ -242,6 +253,7 @@ def test_create_schedule(mocker, client):
         "test-schedule",
         "test-volume",
         ScheduleCrontab(minute="1", hour="2", day="*", month="*", day_of_week="*"),
+        is_schedule=True,
     )
 
 
@@ -266,6 +278,7 @@ def test_get_schedule(mocker, client):
             "hour": "2",
             "day": "*",
             "month": "*",
+            "seconds": "*",
             "day_of_week": "*",
         },
     }
@@ -307,6 +320,7 @@ def test_list_schedule(mocker, client):
                 "hour": "2",
                 "day": "*",
                 "month": "*",
+                "seconds": "*",
                 "day_of_week": "*",
             },
         }
