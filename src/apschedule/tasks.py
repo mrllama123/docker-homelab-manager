@@ -12,6 +12,8 @@ from src.models import (
     BackupFilenames,
     Backups,
     BackupVolumes,
+    ErrorBackups,
+    ErrorRestoredBackups,
     RestoreBackupVolumes,
     RestoredBackups,
     ScheduledBackups,
@@ -30,49 +32,76 @@ def task_create_backup(
     is_schedule: bool = False,
 ) -> None:
     with Session(engine) as session:
-        dt_now = datetime.now(tz=pytz.timezone(TZ))
-        backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
-        backup_volume(volume_name, BACKUP_DIR)
-
+        # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
         backup_id = str(uuid.uuid4()) if is_schedule else job_id
+        try:
+            dt_now = datetime.now(tz=pytz.timezone(TZ))
+            backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
+            backup_volume(volume_name, BACKUP_DIR)
 
-        backup = Backups(
-            backup_id=backup_id,
-            backup_filename=backup_file,
-            backup_created=dt_now.isoformat(),
-            backup_path=os.path.join(BACKUP_DIR, backup_file),
-            volume_name=volume_name,
-            success=True,
-        )
-
-        if is_schedule:
-            schedule = ScheduledBackups(
-                schedule_id=job_id,
+            backup = Backups(
                 backup_id=backup_id,
-                schedule_name=job_name,
+                backup_filename=backup_file,
+                backup_created=dt_now.isoformat(),
+                backup_path=os.path.join(BACKUP_DIR, backup_file),
+                volume_name=volume_name,
+                success=True,
             )
-            backup.schedule_id = job_id
-            session.add(schedule)
 
-        session.add(BackupVolumes(volume_name=volume_name, backup_id=backup_id))
-        session.add(BackupFilenames(backup_filename=backup_file, backup_id=backup_id))
-        session.add(backup)
-        session.commit()
+            if is_schedule:
+                schedule = ScheduledBackups(
+                    schedule_id=job_id,
+                    backup_id=backup_id,
+                    schedule_name=job_name,
+                )
+                backup.schedule_id = job_id
+                session.add(schedule)
+
+            session.add(BackupVolumes(volume_name=volume_name, backup_id=backup_id))
+            session.add(
+                BackupFilenames(backup_filename=backup_file, backup_id=backup_id)
+            )
+            session.add(backup)
+            session.commit()
+        except Exception as e:
+            logger.error(f"Error creating backup: {e}")
+            session.rollback()
+            session.add(
+                ErrorBackups(
+                    backup_id=backup_id,
+                    error_message=str(e),
+                )
+            )
+            session.commit()
 
 
 def task_restore_backup(volume_name: str, backup_file: str, job_id: str) -> None:
+    # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
     with Session(engine) as session:
-        dt_now = datetime.now(tz=pytz.timezone(TZ))
-        restore_volume(volume_name, BACKUP_DIR, backup_file)
+        try:
+            dt_now = datetime.now(tz=pytz.timezone(TZ))
+            restore_volume(volume_name, BACKUP_DIR, backup_file)
 
-        backup = RestoredBackups(
-            restore_id=job_id,
-            backup_filename=backup_file,
-            restored_date=dt_now.isoformat(),
-            restore_path=os.path.join(BACKUP_DIR, backup_file),
-            volume_name=volume_name,
-            success=True,
-        )
-        session.add(RestoreBackupVolumes(volume_name=volume_name, restore_id=job_id))
-        session.add(backup)
-        session.commit()
+            backup = RestoredBackups(
+                restore_id=job_id,
+                backup_filename=backup_file,
+                restored_date=dt_now.isoformat(),
+                restore_path=os.path.join(BACKUP_DIR, backup_file),
+                volume_name=volume_name,
+                success=True,
+            )
+            session.add(
+                RestoreBackupVolumes(volume_name=volume_name, restore_id=job_id)
+            )
+            session.add(backup)
+            session.commit()
+        except Exception as e:
+            logger.error(f"Error restoring backup: {e}")
+            session.rollback()
+            session.add(
+                ErrorRestoredBackups(
+                    restore_id=job_id,
+                    error_message=str(e),
+                )
+            )
+            session.commit()

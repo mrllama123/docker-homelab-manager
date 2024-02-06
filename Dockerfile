@@ -31,6 +31,6 @@ COPY ./src /code/src
 COPY ./migrations /code/migrations
 COPY ./alembic.ini /code/alembic.ini
 
-LABEL org.opencontainers.image.description = "A simple API to manage docker containers" \
-    org.opencontainers.image.source = "https://github.com/mrllama123/docker-homelab-manager" \
-    org.opencontainers.image.licenses="GPL-3.0" 
+LABEL org.opencontainers.image.description = "A simple API to manage docker containers" 
+LABEL org.opencontainers.image.source = "https://github.com/mrllama123/docker-homelab-manager"
+LABEL org.opencontainers.image.licenses="GPL-3.0" 
