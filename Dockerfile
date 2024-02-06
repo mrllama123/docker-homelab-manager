@@ -30,3 +30,7 @@ RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/
 COPY ./src /code/src
 COPY ./migrations /code/migrations
 COPY ./alembic.ini /code/alembic.ini
+
+LABEL org.opencontainers.image.description = "A simple API to manage docker containers" \
+    org.opencontainers.image.source = "https://github.com/mrllama123/docker-homelab-manager" \
+    org.opencontainers.image.licenses="GPL-3.0" 
