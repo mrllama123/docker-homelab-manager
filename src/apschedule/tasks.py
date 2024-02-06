@@ -1,20 +1,21 @@
-from datetime import datetime
-
-from sqlmodel import Session
-from src.docker import backup_volume, restore_volume
-from src.db import engine
-from src.models import (
-    Backups,
-    RestoredBackups,
-    ScheduledBackups,
-    BackupVolumes,
-    BackupFilenames,
-    RestoreBackupVolumes,
-)
-import pytz
+import logging
 import os
 import uuid
-import logging
+from datetime import datetime
+
+import pytz
+from sqlmodel import Session
+
+from src.db import engine
+from src.docker import backup_volume, restore_volume
+from src.models import (
+    BackupFilenames,
+    Backups,
+    BackupVolumes,
+    RestoreBackupVolumes,
+    RestoredBackups,
+    ScheduledBackups,
+)
 
 TZ = os.environ.get("TZ", "UTC")
 BACKUP_DIR = os.getenv("BACKUP_DIR")
@@ -23,7 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 def task_create_backup(
-    volume_name: str, job_id: str, is_schedule: bool = False
+    volume_name: str,
+    job_id: str,
+    job_name: str | None = None,
+    is_schedule: bool = False,
 ) -> None:
     with Session(engine) as session:
         dt_now = datetime.now(tz=pytz.timezone(TZ))
@@ -40,16 +44,19 @@ def task_create_backup(
             volume_name=volume_name,
             success=True,
         )
-        session.add(BackupVolumes(volume_name=volume_name, backup_id=backup_id))
-        session.add(BackupFilenames(backup_filename=backup_file, backup_id=backup_id))
 
-        session.add(backup)
         if is_schedule:
             schedule = ScheduledBackups(
                 schedule_id=job_id,
                 backup_id=backup_id,
+                schedule_name=job_name,
             )
+            backup.schedule_id = job_id
             session.add(schedule)
+
+        session.add(BackupVolumes(volume_name=volume_name, backup_id=backup_id))
+        session.add(BackupFilenames(backup_filename=backup_file, backup_id=backup_id))
+        session.add(backup)
         session.commit()
 
 

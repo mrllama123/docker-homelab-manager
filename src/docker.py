@@ -5,9 +5,6 @@ from functools import lru_cache
 
 from python_on_whales import DockerClient, DockerException, Volume
 
-
-
-
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
@@ -83,7 +80,7 @@ def restore_volume(volume_name: str, backup_dir: str, filename: str) -> None:
         image="busybox",
         command=[
             "tar",
-            "xvf",  
+            "xvf",
             f"/source/{filename}",
             "-C",
             "/dest",

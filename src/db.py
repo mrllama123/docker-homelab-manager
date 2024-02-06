@@ -1,6 +1,6 @@
 import os
 
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 from src.models import *  # pylint: disable=wildcard-import, unused-wildcard-import
 

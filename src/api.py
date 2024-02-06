@@ -14,9 +14,10 @@ from src.apschedule.schedule import (
     list_backup_schedules,
     setup_scheduler,
 )
-from src.db import Backups, engine, get_session
+from src.db import get_session
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
+    Backups,
     BackupSchedule,
     BackupVolume,
     BackupVolumeResponse,
@@ -130,16 +131,14 @@ def api_restore_volume(
     )
 
 
-@app.get(
-    "/volumes/backup/schedule/{schedule_name}", description="Get a backup schedule"
-)
-def api_get_backup_schedule(schedule_name: str) -> BackupSchedule:
-    logger.info("Getting schedule %s", schedule_name)
-    schedule = get_backup_schedule(schedule_name)
+@app.get("/volumes/backup/schedule/{schedule_id}", description="Get a backup schedule")
+def api_get_backup_schedule(schedule_id: str) -> BackupSchedule:
+    logger.info("Getting schedule %s", schedule_id)
+    schedule = get_backup_schedule(schedule_id)
     if not schedule:
         raise HTTPException(
             status_code=404,
-            detail=f"Schedule job {schedule_name} does not exist",
+            detail=f"Schedule job {schedule_id} does not exist",
         )
     return schedule
 
@@ -151,20 +150,20 @@ def api_list_backup_schedules() -> list[BackupSchedule]:
 
 
 @app.delete(
-    "/volumes/backup/schedule/{schedule_name}", description="Remove a backup schedule"
+    "/volumes/backup/schedule/{schedule_id}", description="Remove a backup schedule"
 )
-def api_remove_backup_schedule(schedule_name: str) -> str:
-    logger.info("Removing schedule %s", schedule_name)
+def api_remove_backup_schedule(schedule_id: str) -> str:
+    logger.info("Removing schedule %s", schedule_id)
     try:
-        delete_backup_schedule(schedule_name)
+        delete_backup_schedule(schedule_id)
     except JobLookupError as e:
         raise HTTPException(
             status_code=404,
-            detail=f"Schedule job {schedule_name} does not exist",
+            detail=f"Schedule job {schedule_id} does not exist",
         ) from e
     except Exception:
         raise
-    return f"Schedule {schedule_name} removed"
+    return f"Schedule {schedule_id} removed"
 
 
 @app.post("/volumes/backup/schedule", description="Create a backup schedule")
@@ -182,6 +181,7 @@ async def api_create_backup_schedule(
             schedule_body.schedule_name,
             schedule_body.volume_name,
             schedule_body.crontab,
+            is_schedule=True,
         )
 
     except ConflictingIdError as e:
