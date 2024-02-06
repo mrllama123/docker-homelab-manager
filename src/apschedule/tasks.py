@@ -12,11 +12,11 @@ from src.models import (
     BackupFilenames,
     Backups,
     BackupVolumes,
+    ErrorBackups,
+    ErrorRestoredBackups,
     RestoreBackupVolumes,
     RestoredBackups,
     ScheduledBackups,
-    ErrorBackups,
-    ErrorRestoredBackups,
 )
 
 TZ = os.environ.get("TZ", "UTC")
@@ -31,7 +31,6 @@ def task_create_backup(
     job_name: str | None = None,
     is_schedule: bool = False,
 ) -> None:
-
     with Session(engine) as session:
         # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
         backup_id = str(uuid.uuid4()) if is_schedule else job_id

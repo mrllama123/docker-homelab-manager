@@ -1,17 +1,17 @@
-from freezegun import freeze_time
 from datetime import datetime, timezone
 
+from freezegun import freeze_time
 from sqlmodel import select
 
 from src.models import (
-    Backups,
-    ScheduledBackups,
-    BackupVolumes,
     BackupFilenames,
-    RestoreBackupVolumes,
-    RestoredBackups,
+    Backups,
+    BackupVolumes,
     ErrorBackups,
     ErrorRestoredBackups,
+    RestoreBackupVolumes,
+    RestoredBackups,
+    ScheduledBackups,
 )
 
 
@@ -257,7 +257,9 @@ def test_task_restore_backup_error(mocker, session):
     )
 
     restore_db = session.exec(
-        select(ErrorRestoredBackups).where(ErrorRestoredBackups.restore_id == "job_id_2")
+        select(ErrorRestoredBackups).where(
+            ErrorRestoredBackups.restore_id == "job_id_2"
+        )
     ).first()
 
     assert restore_db

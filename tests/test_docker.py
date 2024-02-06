@@ -2,9 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
-from sqlmodel import select
 
-from src.db import Backups
 
 from tests.fixtures import MockVolume
 
@@ -116,7 +114,6 @@ def test_backup_volume_failure_volume_not_found(mocker):
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
 def test_restore_volume(mocker):
-
     mock_docker_client = mocker.MagicMock()
     mock_get_docker_client = mocker.patch(
         "src.docker.get_docker_client", return_value=mock_docker_client
@@ -164,7 +161,7 @@ def test_restore_volume_not_found(mocker):
 
     # Run the function
     with pytest.raises(RuntimeError, match="Restore failed"):
-        restore_volume(volume_name, "/backup",filename)
+        restore_volume(volume_name, "/backup", filename)
 
     # # Assert the function calls and behavior
     mock_get_docker_client.assert_called_once()
