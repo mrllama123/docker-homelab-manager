@@ -64,6 +64,7 @@ class Backups(SQLModel, table=True):
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
     backup_created: str
+    # TODO: remove
     success: Optional[bool] = Field(default=None)
     errorMessage: Optional[str] = Field(default=None)
 
@@ -74,19 +75,6 @@ class BackupFilenames(SQLModel, table=True):
         default=None,
         foreign_key="backups.backup_id",
     )
-
-
-class RestoredBackups(SQLModel, table=True):
-    restore_id: Optional[str] = Field(default=None, primary_key=True)
-    volume_name: Optional[str] = Field(
-        default=None, foreign_key="restorebackupvolumes.volume_name"
-    )
-    backup_filename: Optional[str] = Field(
-        default=None, foreign_key="backupfilenames.backup_filename"
-    )
-    restored_date: Optional[str] = Field(default=None)
-    success: Optional[bool] = Field(default=None)
-    errorMessage: Optional[str] = Field(default=None)
 
 
 class ScheduledBackups(SQLModel, table=True):
@@ -102,6 +90,30 @@ class BackupVolumes(SQLModel, table=True):
         default=None, primary_key=True, foreign_key="backups.backup_id"
     )
     volume_name: str
+
+
+class ErrorBackups(SQLModel, table=True):
+    backup_id: Optional[str] = Field(default=None, primary_key=True)
+    error_message: Optional[str] = Field(default=None)
+
+
+class RestoredBackups(SQLModel, table=True):
+    restore_id: Optional[str] = Field(default=None, primary_key=True)
+    volume_name: Optional[str] = Field(
+        default=None, foreign_key="restorebackupvolumes.volume_name"
+    )
+    backup_filename: Optional[str] = Field(
+        default=None, foreign_key="backupfilenames.backup_filename"
+    )
+    restored_date: Optional[str] = Field(default=None)
+    # TODO: remove
+    success: Optional[bool] = Field(default=None)
+    errorMessage: Optional[str] = Field(default=None)
+
+
+class ErrorRestoredBackups(SQLModel, table=True):
+    restore_id: Optional[str] = Field(default=None, primary_key=True)
+    error_message: Optional[str] = Field(default=None)
 
 
 class RestoreBackupVolumes(SQLModel, table=True):

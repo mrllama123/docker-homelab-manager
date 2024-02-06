@@ -27,6 +27,6 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*
 
-LABEL org.opencontainers.image.description = "A simple API to manage docker containers" \
-    org.opencontainers.image.source = "https://github.com/mrllama123/docker-homelab-manager" \
-    org.opencontainers.image.licenses="GPL-3.0" 
+LABEL org.opencontainers.image.description = "A simple API to manage docker containers" 
+LABEL org.opencontainers.image.source = "https://github.com/mrllama123/docker-homelab-manager"
+LABEL org.opencontainers.image.licenses="GPL-3.0" 

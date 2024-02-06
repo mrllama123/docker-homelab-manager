@@ -3,7 +3,16 @@ from datetime import datetime, timezone
 
 from sqlmodel import select
 
-from src.models import Backups, ScheduledBackups, BackupVolumes, BackupFilenames, RestoreBackupVolumes, RestoredBackups
+from src.models import (
+    Backups,
+    ScheduledBackups,
+    BackupVolumes,
+    BackupFilenames,
+    RestoreBackupVolumes,
+    RestoredBackups,
+    ErrorBackups,
+    ErrorRestoredBackups,
+)
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
@@ -59,6 +68,55 @@ def test_task_backup_volume(mocker, session):
     ).first()
 
     assert not db_scheduled_backups
+
+
+@freeze_time(lambda: datetime.now(timezone.utc), tick=False)
+def test_task_backup_volume_error(mocker, session):
+    mocker.patch(
+        "src.apschedule.tasks.Session",
+        **{"return_value.__enter__.return_value": session},
+    )
+    mock_backup_volume = mocker.patch(
+        "src.apschedule.tasks.backup_volume", side_effect=Exception("test error")
+    )
+    mocker.patch("src.apschedule.tasks.BACKUP_DIR", "/backup")
+    from src.apschedule.tasks import task_create_backup
+
+    task_create_backup("test-volume", "job_id_1")
+
+    mock_backup_volume.assert_called_once_with("test-volume", "/backup")
+    backup_db = session.exec(
+        select(ErrorBackups).where(ErrorBackups.backup_id == "job_id_1")
+    ).first()
+
+    assert backup_db
+    assert backup_db.backup_id == "job_id_1"
+    assert backup_db.error_message == "test error"
+
+
+@freeze_time(lambda: datetime.now(timezone.utc), tick=False)
+def test_task_backup_volume_error_schedule(mocker, session):
+    mocker.patch(
+        "src.apschedule.tasks.Session",
+        **{"return_value.__enter__.return_value": session},
+    )
+    mock_backup_volume = mocker.patch(
+        "src.apschedule.tasks.backup_volume", side_effect=Exception("test error")
+    )
+    mocker.patch("src.apschedule.tasks.BACKUP_DIR", "/backup")
+    mocker.patch("src.apschedule.tasks.uuid", **{"uuid4.return_value": "test-uuid"})
+    from src.apschedule.tasks import task_create_backup
+
+    task_create_backup("test-volume", "job_id_1", "job_name_1", True)
+
+    mock_backup_volume.assert_called_once_with("test-volume", "/backup")
+    backup_db = session.exec(
+        select(ErrorBackups).where(ErrorBackups.backup_id == "test-uuid")
+    ).first()
+
+    assert backup_db
+    assert backup_db.backup_id == "test-uuid"
+    assert backup_db.error_message == "test error"
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
@@ -160,7 +218,9 @@ def test_task_restore_backup(mocker, session):
     assert restore_db.errorMessage == None
 
     db_restore_volumes = session.exec(
-        select(RestoreBackupVolumes).where(RestoreBackupVolumes.restore_id == "job_id_2")
+        select(RestoreBackupVolumes).where(
+            RestoreBackupVolumes.restore_id == "job_id_2"
+        )
     ).first()
 
     assert db_restore_volumes
@@ -168,6 +228,38 @@ def test_task_restore_backup(mocker, session):
     assert db_restore_volumes.restore_id == "job_id_2"
 
 
+@freeze_time(lambda: datetime.now(timezone.utc), tick=False)
+def test_task_restore_backup_error(mocker, session):
+    mocker.patch(
+        "src.apschedule.tasks.Session",
+        **{"return_value.__enter__.return_value": session},
+    )
+    mock_restore_volume = mocker.patch(
+        "src.apschedule.tasks.restore_volume", side_effect=Exception("test error")
+    )
+    mocker.patch("src.apschedule.tasks.BACKUP_DIR", "/backup")
+    backup = Backups(
+        backup_id="job_id_1",
+        backup_filename="test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
+        backup_created="2021-01-01T00:00:00.000000+00:00",
+        backup_path="/backup/test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
+        volume_name="test-volume",
+        success=True,
+    )
+    session.add(backup)
 
+    from src.apschedule.tasks import task_restore_backup
 
+    task_restore_backup(backup.volume_name, backup.backup_filename, "job_id_2")
 
+    mock_restore_volume.assert_called_once_with(
+        backup.volume_name, "/backup", backup.backup_filename
+    )
+
+    restore_db = session.exec(
+        select(ErrorRestoredBackups).where(ErrorRestoredBackups.restore_id == "job_id_2")
+    ).first()
+
+    assert restore_db
+    assert restore_db.restore_id == "job_id_2"
+    assert restore_db.error_message == "test error"
