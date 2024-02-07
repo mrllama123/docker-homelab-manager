@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from freezegun import freeze_time
 import pytest
+from freezegun import freeze_time
 from sqlmodel import select
 
 from src.models import (
@@ -245,7 +245,6 @@ def test_task_restore_backup_error(mocker, session):
     from src.apschedule.tasks import task_restore_backup
 
     with pytest.raises(Exception, match="test error"):
-
         task_restore_backup(backup.volume_name, backup.backup_filename, "job_id_2")
 
     mock_restore_volume.assert_called_once_with(

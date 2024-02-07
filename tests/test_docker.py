@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 import pytest
 from freezegun import freeze_time
 
-
 from tests.fixtures import MockVolume
 
 
