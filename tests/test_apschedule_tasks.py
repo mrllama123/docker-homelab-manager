@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import pytest
 from freezegun import freeze_time
 from sqlmodel import select
 
@@ -40,8 +41,6 @@ def test_task_backup_volume(mocker, session):
     assert backup_db.backup_created == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.volume_name == "test-volume"
-    assert backup_db.success == True
-    assert backup_db.errorMessage == None
     assert backup_db.schedule_id == None
 
     db_backup_volumes = session.exec(
@@ -82,7 +81,8 @@ def test_task_backup_volume_error(mocker, session):
     mocker.patch("src.apschedule.tasks.BACKUP_DIR", "/backup")
     from src.apschedule.tasks import task_create_backup
 
-    task_create_backup("test-volume", "job_id_1")
+    with pytest.raises(Exception, match="test error"):
+        task_create_backup("test-volume", "job_id_1")
 
     mock_backup_volume.assert_called_once_with("test-volume", "/backup")
     backup_db = session.exec(
@@ -107,7 +107,8 @@ def test_task_backup_volume_error_schedule(mocker, session):
     mocker.patch("src.apschedule.tasks.uuid", **{"uuid4.return_value": "test-uuid"})
     from src.apschedule.tasks import task_create_backup
 
-    task_create_backup("test-volume", "job_id_1", "job_name_1", True)
+    with pytest.raises(Exception, match="test error"):
+        task_create_backup("test-volume", "job_id_1", "job_name_1", True)
 
     mock_backup_volume.assert_called_once_with("test-volume", "/backup")
     backup_db = session.exec(
@@ -145,8 +146,6 @@ def test_task_backup_volume_schedule(mocker, session):
     assert backup_db.backup_created == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.volume_name == "test-volume"
-    assert backup_db.success == True
-    assert backup_db.errorMessage == None
     assert backup_db.schedule_id == "job_id_1"
 
     db_backup_volumes = session.exec(
@@ -192,7 +191,6 @@ def test_task_restore_backup(mocker, session):
         backup_created="2021-01-01T00:00:00.000000+00:00",
         backup_path="/backup/test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
         volume_name="test-volume",
-        success=True,
     )
     session.add(backup)
 
@@ -214,9 +212,6 @@ def test_task_restore_backup(mocker, session):
     assert restore_db.backup_filename == backup.backup_filename
     assert restore_db.restored_date == dt_now.isoformat()
     assert restore_db.volume_name == "test-volume"
-    assert restore_db.success == True
-    assert restore_db.errorMessage == None
-
     db_restore_volumes = session.exec(
         select(RestoreBackupVolumes).where(
             RestoreBackupVolumes.restore_id == "job_id_2"
@@ -244,13 +239,13 @@ def test_task_restore_backup_error(mocker, session):
         backup_created="2021-01-01T00:00:00.000000+00:00",
         backup_path="/backup/test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
         volume_name="test-volume",
-        success=True,
     )
     session.add(backup)
 
     from src.apschedule.tasks import task_restore_backup
 
-    task_restore_backup(backup.volume_name, backup.backup_filename, "job_id_2")
+    with pytest.raises(Exception, match="test error"):
+        task_restore_backup(backup.volume_name, backup.backup_filename, "job_id_2")
 
     mock_restore_volume.assert_called_once_with(
         backup.volume_name, "/backup", backup.backup_filename

@@ -49,7 +49,6 @@ def test_get_backups(client, session):
                 backup_filename=f"{backup_id}.tar.gz",
                 backup_path="/backup/test-backup-name.tar.gz",
                 volume_name="test-volume",
-                success=True,
             )
         )
     session.commit()
@@ -61,20 +60,16 @@ def test_get_backups(client, session):
             "backup_filename": "test-backup-id-1.tar.gz",
             "backup_id": "test-backup-id-1",
             "backup_path": "/backup/test-backup-name.tar.gz",
-            "success": True,
             "volume_name": "test-volume",
             "backup_created": "2021-01-01T00:00:00+00:00",
-            "errorMessage": None,
         },
         {
             "schedule_id": None,
             "backup_filename": "test-backup-id-2.tar.gz",
             "backup_id": "test-backup-id-2",
             "backup_path": "/backup/test-backup-name.tar.gz",
-            "success": True,
             "volume_name": "test-volume",
             "backup_created": "2021-01-01T00:00:00+00:00",
-            "errorMessage": None,
         },
     ]
 
@@ -104,9 +99,7 @@ def test_get_backup(client, session):
         "backup_created": "2021-01-01T00:00:00+00:00",
         "backup_path": "/backup/test-backup-name.tar.gz",
         "volume_name": "test-volume",
-        "errorMessage": None,
         "schedule_id": None,
-        "success": None,
     }
 
 

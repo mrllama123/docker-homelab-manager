@@ -64,9 +64,6 @@ class Backups(SQLModel, table=True):
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
     backup_created: str
-    # TODO: remove
-    success: Optional[bool] = Field(default=None)
-    errorMessage: Optional[str] = Field(default=None)
 
 
 class BackupFilenames(SQLModel, table=True):
@@ -106,9 +103,6 @@ class RestoredBackups(SQLModel, table=True):
         default=None, foreign_key="backupfilenames.backup_filename"
     )
     restored_date: Optional[str] = Field(default=None)
-    # TODO: remove
-    success: Optional[bool] = Field(default=None)
-    errorMessage: Optional[str] = Field(default=None)
 
 
 class ErrorRestoredBackups(SQLModel, table=True):
