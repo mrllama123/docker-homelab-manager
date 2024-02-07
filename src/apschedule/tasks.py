@@ -45,7 +45,6 @@ def task_create_backup(
                 backup_created=dt_now.isoformat(),
                 backup_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
-                success=True,
             )
 
             if is_schedule:
@@ -73,6 +72,7 @@ def task_create_backup(
                 )
             )
             session.commit()
+            raise
 
 
 def task_restore_backup(volume_name: str, backup_file: str, job_id: str) -> None:
@@ -88,7 +88,6 @@ def task_restore_backup(volume_name: str, backup_file: str, job_id: str) -> None
                 restored_date=dt_now.isoformat(),
                 restore_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
-                success=True,
             )
             session.add(
                 RestoreBackupVolumes(volume_name=volume_name, restore_id=job_id)
@@ -105,3 +104,4 @@ def task_restore_backup(volume_name: str, backup_file: str, job_id: str) -> None
                 )
             )
             session.commit()
+            raise
