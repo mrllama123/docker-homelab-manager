@@ -47,19 +47,19 @@ def test_get_backups(client, session):
                 backup_id=backup_id,
                 backup_created="2021-01-01T00:00:00+00:00",
                 backup_filename=f"{backup_id}.tar.gz",
-                backup_path="/backup/test-backup-name.tar.gz",
+                backup_path="/volumes/backup/test-backup-name.tar.gz",
                 volume_name="test-volume",
             )
         )
     session.commit()
-    response = client.get("/backups")
+    response = client.get("/volumes/backup")
     assert response.status_code == 200
     assert response.json() == [
         {
             "schedule_id": None,
             "backup_filename": "test-backup-id-1.tar.gz",
             "backup_id": "test-backup-id-1",
-            "backup_path": "/backup/test-backup-name.tar.gz",
+            "backup_path": "/volumes/backup/test-backup-name.tar.gz",
             "volume_name": "test-volume",
             "backup_created": "2021-01-01T00:00:00+00:00",
         },
@@ -67,7 +67,7 @@ def test_get_backups(client, session):
             "schedule_id": None,
             "backup_filename": "test-backup-id-2.tar.gz",
             "backup_id": "test-backup-id-2",
-            "backup_path": "/backup/test-backup-name.tar.gz",
+            "backup_path": "/volumes/backup/test-backup-name.tar.gz",
             "volume_name": "test-volume",
             "backup_created": "2021-01-01T00:00:00+00:00",
         },
@@ -75,7 +75,7 @@ def test_get_backups(client, session):
 
 
 def test_get_no_backups(client):
-    response = client.get("/backups")
+    response = client.get("/volumes/backup")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -86,25 +86,25 @@ def test_get_backup(client, session):
             backup_id="test-backup-id",
             backup_filename="test-backup-name.tar.gz",
             backup_created="2021-01-01T00:00:00+00:00",
-            backup_path="/backup/test-backup-name.tar.gz",
+            backup_path="/volumes/backup/test-backup-name.tar.gz",
             volume_name="test-volume",
         )
     )
     session.commit()
-    response = client.get("/backups/test-backup-id")
+    response = client.get("/volumes/backup/test-backup-id")
     assert response.status_code == 200
     assert response.json() == {
         "backup_id": "test-backup-id",
         "backup_filename": "test-backup-name.tar.gz",
         "backup_created": "2021-01-01T00:00:00+00:00",
-        "backup_path": "/backup/test-backup-name.tar.gz",
+        "backup_path": "/volumes/backup/test-backup-name.tar.gz",
         "volume_name": "test-volume",
         "schedule_id": None,
     }
 
 
 def test_get_backup_not_found(client):
-    response = client.get("/backups/test-backup-name.tar.gz")
+    response = client.get("/volumes/backup/test-backup-name.tar.gz")
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Backup test-backup-name.tar.gz does not exist",
@@ -120,7 +120,7 @@ def test_create_backup_volume_not_found(mocker, client):
         "src.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
-    response = client.post("/backup/test-volume")
+    response = client.post("/volumes/backup/test-volume")
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Volume test-volume does not exist",
@@ -144,7 +144,7 @@ def test_create_backup(mocker, client):
         return_value=MockAsyncResult(),
     )
 
-    response = client.post("/backup/test-volume")
+    response = client.post("/volumes/backup/test-volume")
     assert response.status_code == 200
     assert response.json() == {
         "message": "Backup of test-volume started",
@@ -171,7 +171,7 @@ def test_create_backup_volume_attached(mocker, client):
         "src.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
-    response = client.post("/backup/test-volume")
+    response = client.post("/volumes/backup/test-volume")
     assert response.status_code == 409
     assert response.json() == {
         "detail": "Volume test-volume is attached to a container"
@@ -188,7 +188,7 @@ def test_restore_backup(mocker, client):
         return_value=MockAsyncResult(),
     )
     response = client.post(
-        "/restore",
+        "/volumes/restore",
         json={
             "volume_name": "test-volume",
             "backup_filename": "test-backup-name.tar.gz",
@@ -214,7 +214,7 @@ def test_create_schedule(mocker, client):
         return_value=MockAsyncResult(),
     )
     response = client.post(
-        "/volumes/backup/schedule",
+        "/volumes/schedule/backup",
         json={
             "schedule_name": "test-schedule",
             "volume_name": "test-volume",
@@ -261,7 +261,7 @@ def test_get_schedule(mocker, client):
             ),
         ),
     )
-    response = client.get("/volumes/backup/schedule/test-schedule")
+    response = client.get("/volumes/schedule/backup/test-schedule")
     assert response.status_code == 200
     assert response.json() == {
         "schedule_name": "test-schedule",
@@ -283,7 +283,7 @@ def test_get_schedule_not_found(mocker, client):
         "src.api.get_backup_schedule",
         return_value=None,
     )
-    response = client.get("/volumes/backup/schedule/test-schedule")
+    response = client.get("/volumes/schedule/backup/test-schedule")
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
     mock_get_schedule.assert_called_once_with("test-schedule")
@@ -302,7 +302,7 @@ def test_list_schedule(mocker, client):
             )
         ],
     )
-    response = client.get("/volumes/backup/schedule")
+    response = client.get("/volumes/schedule/backup")
     assert response.status_code == 200
     assert response.json() == [
         {
@@ -325,7 +325,7 @@ def test_remove_schedule(mocker, client):
     mock_remove_schedule = mocker.patch(
         "src.api.delete_backup_schedule",
     )
-    response = client.delete("/volumes/backup/schedule/test-schedule")
+    response = client.delete("/volumes/schedule/backup/test-schedule")
     assert response.status_code == 200
     assert response.json() == "Schedule test-schedule removed"
     mock_remove_schedule.assert_called_once_with("test-schedule")
@@ -336,7 +336,7 @@ def test_remove_schedule_not_found(mocker, client):
         "src.api.delete_backup_schedule",
         side_effect=JobLookupError("test-schedule"),
     )
-    response = client.delete("/volumes/backup/schedule/test-schedule")
+    response = client.delete("/volumes/schedule/backup/test-schedule")
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
     mock_remove_schedule.assert_called_once_with("test-schedule")
