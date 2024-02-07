@@ -55,14 +55,18 @@ async def api_volumes() -> list[VolumeItem]:
 
 
 @app.get(
-    "/volumes/backup", description="Get a list of all backups", response_model=list[Backups]
+    "/volumes/backup",
+    description="Get a list of all backups",
+    response_model=list[Backups],
 )
 async def api_backups(session: Session = Depends(get_session)) -> list[Backups]:
     return session.exec(select(Backups)).all()
 
 
 @app.get(
-    "/volumes/backup/{backup_id}", description="Get a backup by name", response_model=Backups
+    "/volumes/backup/{backup_id}",
+    description="Get a backup by name",
+    response_model=Backups,
 )
 async def api_backup(
     backup_id: str, session: Session = Depends(get_session)
