@@ -28,7 +28,11 @@ def test_task_backup_volume(mocker, session):
 
     task_create_backup("test-volume", "job_id_1")
 
-    mock_backup_volume.assert_called_once_with("test-volume", "/backup")
+    mock_backup_volume.assert_called_once_with(
+        "test-volume",
+        "/backup",
+        f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
+    )
     backup_db = session.exec(
         select(Backups).where(Backups.backup_id == "job_id_1")
     ).first()
@@ -84,7 +88,11 @@ def test_task_backup_volume_error(mocker, session):
     with pytest.raises(Exception, match="test error"):
         task_create_backup("test-volume", "job_id_1")
 
-    mock_backup_volume.assert_called_once_with("test-volume", "/backup")
+    mock_backup_volume.assert_called_once_with(
+        "test-volume",
+        "/backup",
+        f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
+    )
     backup_db = session.exec(
         select(ErrorBackups).where(ErrorBackups.backup_id == "job_id_1")
     ).first()
@@ -110,7 +118,11 @@ def test_task_backup_volume_error_schedule(mocker, session):
     with pytest.raises(Exception, match="test error"):
         task_create_backup("test-volume", "job_id_1", "job_name_1", True)
 
-    mock_backup_volume.assert_called_once_with("test-volume", "/backup")
+    mock_backup_volume.assert_called_once_with(
+        "test-volume",
+        "/backup",
+        f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
+    )
     backup_db = session.exec(
         select(ErrorBackups).where(ErrorBackups.backup_id == "test-uuid")
     ).first()
@@ -133,7 +145,11 @@ def test_task_backup_volume_schedule(mocker, session):
 
     task_create_backup("test-volume", "job_id_1", "job_name_1", True)
 
-    mock_backup_volume.assert_called_once_with("test-volume", "/backup")
+    mock_backup_volume.assert_called_once_with(
+        "test-volume",
+        "/backup",
+        f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
+    )
     backup_db = session.exec(
         select(Backups).where(Backups.backup_id == "test-uuid")
     ).first()
