@@ -23,7 +23,7 @@ def test_backup_volume(mocker):
     backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
 
     # Run the function
-    backup_volume(volume_name, "/backup")
+    backup_volume(volume_name, "/backup", backup_file)
 
     # Assert the function calls and behavior
     mock_get_docker_client.assert_called_once()
@@ -63,7 +63,7 @@ def test_backup_volume_failure_backup_not_found(mocker):
 
     # Run the function
     with pytest.raises(RuntimeError, match="Backup failed"):
-        backup_volume(volume_name, "/backup")
+        backup_volume(volume_name, "/backup", backup_file)
 
     # # Assert the function calls and behavior
     mock_get_docker_client.assert_called_once()
@@ -101,7 +101,7 @@ def test_backup_volume_failure_volume_not_found(mocker):
 
     # Run the function
     with pytest.raises(ValueError, match=f"Volume {volume_name} does not exist"):
-        backup_volume(volume_name, "/backup")
+        backup_volume(volume_name, "/backup", backup_file)
 
     # # Assert the function calls and behavior
     mock_get_docker_client.assert_called_once()

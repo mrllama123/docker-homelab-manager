@@ -37,7 +37,7 @@ def task_create_backup(
         try:
             dt_now = datetime.now(tz=pytz.timezone(TZ))
             backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
-            backup_volume(volume_name, BACKUP_DIR)
+            backup_volume(volume_name, BACKUP_DIR, backup_file)
 
             backup = Backups(
                 backup_id=backup_id,

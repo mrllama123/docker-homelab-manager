@@ -45,24 +45,23 @@ def is_volume_attached(volume_name: str) -> bool:
     return len(client.volume.list(filters={"name": volume_name, "dangling": 0})) == 0
 
 
-def backup_volume(volume_name: str, backup_dir: str) -> None:
+def backup_volume(volume_name: str, backup_dir: str, filename: str) -> None:
     client = get_docker_client()
-
-    dt_now = datetime.now(tz=timezone.utc)
-    backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
 
     volume = get_volume(volume_name)
 
     if not volume:
         raise ValueError(f"Volume {volume_name} does not exist")
 
-    logger.info("Backing up volume %s to %s", volume_name, backup_file)
+    logger.info(
+        "Backing up volume %s to %s", volume_name, os.path.join(backup_dir, filename)
+    )
     client.run(
         image="busybox",
         command=[
             "tar",
             "cvaf",
-            f"/dest/{backup_file}",
+            f"/dest/{filename}",
             "-C",
             "/source",
             ".",
@@ -70,7 +69,7 @@ def backup_volume(volume_name: str, backup_dir: str) -> None:
         remove=True,
         volumes=[(volume, "/source"), (backup_dir, "/dest")],
     )
-    if not os.path.exists(os.path.join("/backup", backup_file)):
+    if not os.path.exists(os.path.join("/backup", filename)):
         raise RuntimeError("Backup failed")
 
 
