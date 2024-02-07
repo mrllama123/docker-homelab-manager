@@ -117,8 +117,9 @@ def map_job_to_backup_schedule(job: Job):
         cron_fields = {field.name: str(field) for field in job.trigger.fields}
         logger.info("cron_fields: %s", cron_fields)
         return BackupSchedule(
-            schedule_name=job.id,
+            schedule_id=job.id,
             volume_name=job.args[0],
+            schedule_name=job.name,
             crontab=ScheduleCrontab(
                 minute=cron_fields["minute"],
                 hour=cron_fields["hour"],
@@ -129,6 +130,7 @@ def map_job_to_backup_schedule(job: Job):
         )
 
     return BackupSchedule(
-        schedule_name=job.id,
+        schedule_id=job.id,
+        schedule_name=job.name,
         volume_name=job.args[0],
     )

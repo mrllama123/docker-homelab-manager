@@ -19,8 +19,10 @@ from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
     Backups,
     BackupSchedule,
-    BackupVolume,
-    BackupVolumeResponse,
+    RestoreVolume,
+    CreateBackupResponse,
+    CreateBackupSchedule,
+    RestoreVolume,
     RestoreVolumeResponse,
     VolumeItem,
 )
@@ -81,7 +83,7 @@ async def api_backup(
 
 
 @app.post("/volumes/backup/{volume_name}", description="Backup a Docker volume")
-def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
+def api_backup_volume(volume_name: str) -> CreateBackupResponse:
     logger.info("backing up volume: %s", volume_name)
     if not get_volume(volume_name):
         raise HTTPException(
@@ -94,16 +96,17 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
             detail=f"Volume {volume_name} is attached to a container",
         )
 
-    task = add_backup_job(f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name)
+    job = add_backup_job(f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name)
     logger.info(
         "backup %s started task id: %s",
         volume_name,
-        task.id,
-        extra={"task_id": task.id},
+        job.id,
+        extra={"task_id": job.id},
     )
 
-    return BackupVolumeResponse(
-        message=f"Backup of {volume_name} started", backup_id=task.id
+    return CreateBackupResponse(
+        backup_id=job.id,
+        volume_name=volume_name,
     )
 
 
@@ -112,26 +115,26 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     description="Restore a Docker volume",
 )
 def api_restore_volume(
-    backup_volume: BackupVolume,
+    restore_volume: RestoreVolume,
 ) -> RestoreVolumeResponse:
     logger.info(
         "restoring volume: %s from backup: %s",
-        backup_volume.volume_name,
-        backup_volume.backup_filename,
+        restore_volume.volume_name,
+        restore_volume.backup_filename,
     )
     task = add_restore_job(
-        f"restore-{backup_volume.volume_name}-{str(uuid.uuid4())}",
-        backup_volume.volume_name,
-        backup_volume.backup_filename,
+        f"restore-{restore_volume.volume_name}-{str(uuid.uuid4())}",
+        restore_volume.volume_name,
+        restore_volume.backup_filename,
     )
     logger.info(
         "restore of %s started task id: %s",
-        backup_volume.volume_name,
+        restore_volume.volume_name,
         task.id,
         extra={"task_id": task.id},
     )
     return RestoreVolumeResponse(
-        message=f"restore of {backup_volume.volume_name} started", restore_id=task.id
+        restore_id=task.id, volume_name=restore_volume.volume_name
     )
 
 
@@ -172,7 +175,7 @@ def api_remove_backup_schedule(schedule_id: str) -> str:
 
 @app.post("/volumes/schedule/backup", description="Create a backup schedule")
 async def api_create_backup_schedule(
-    schedule_body: BackupSchedule,
+    schedule_body: CreateBackupSchedule,
 ) -> BackupSchedule:
     if not get_volume(schedule_body.volume_name):
         raise HTTPException(
@@ -197,7 +200,8 @@ async def api_create_backup_schedule(
         raise
 
     return BackupSchedule(
-        schedule_name=job.id,
+        schedule_id=job.id,
+        schedule_name=schedule_body.schedule_name,
         volume_name=schedule_body.volume_name,
         crontab=schedule_body.crontab,
     )
