@@ -19,7 +19,6 @@ from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
     Backups,
     BackupSchedule,
-    RestoreVolume,
     CreateBackupResponse,
     CreateBackupSchedule,
     RestoreVolume,
