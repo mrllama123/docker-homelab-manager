@@ -1,6 +1,5 @@
 import logging
 import os
-from datetime import datetime, timezone
 from functools import lru_cache
 
 from python_on_whales import DockerClient, DockerException, Volume
