@@ -7,12 +7,9 @@ from sqlmodel import select
 from src.models import (
     BackupFilenames,
     Backups,
-    BackupVolumes,
     ErrorBackups,
     ErrorRestoredBackups,
-    RestoreBackupVolumes,
     RestoredBackups,
-    ScheduledBackups,
 )
 
 
@@ -47,14 +44,6 @@ def test_task_backup_volume(mocker, session):
     assert backup_db.volume_name == "test-volume"
     assert backup_db.schedule_id == None
 
-    db_backup_volumes = session.exec(
-        select(BackupVolumes).where(BackupVolumes.backup_id == "job_id_1")
-    ).first()
-
-    assert db_backup_volumes
-    assert db_backup_volumes.volume_name == "test-volume"
-    assert db_backup_volumes.backup_id == "job_id_1"
-
     db_backup_filenames = session.exec(
         select(BackupFilenames).where(BackupFilenames.backup_id == "job_id_1")
     ).first()
@@ -65,12 +54,6 @@ def test_task_backup_volume(mocker, session):
         == f"test-volume-{dt_now.isoformat()}.tar.gz"
     )
     assert db_backup_filenames.backup_id == "job_id_1"
-
-    db_scheduled_backups = session.exec(
-        select(ScheduledBackups).where(ScheduledBackups.backup_id == "job_id_1")
-    ).first()
-
-    assert not db_scheduled_backups
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
@@ -164,14 +147,6 @@ def test_task_backup_volume_schedule(mocker, session):
     assert backup_db.volume_name == "test-volume"
     assert backup_db.schedule_id == "job_id_1"
 
-    db_backup_volumes = session.exec(
-        select(BackupVolumes).where(BackupVolumes.backup_id == "test-uuid")
-    ).first()
-
-    assert db_backup_volumes
-    assert db_backup_volumes.volume_name == "test-volume"
-    assert db_backup_volumes.backup_id == "test-uuid"
-
     db_backup_filenames = session.exec(
         select(BackupFilenames).where(BackupFilenames.backup_id == "test-uuid")
     ).first()
@@ -182,15 +157,6 @@ def test_task_backup_volume_schedule(mocker, session):
         == f"test-volume-{dt_now.isoformat()}.tar.gz"
     )
     assert db_backup_filenames.backup_id == "test-uuid"
-
-    db_scheduled_backups = session.exec(
-        select(ScheduledBackups).where(ScheduledBackups.backup_id == "test-uuid")
-    ).first()
-
-    assert db_scheduled_backups
-    assert db_scheduled_backups.schedule_id == "job_id_1"
-    assert db_scheduled_backups.backup_id == "test-uuid"
-    assert db_scheduled_backups.schedule_name == "job_name_1"
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
@@ -228,15 +194,6 @@ def test_task_restore_backup(mocker, session):
     assert restore_db.backup_filename == backup.backup_filename
     assert restore_db.restored_date == dt_now.isoformat()
     assert restore_db.volume_name == "test-volume"
-    db_restore_volumes = session.exec(
-        select(RestoreBackupVolumes).where(
-            RestoreBackupVolumes.restore_id == "job_id_2"
-        )
-    ).first()
-
-    assert db_restore_volumes
-    assert db_restore_volumes.volume_name == "test-volume"
-    assert db_restore_volumes.restore_id == "job_id_2"
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)

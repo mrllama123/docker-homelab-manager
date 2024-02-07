@@ -11,12 +11,9 @@ from src.docker import backup_volume, restore_volume
 from src.models import (
     BackupFilenames,
     Backups,
-    BackupVolumes,
     ErrorBackups,
     ErrorRestoredBackups,
-    RestoreBackupVolumes,
     RestoredBackups,
-    ScheduledBackups,
 )
 
 TZ = os.environ.get("TZ", "UTC")
@@ -48,15 +45,7 @@ def task_create_backup(
             )
 
             if is_schedule:
-                schedule = ScheduledBackups(
-                    schedule_id=job_id,
-                    backup_id=backup_id,
-                    schedule_name=job_name,
-                )
                 backup.schedule_id = job_id
-                session.add(schedule)
-
-            session.add(BackupVolumes(volume_name=volume_name, backup_id=backup_id))
             session.add(
                 BackupFilenames(backup_filename=backup_file, backup_id=backup_id)
             )
@@ -89,9 +78,6 @@ def task_restore_backup(volume_name: str, backup_file: str, job_id: str) -> None
                 restored_date=dt_now.isoformat(),
                 restore_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
-            )
-            session.add(
-                RestoreBackupVolumes(volume_name=volume_name, restore_id=job_id)
             )
             session.add(backup)
             session.commit()
