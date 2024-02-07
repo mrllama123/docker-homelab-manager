@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
@@ -13,23 +13,17 @@ class VolumeItem(BaseModel):
     createdAt: str
 
 
-class BackupVolumeResponse(BaseModel):
-    message: str
+class CreateBackupResponse(BaseModel):
     backup_id: str
+    volume_name: str
 
 
 class RestoreVolumeResponse(BaseModel):
-    message: str
     restore_id: str
+    volume_name: str
 
 
-class BackupStatusResponse(BaseModel):
-    status: str
-    backup_id: str
-    result: Any
-
-
-class BackupVolume(BaseModel):
+class RestoreVolume(BaseModel):
     volume_name: str
     backup_filename: str
 
@@ -43,10 +37,16 @@ class ScheduleCrontab(BaseModel):
     day_of_week: str = "*"
 
 
-class BackupSchedule(BaseModel):
-    # TODO add schedule_id
+class CreateBackupSchedule(BaseModel):
     schedule_name: str
     volume_name: str
+    crontab: ScheduleCrontab
+
+
+class BackupSchedule(BaseModel):
+    schedule_id: str
+    volume_name: str
+    schedule_name: str | None = None
     crontab: ScheduleCrontab = None
 
 

@@ -147,7 +147,7 @@ def test_create_backup(mocker, client):
     response = client.post("/volumes/backup/test-volume")
     assert response.status_code == 200
     assert response.json() == {
-        "message": "Backup of test-volume started",
+        "volume_name": "test-volume",
         "backup_id": "test-task-id",
     }
     mock_get_volume.assert_called_once_with("test-volume")
@@ -196,7 +196,7 @@ def test_restore_backup(mocker, client):
     )
     assert response.status_code == 200
     assert response.json() == {
-        "message": "restore of test-volume started",
+        "volume_name": "test-volume",
         "restore_id": "test-task-id",
     }
     mock_create_volume_backup.assert_called_once_with(
@@ -230,7 +230,8 @@ def test_create_schedule(mocker, client):
     )
     assert response.status_code == 200
     assert response.json() == {
-        "schedule_name": "test-task-id",
+        "schedule_id": "test-task-id",
+        "schedule_name": "test-schedule",
         "volume_name": "test-volume",
         "crontab": {
             "minute": "1",
@@ -255,6 +256,7 @@ def test_get_schedule(mocker, client):
         "src.api.get_backup_schedule",
         return_value=BackupSchedule(
             volume_name="test-volume",
+            schedule_id="test-schedule-id",
             schedule_name="test-schedule",
             crontab=ScheduleCrontab(
                 minute="1", hour="2", day="*", month="*", day_of_week="*"
@@ -264,6 +266,7 @@ def test_get_schedule(mocker, client):
     response = client.get("/volumes/schedule/backup/test-schedule")
     assert response.status_code == 200
     assert response.json() == {
+        "schedule_id": "test-schedule-id",
         "schedule_name": "test-schedule",
         "volume_name": "test-volume",
         "crontab": {
@@ -295,6 +298,7 @@ def test_list_schedule(mocker, client):
         return_value=[
             BackupSchedule(
                 volume_name="test-volume",
+                schedule_id="test-schedule-id",
                 schedule_name="test-schedule",
                 crontab=ScheduleCrontab(
                     minute="1", hour="2", day="*", month="*", day_of_week="*"
@@ -306,6 +310,7 @@ def test_list_schedule(mocker, client):
     assert response.status_code == 200
     assert response.json() == [
         {
+            "schedule_id": "test-schedule-id",
             "schedule_name": "test-schedule",
             "volume_name": "test-volume",
             "crontab": {

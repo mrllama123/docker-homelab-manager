@@ -80,6 +80,7 @@ def task_restore_backup(volume_name: str, backup_file: str, job_id: str) -> None
     with Session(engine) as session:
         try:
             dt_now = datetime.now(tz=pytz.timezone(TZ))
+            logger.info("backup dir: %s", BACKUP_DIR)
             restore_volume(volume_name, BACKUP_DIR, backup_file)
 
             backup = RestoredBackups(
