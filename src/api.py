@@ -55,14 +55,18 @@ async def api_volumes() -> list[VolumeItem]:
 
 
 @app.get(
-    "/backups", description="Get a list of all backups", response_model=list[Backups]
+    "/volumes/backup",
+    description="Get a list of all backups",
+    response_model=list[Backups],
 )
 async def api_backups(session: Session = Depends(get_session)) -> list[Backups]:
     return session.exec(select(Backups)).all()
 
 
 @app.get(
-    "/backups/{backup_id}", description="Get a backup by name", response_model=Backups
+    "/volumes/backup/{backup_id}",
+    description="Get a backup by name",
+    response_model=Backups,
 )
 async def api_backup(
     backup_id: str, session: Session = Depends(get_session)
@@ -76,7 +80,7 @@ async def api_backup(
     return backup
 
 
-@app.post("/backup/{volume_name}", description="Backup a Docker volume")
+@app.post("/volumes/backup/{volume_name}", description="Backup a Docker volume")
 def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
     logger.info("backing up volume: %s", volume_name)
     if not get_volume(volume_name):
@@ -104,7 +108,7 @@ def api_backup_volume(volume_name: str) -> BackupVolumeResponse:
 
 
 @app.post(
-    "/restore",
+    "/volumes/restore",
     description="Restore a Docker volume",
 )
 def api_restore_volume(
@@ -131,7 +135,7 @@ def api_restore_volume(
     )
 
 
-@app.get("/volumes/backup/schedule/{schedule_id}", description="Get a backup schedule")
+@app.get("/volumes/schedule/backup/{schedule_id}", description="Get a backup schedule")
 def api_get_backup_schedule(schedule_id: str) -> BackupSchedule:
     logger.info("Getting schedule %s", schedule_id)
     schedule = get_backup_schedule(schedule_id)
@@ -143,14 +147,14 @@ def api_get_backup_schedule(schedule_id: str) -> BackupSchedule:
     return schedule
 
 
-@app.get("/volumes/backup/schedule", description="Get a list of backup schedules")
+@app.get("/volumes/schedule/backup", description="Get a list of backup schedules")
 def api_list_backup_schedules() -> list[BackupSchedule]:
     # TODO: add filters e.g volume_name, cron schedule
     return list_backup_schedules()
 
 
 @app.delete(
-    "/volumes/backup/schedule/{schedule_id}", description="Remove a backup schedule"
+    "/volumes/schedule/backup/{schedule_id}", description="Remove a backup schedule"
 )
 def api_remove_backup_schedule(schedule_id: str) -> str:
     logger.info("Removing schedule %s", schedule_id)
@@ -166,7 +170,7 @@ def api_remove_backup_schedule(schedule_id: str) -> str:
     return f"Schedule {schedule_id} removed"
 
 
-@app.post("/volumes/backup/schedule", description="Create a backup schedule")
+@app.post("/volumes/schedule/backup", description="Create a backup schedule")
 async def api_create_backup_schedule(
     schedule_body: BackupSchedule,
 ) -> BackupSchedule:
