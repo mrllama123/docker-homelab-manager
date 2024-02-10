@@ -22,7 +22,7 @@ homepage = "https://github.com/mrllama123/docker-homelab-manager"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-fastapi = {extras = ["all"], version = "^0.104.1"}
+fastapi = { extras = ["all"], version = "^0.104.1" }
 uvicorn = { extras = ["standard"], version = "^0.24.0.post1" }
 python-on-whales = "^0.67.0"
 sqlmodel = "^0.0.14"
@@ -52,28 +52,32 @@ pylint = { cmd = "pylint src", help = "Run pylint on codebase" }
 check_black = { cmd = "black src --check" }
 check_imports = { cmd = "isort --check-only --profile=black src" }
 lint = ["check_black", "check_imports", "pylint"]
-api-dev = { cmd = "uvicorn src.api.main:app --reload", help = "Run the API in dev mode" }
+api-dev = { cmd = "uvicorn src.api:app --reload --log-config=src/config/log_config.yaml", help = "Run the API in dev mode", envfile = ".env" }
+local-dev = ["migrate", "api-dev"]
 dev = "docker compose -f docker-compose-dev.yml  up  --build"
-clear-cache= { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
+clear-cache = { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
+
 
 [tool.poe.tasks.migrate]
-cmd = "alembic upgrade ${revision}"
+shell = "mkdir -p ${DB_DIR} && alembic upgrade ${revision}"
 help = "Run alembic migration on ${revision}"
 envfile = ".env"
-args = [{ name = "revision", positional = true, default = "head"}]
+args = [{ name = "revision", positional = true, default = "head" }]
 
 [tool.poe.tasks.downgrade]
 cmd = "alembic downgrade ${revision}"
 help = "Run alembic migration on ${revision}"
 envfile = ".env"
-args = [{ name = "revision", positional = true, default = "-1"}]
+args = [{ name = "revision", positional = true, default = "-1" }]
 
 
 [tool.poe.tasks.revision]
 cmd = 'alembic revision --autogenerate  -m "${message}"'
 help = "Create a new alembic migration revision"
 envfile = ".env"
-args = [{ name = "message", positional = true,  multiple = true, type = "string"}]
+args = [
+    { name = "message", positional = true, multiple = true, type = "string" },
+]
 
 
 [tool.poe.tasks.format]
@@ -83,7 +87,6 @@ help = "Format code"
 [tool.poe.tasks.test]
 cmd = "pytest -vvv --cov=src"
 help = "Simply run test suite"
-
 
 
 [build-system]
@@ -142,6 +145,5 @@ disable = [
     "unexpected-special-method-signature",
     "consider-using-from-import",
     "try-except-raise",
-    "line-too-long"
+    "line-too-long",
 ]
-
