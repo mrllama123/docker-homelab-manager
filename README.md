@@ -85,7 +85,7 @@ poe lint
 
 To make it easy there is some poe tasks to run the migrations:
 
-Run migration
+Run migrationthe
 
 ```bash
 # run the migrations
@@ -113,6 +113,9 @@ To find out all options for tasks run `poe --help`
 
 there is a example [docker-compose file](./docker-compose.yml) in the root of the project that you can use to run the app in production
 
+## database structure
+
+See [database.md](./docs/database.md) for a diagram and explanation of the database structure
 
 ## License
 
