@@ -56,6 +56,7 @@ class BackupSchedule(BaseModel):
 class Backups(SQLModel, table=True):
     backup_id: Optional[str] = Field(default=None, primary_key=True)
     schedule_id: Optional[str] = Field(default=None)
+    backup_name: Optional[str] = Field(default=None)
     volume_name: Optional[str] = Field(default=None)
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
@@ -72,11 +73,13 @@ class BackupFilenames(SQLModel, table=True):
 
 class ErrorBackups(SQLModel, table=True):
     backup_id: Optional[str] = Field(default=None, primary_key=True)
+    backup_name: Optional[str] = Field(default=None)
     error_message: Optional[str] = Field(default=None)
 
 
 class RestoredBackups(SQLModel, table=True):
     restore_id: Optional[str] = Field(default=None, primary_key=True)
+    restore_name: Optional[str] = Field(default=None)
     volume_name: Optional[str] = Field(default=None)
     backup_filename: Optional[str] = Field(default=None)
     restored_date: Optional[str] = Field(default=None)
@@ -84,4 +87,5 @@ class RestoredBackups(SQLModel, table=True):
 
 class ErrorRestoredBackups(SQLModel, table=True):
     restore_id: Optional[str] = Field(default=None, primary_key=True)
+    restore_name: Optional[str] = Field(default=None)
     error_message: Optional[str] = Field(default=None)

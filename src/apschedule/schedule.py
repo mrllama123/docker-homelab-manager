@@ -8,7 +8,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from src.apschedule.tasks import task_create_backup, task_restore_backup
-from src.docker import restore_volume
 from src.models import BackupSchedule, ScheduleCrontab
 
 logger = logging.getLogger(__name__)
@@ -38,7 +37,11 @@ def add_backup_job(
 ):
     job_id = str(uuid.uuid4())
 
-    kwargs = {"is_schedule": True, "job_name": job_name} if is_schedule else {}
+    kwargs = (
+        {"is_schedule": True, "job_name": job_name}
+        if is_schedule
+        else {"job_name": job_name}
+    )
 
     if crontab:
         return SCHEDULER.add_job(
@@ -77,11 +80,11 @@ def add_restore_job(
     job_id = str(uuid.uuid4())
     if crontab:
         return SCHEDULER.add_job(
-            func=restore_volume,
+            func=task_restore_backup,
             trigger=CronTrigger(**crontab),
             id=job_id,
             name=job_name,
-            args=[volume_name, backup_filename, job_id],
+            args=[volume_name, backup_filename, job_id, job_name],
             replace_existing=False,
         )
 
@@ -89,7 +92,7 @@ def add_restore_job(
         func=task_restore_backup,
         id=job_id,
         name=job_name,
-        args=[volume_name, backup_filename, job_id],
+        args=[volume_name, backup_filename, job_id, job_name],
         replace_existing=False,
         coalesce=True,
     )
