@@ -47,6 +47,7 @@ def test_get_backups(client, session):
                 backup_id=backup_id,
                 backup_created="2021-01-01T00:00:00+00:00",
                 backup_filename=f"{backup_id}.tar.gz",
+                backup_name="test-backup-name",
                 backup_path="/volumes/backup/test-backup-name.tar.gz",
                 volume_name="test-volume",
             )
@@ -61,6 +62,7 @@ def test_get_backups(client, session):
             "backup_id": "test-backup-id-1",
             "backup_path": "/volumes/backup/test-backup-name.tar.gz",
             "volume_name": "test-volume",
+            "backup_name": "test-backup-name",
             "backup_created": "2021-01-01T00:00:00+00:00",
         },
         {
@@ -68,6 +70,7 @@ def test_get_backups(client, session):
             "backup_filename": "test-backup-id-2.tar.gz",
             "backup_id": "test-backup-id-2",
             "backup_path": "/volumes/backup/test-backup-name.tar.gz",
+            "backup_name": "test-backup-name",
             "volume_name": "test-volume",
             "backup_created": "2021-01-01T00:00:00+00:00",
         },
@@ -85,6 +88,7 @@ def test_get_backup(client, session):
         Backups(
             backup_id="test-backup-id",
             backup_filename="test-backup-name.tar.gz",
+            backup_name="test-backup-name",
             backup_created="2021-01-01T00:00:00+00:00",
             backup_path="/volumes/backup/test-backup-name.tar.gz",
             volume_name="test-volume",
@@ -97,6 +101,7 @@ def test_get_backup(client, session):
         "backup_id": "test-backup-id",
         "backup_filename": "test-backup-name.tar.gz",
         "backup_created": "2021-01-01T00:00:00+00:00",
+        "backup_name": "test-backup-name",
         "backup_path": "/volumes/backup/test-backup-name.tar.gz",
         "volume_name": "test-volume",
         "schedule_id": None,
