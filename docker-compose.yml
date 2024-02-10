@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: Dockerfile
     ports:
-      - 10000:80
+      - 80:80
     volumes:
       - ${DB_DIR}:/db
       - ${BACKUP_DIR}:/backup

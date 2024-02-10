@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: Dockerfile-Dev
     ports:
-      - 10000:80
+      - 8000:80
     volumes:
       - ./src:/code/src
       - ./migrations:/code/migrations
