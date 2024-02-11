@@ -31,7 +31,7 @@ alembic = "^1.13.1"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
+black = "^24.1.1"
 hypothesis = "^6.68.2"
 mypy = "^1.0.1"
 pytest = "^7.2.1"
