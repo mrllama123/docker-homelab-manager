@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Docker homelab manager</title>
+  <meta charset="UTF-8" />
+
+  <link rel="stylesheet" href="https://unpkg.com/98.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.10"
+    integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+    crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+  <div class="window">
+    <div class="title-bar" style="pointer-events: none;">
+      <div class="title-bar-text">
+        Docker homelab manager
+      </div>
+
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <menu role="tablist">
+        <li role="tab" aria-selected="true"><a href="#tabs">Backup Volume</a></li>
+        <li role="tab" aria-selected="false" ><a href="#tabs">Restore Volume</a></li>
+      </menu>
+      <div class="window" role="tabpanel">
+        <div class="window-body">
+          <div class="backup-volume-tab-body" >
+            <p>the tab content 1 </p>
+          </div>
+          <div class="restore-volume-tab-body" style="display: none;">
+            <p>the tab content 2</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
