@@ -27,17 +27,17 @@
     </div>
     <div class="window-body">
       <menu role="tablist">
-        <li role="tab" aria-selected="true"><a href="#tabs">Backup Volume</a></li>
-        <li role="tab" aria-selected="false" ><a href="#tabs">Restore Volume</a></li>
+        <li role="tab" aria-selected="true" aria-controls="backup-volume-tab"><a href="#tabs">Backup Volume</a></li>
+        <li role="tab" aria-selected="false" aria-controls="restore-volume-tab"><a href="#tabs">Restore Volume</a></li>
       </menu>
-      <div class="window" role="tabpanel">
+      <div class="window" id="backup-volume-tab"  role="tabpanel">
         <div class="window-body">
-          <div class="backup-volume-tab-body" >
             <p>the tab content 1 </p>
-          </div>
-          <div class="restore-volume-tab-body" style="display: none;">
-            <p>the tab content 2</p>
-          </div>
+        </div>
+      </div>
+      <div class="window" hidden id="restore-volume-tab"  role="tabpanel">
+        <div class="window-body">
+            <p>the tab content 2 </p>
         </div>
       </div>
     </div>
