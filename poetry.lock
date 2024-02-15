@@ -2240,21 +2240,21 @@ jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
 name = "shed"
-version = "0.10.9"
+version = "2023.6.1"
 description = "`shed` canonicalises Python code."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "shed-0.10.9-py3-none-any.whl", hash = "sha256:ca2c4863abba47df2463fed51bca1cc81b4380b0fb07e18ccc207506ea5ef03b"},
-    {file = "shed-0.10.9.tar.gz", hash = "sha256:586409073267c0b74ec82526d0bcd1f9e857f785d9f1f07e6c3f3f1091e82712"},
+    {file = "shed-2023.6.1-py3-none-any.whl", hash = "sha256:f57ec3c5bebdace91dd4cff975e0b76405914dd4d3d6a107aa5fe5c05ca1c6c7"},
+    {file = "shed-2023.6.1.tar.gz", hash = "sha256:9f884d783f48b8ad86ce8fef9e3f71056190ce1421d942cbf59c23ac08ccd380"},
 ]
 
 [package.dependencies]
 autoflake = ">=1.4"
-black = ">=23.1.0"
-com2ann = {version = ">=0.3.0", markers = "python_version >= \"3.8\""}
+black = ">=23.3.0"
+com2ann = ">=0.3.0"
 isort = ">=5.10.1"
-libcst = ">=0.4.7"
+libcst = ">=0.4.10"
 pyupgrade = ">=3.0.0"
 
 [[package]]
@@ -3001,4 +3001,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "2ea44e64a0a73b9c6cfaeadebbaca85128fd5fa285c89cd6e373703f42bb8e05"
+content-hash = "d66fa592a9b59b0895915f4daa294fed6a4043b64f9ba294c373ae23b54a651c"
