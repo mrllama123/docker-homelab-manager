@@ -10,8 +10,8 @@ from tests.fixtures import MockAsyncResult, MockVolume
 
 @pytest.fixture()
 def client(session) -> TestClient:
-    from src.main import app
     from src.db import get_session
+    from src.main import app
 
     def get_session_override():
         return session
@@ -170,7 +170,7 @@ def test_create_backup_volume_attached(mocker, client):
         return_value=MockVolume(),
     )
     mock_is_volume_attached = mocker.patch(
-        "src.routes.impl.volumes.is_volume_attached",   
+        "src.routes.impl.volumes.is_volume_attached",
         return_value=False,
     )
     mock_create_volume_backup = mocker.patch(

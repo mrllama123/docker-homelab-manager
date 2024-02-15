@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
-
 from src.db import get_session
 from src.models import (
     Backups,
@@ -13,10 +12,10 @@ from src.models import (
     VolumeItem,
 )
 from src.routes.impl.volumes import (
+    api_backup_volume,
     api_backups,
     api_create_backup_schedule,
     api_get_backup,
-    api_backup_volume,
     api_get_backup_schedule,
     api_list_backup_schedules,
     api_remove_backup_schedule,
@@ -56,9 +55,7 @@ async def get_backup(
     "/volumes/backup/{backup_id}",
     description="Backup a volume",
 )
-def backup_volume(
-    backup_id: str
-) -> CreateBackupResponse:
+def backup_volume(backup_id: str) -> CreateBackupResponse:
     return api_backup_volume(backup_id)
 
 
