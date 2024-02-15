@@ -1,6 +1,10 @@
+import logging
 import uuid
-from fastapi import Depends, HTTPException
+
+from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
+from fastapi import HTTPException
 from sqlmodel import Session, select
+
 from src.apschedule.schedule import (
     add_backup_job,
     add_restore_job,
@@ -8,19 +12,16 @@ from src.apschedule.schedule import (
     get_backup_schedule,
     list_backup_schedules,
 )
-from src.db import get_session
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
-    BackupSchedule,
     Backups,
+    BackupSchedule,
     CreateBackupResponse,
     CreateBackupSchedule,
     RestoreVolume,
     RestoreVolumeResponse,
     VolumeItem,
 )
-import logging
-from apscheduler.jobstores.base import JobLookupError, ConflictingIdError
 
 logger = logging.getLogger(__name__)
 

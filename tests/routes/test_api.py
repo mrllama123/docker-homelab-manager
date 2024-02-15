@@ -10,7 +10,8 @@ from tests.fixtures import MockAsyncResult, MockVolume
 
 @pytest.fixture()
 def client(session) -> TestClient:
-    from src.api import app, get_session
+    from src.main import app
+    from src.db import get_session
 
     def get_session_override():
         return session
@@ -22,10 +23,10 @@ def client(session) -> TestClient:
 
 def test_list_volumes(mocker, client):
     mock_get_volumes = mocker.patch(
-        "src.api.get_volumes",
+        "src.routes.impl.volumes.get_volumes",
         return_value=[MockVolume()],
     )
-    response = client.get("/volumes")
+    response = client.get("/api/volumes")
     assert response.status_code == 200
     assert response.json() == [
         {
@@ -53,7 +54,7 @@ def test_get_backups(client, session):
             )
         )
     session.commit()
-    response = client.get("/volumes/backup")
+    response = client.get("/api/volumes/backup")
     assert response.status_code == 200
     assert response.json() == [
         {
@@ -78,7 +79,7 @@ def test_get_backups(client, session):
 
 
 def test_get_no_backups(client):
-    response = client.get("/volumes/backup")
+    response = client.get("/api/volumes/backup")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -95,7 +96,7 @@ def test_get_backup(client, session):
         )
     )
     session.commit()
-    response = client.get("/volumes/backup/test-backup-id")
+    response = client.get("/api/volumes/backup/test-backup-id")
     assert response.status_code == 200
     assert response.json() == {
         "backup_id": "test-backup-id",
@@ -109,7 +110,7 @@ def test_get_backup(client, session):
 
 
 def test_get_backup_not_found(client):
-    response = client.get("/volumes/backup/test-backup-name.tar.gz")
+    response = client.get("/api/volumes/backup/test-backup-name.tar.gz")
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Backup test-backup-name.tar.gz does not exist",
@@ -118,14 +119,14 @@ def test_get_backup_not_found(client):
 
 def test_create_backup_volume_not_found(mocker, client):
     mock_get_volume = mocker.patch(
-        "src.api.get_volume",
+        "src.routes.impl.volumes.get_volume",
         return_value=None,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.api.add_backup_job",
+        "src.routes.impl.volumes.add_backup_job",
         return_value=MockAsyncResult(),
     )
-    response = client.post("/volumes/backup/test-volume")
+    response = client.post("/api/volumes/backup/test-volume")
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Volume test-volume does not exist",
@@ -135,21 +136,21 @@ def test_create_backup_volume_not_found(mocker, client):
 
 
 def test_create_backup(mocker, client):
-    mocker.patch("src.api.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.api.get_volume",
+        "src.routes.impl.volumes.get_volume",
         return_value=MockVolume(),
     )
     mock_is_volume_attached = mocker.patch(
-        "src.api.is_volume_attached",
+        "src.routes.impl.volumes.is_volume_attached",
         return_value=True,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.api.add_backup_job",
+        "src.routes.impl.volumes.add_backup_job",
         return_value=MockAsyncResult(),
     )
 
-    response = client.post("/volumes/backup/test-volume")
+    response = client.post("/api/volumes/backup/test-volume")
     assert response.status_code == 200
     assert response.json() == {
         "volume_name": "test-volume",
@@ -165,18 +166,18 @@ def test_create_backup(mocker, client):
 
 def test_create_backup_volume_attached(mocker, client):
     mock_get_volume = mocker.patch(
-        "src.api.get_volume",
+        "src.routes.impl.volumes.get_volume",
         return_value=MockVolume(),
     )
     mock_is_volume_attached = mocker.patch(
-        "src.api.is_volume_attached",
+        "src.routes.impl.volumes.is_volume_attached",   
         return_value=False,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.api.add_backup_job",
+        "src.routes.impl.volumes.add_backup_job",
         return_value=MockAsyncResult(),
     )
-    response = client.post("/volumes/backup/test-volume")
+    response = client.post("/api/volumes/backup/test-volume")
     assert response.status_code == 409
     assert response.json() == {
         "detail": "Volume test-volume is attached to a container"
@@ -187,13 +188,13 @@ def test_create_backup_volume_attached(mocker, client):
 
 
 def test_restore_backup(mocker, client):
-    mocker.patch("src.api.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_create_volume_backup = mocker.patch(
-        "src.api.add_restore_job",
+        "src.routes.impl.volumes.add_restore_job",
         return_value=MockAsyncResult(),
     )
     response = client.post(
-        "/volumes/restore",
+        "/api/volumes/restore",
         json={
             "volume_name": "test-volume",
             "backup_filename": "test-backup-name.tar.gz",
@@ -210,16 +211,16 @@ def test_restore_backup(mocker, client):
 
 
 def test_create_schedule(mocker, client):
-    mocker.patch("src.api.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.api.get_volume",
+        "src.routes.impl.volumes.get_volume",
     )
     mock_create_volume_backup = mocker.patch(
-        "src.api.add_backup_job",
+        "src.routes.impl.volumes.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post(
-        "/volumes/schedule/backup",
+        "/api/volumes/schedule/backup",
         json={
             "schedule_name": "test-schedule",
             "volume_name": "test-volume",
@@ -258,7 +259,7 @@ def test_create_schedule(mocker, client):
 
 def test_get_schedule(mocker, client):
     mock_get_schedule = mocker.patch(
-        "src.api.get_backup_schedule",
+        "src.routes.impl.volumes.get_backup_schedule",
         return_value=BackupSchedule(
             volume_name="test-volume",
             schedule_id="test-schedule-id",
@@ -268,7 +269,7 @@ def test_get_schedule(mocker, client):
             ),
         ),
     )
-    response = client.get("/volumes/schedule/backup/test-schedule")
+    response = client.get("/api/volumes/schedule/backup/test-schedule")
     assert response.status_code == 200
     assert response.json() == {
         "schedule_id": "test-schedule-id",
@@ -288,10 +289,10 @@ def test_get_schedule(mocker, client):
 
 def test_get_schedule_not_found(mocker, client):
     mock_get_schedule = mocker.patch(
-        "src.api.get_backup_schedule",
+        "src.routes.impl.volumes.get_backup_schedule",
         return_value=None,
     )
-    response = client.get("/volumes/schedule/backup/test-schedule")
+    response = client.get("/api/volumes/schedule/backup/test-schedule")
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
     mock_get_schedule.assert_called_once_with("test-schedule")
@@ -299,7 +300,7 @@ def test_get_schedule_not_found(mocker, client):
 
 def test_list_schedule(mocker, client):
     mock_list_schedule = mocker.patch(
-        "src.api.list_backup_schedules",
+        "src.routes.impl.volumes.list_backup_schedules",
         return_value=[
             BackupSchedule(
                 volume_name="test-volume",
@@ -311,7 +312,7 @@ def test_list_schedule(mocker, client):
             )
         ],
     )
-    response = client.get("/volumes/schedule/backup")
+    response = client.get("/api/volumes/schedule/backup")
     assert response.status_code == 200
     assert response.json() == [
         {
@@ -333,9 +334,9 @@ def test_list_schedule(mocker, client):
 
 def test_remove_schedule(mocker, client):
     mock_remove_schedule = mocker.patch(
-        "src.api.delete_backup_schedule",
+        "src.routes.impl.volumes.delete_backup_schedule",
     )
-    response = client.delete("/volumes/schedule/backup/test-schedule")
+    response = client.delete("/api/volumes/schedule/backup/test-schedule")
     assert response.status_code == 200
     assert response.json() == "Schedule test-schedule removed"
     mock_remove_schedule.assert_called_once_with("test-schedule")
@@ -343,10 +344,10 @@ def test_remove_schedule(mocker, client):
 
 def test_remove_schedule_not_found(mocker, client):
     mock_remove_schedule = mocker.patch(
-        "src.api.delete_backup_schedule",
+        "src.routes.impl.volumes.delete_backup_schedule",
         side_effect=JobLookupError("test-schedule"),
     )
-    response = client.delete("/volumes/schedule/backup/test-schedule")
+    response = client.delete("/api/volumes/schedule/backup/test-schedule")
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
     mock_remove_schedule.assert_called_once_with("test-schedule")

@@ -1,27 +1,28 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-from src.api import api_backup_volume
-from src.db import get_session
 
+
+from src.db import get_session
 from src.models import (
-    BackupSchedule,
     Backups,
+    BackupSchedule,
     CreateBackupResponse,
     CreateBackupSchedule,
     RestoreVolume,
+    RestoreVolumeResponse,
     VolumeItem,
 )
 from src.routes.impl.volumes import (
-    api_get_backup,
-    api_volumes,
     api_backups,
-    api_restore_volume,
+    api_create_backup_schedule,
+    api_get_backup,
+    api_backup_volume,
     api_get_backup_schedule,
     api_list_backup_schedules,
     api_remove_backup_schedule,
-    api_create_backup_schedule,
+    api_restore_volume,
+    api_volumes,
 )
-
 
 router = APIRouter(prefix="/api", tags=["api"])
 
@@ -55,24 +56,24 @@ async def get_backup(
     "/volumes/backup/{backup_id}",
     description="Backup a volume",
 )
-async def backup_volume(
-    backup_id: str, session: Session = Depends(get_session)
+def backup_volume(
+    backup_id: str
 ) -> CreateBackupResponse:
-    return await api_backup_volume(backup_id, session)
+    return api_backup_volume(backup_id)
 
 
 @router.post(
     "/volumes/restore",
     description="Restore a Docker volume",
 )
-def restore_volume(restore_volume: RestoreVolume) -> CreateBackupResponse:
+def restore_volume(restore_volume: RestoreVolume) -> RestoreVolumeResponse:
     return api_restore_volume(restore_volume)
 
 
 @router.get(
     "/volumes/schedule/backup/{schedule_id}", description="Get a backup schedule"
 )
-async def get_backup_schedule(schedule_id: str) -> dict:
+async def get_backup_schedule(schedule_id: str) -> BackupSchedule:
     return api_get_backup_schedule(schedule_id)
 
 
@@ -84,10 +85,10 @@ async def list_backup_schedules() -> list[BackupSchedule]:
 @router.delete(
     "/volumes/schedule/backup/{schedule_id}", description="Remove a backup schedule"
 )
-async def remove_backup_schedule(schedule_id: str) -> dict:
+def remove_backup_schedule(schedule_id: str) -> str:
     return api_remove_backup_schedule(schedule_id)
 
 
 @router.post("/volumes/schedule/backup", description="Create a backup schedule")
-def create_backup_schedule(schedule: CreateBackupSchedule) -> dict:
-    return api_create_backup_schedule(schedule)
+async def create_backup_schedule(schedule: CreateBackupSchedule) -> BackupSchedule:
+    return await api_create_backup_schedule(schedule)
