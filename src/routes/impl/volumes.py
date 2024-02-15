@@ -1,9 +1,8 @@
 import logging
 import uuid
-from contextlib import asynccontextmanager
 
 from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from src.apschedule.schedule import (
@@ -12,9 +11,7 @@ from src.apschedule.schedule import (
     delete_backup_schedule,
     get_backup_schedule,
     list_backup_schedules,
-    setup_scheduler,
 )
-from src.db import get_session
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
     Backups,
@@ -29,17 +26,6 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    scheduler = setup_scheduler()
-    yield
-    scheduler.shutdown(wait=False)
-
-
-app = FastAPI(lifespan=lifespan)
-
-
-@app.get("/volumes", description="Get a list of all Docker volumes")
 async def api_volumes() -> list[VolumeItem]:
     volumes = get_volumes()
     return [
@@ -55,23 +41,11 @@ async def api_volumes() -> list[VolumeItem]:
     ]
 
 
-@app.get(
-    "/volumes/backup",
-    description="Get a list of all backups",
-    response_model=list[Backups],
-)
-async def api_backups(session: Session = Depends(get_session)) -> list[Backups]:
+async def api_backups(session: Session) -> list[Backups]:
     return session.exec(select(Backups)).all()
 
 
-@app.get(
-    "/volumes/backup/{backup_id}",
-    description="Get a backup by name",
-    response_model=Backups,
-)
-async def api_backup(
-    backup_id: str, session: Session = Depends(get_session)
-) -> Backups:
+async def api_get_backup(backup_id: str, session: Session) -> Backups:
     backup = session.exec(select(Backups).where(Backups.backup_id == backup_id)).first()
     if not backup:
         raise HTTPException(
@@ -81,7 +55,6 @@ async def api_backup(
     return backup
 
 
-@app.post("/volumes/backup/{volume_name}", description="Backup a Docker volume")
 def api_backup_volume(volume_name: str) -> CreateBackupResponse:
     logger.info("backing up volume: %s", volume_name)
     if not get_volume(volume_name):
@@ -109,10 +82,6 @@ def api_backup_volume(volume_name: str) -> CreateBackupResponse:
     )
 
 
-@app.post(
-    "/volumes/restore",
-    description="Restore a Docker volume",
-)
 def api_restore_volume(
     restore_volume: RestoreVolume,
 ) -> RestoreVolumeResponse:
@@ -137,7 +106,6 @@ def api_restore_volume(
     )
 
 
-@app.get("/volumes/schedule/backup/{schedule_id}", description="Get a backup schedule")
 def api_get_backup_schedule(schedule_id: str) -> BackupSchedule:
     logger.info("Getting schedule %s", schedule_id)
     schedule = get_backup_schedule(schedule_id)
@@ -149,15 +117,11 @@ def api_get_backup_schedule(schedule_id: str) -> BackupSchedule:
     return schedule
 
 
-@app.get("/volumes/schedule/backup", description="Get a list of backup schedules")
 def api_list_backup_schedules() -> list[BackupSchedule]:
     # TODO: add filters e.g volume_name, cron schedule
     return list_backup_schedules()
 
 
-@app.delete(
-    "/volumes/schedule/backup/{schedule_id}", description="Remove a backup schedule"
-)
 def api_remove_backup_schedule(schedule_id: str) -> str:
     logger.info("Removing schedule %s", schedule_id)
     try:
@@ -172,7 +136,6 @@ def api_remove_backup_schedule(schedule_id: str) -> str:
     return f"Schedule {schedule_id} removed"
 
 
-@app.post("/volumes/schedule/backup", description="Create a backup schedule")
 async def api_create_backup_schedule(
     schedule_body: CreateBackupSchedule,
 ) -> BackupSchedule:

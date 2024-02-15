@@ -4,11 +4,7 @@ import pytest
 from freezegun import freeze_time
 from sqlmodel import select
 
-from src.models import (
-    BackupFilenames,
-    Backups,
-    ErrorBackups,
-)
+from src.models import BackupFilenames, Backups, ErrorBackups
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
