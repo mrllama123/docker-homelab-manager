@@ -1,20 +1,28 @@
 #docker-homelab-manager-window {
     margin: 0;
-    width: 100%;
+    width: 540px;
     height: 100%;
-}
-#docker-homelab-manager-window-body {
-    max-width: 100%;
-    max-height: 100%;
 }
 
+
+/*TODO check if there is better way to do this*/
 #volume-table {
-    width: 50%;
-    height: 100%;
+    width: 475px
+}
+div #volume-table  .sunken-panel {
+    height: 200px; 
+    width: 474px;
+    flex-direction: column;
+    flex-flow: column wrap;
 }
 
 #backup-table {
-    width: 50%;
-    height: 100%;
+    flex-direction: column;
+    flex-flow: column wrap;
+    width: 474px;
+    height: 200px;
 }
 
+body {
+    background-color: #008080;
+}
