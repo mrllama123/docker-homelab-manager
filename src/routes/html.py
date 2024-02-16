@@ -33,3 +33,14 @@ templates = Jinja2Templates(directory="src/templates")
 @router.get("/", description="home page", response_class=HTMLResponse)
 def root(request: Request):
     return templates.TemplateResponse(request, "index.html")
+
+
+@router.get("/volumes", description="volumes page", response_class=HTMLResponse)
+async def volumes(request: Request):
+    volumes = await api_volumes()
+    return templates.TemplateResponse(request, "volume_rows.html", {"volumes": volumes})
+
+
+@router.get("/backup-volume-tab", description="backup volumes tab", response_class=HTMLResponse)
+def backup_volume_tab(request: Request):
+    return templates.TemplateResponse(request, "backup_volume_tab.html")

@@ -14,44 +14,7 @@
         </div>
     </div>
     <div class="window-body" id="docker-homelab-manager-window-body">
-        <section class="tabs">
-            <menu role="tablist" aria-label="docker-manager-tabs">
-                <li role="tab" aria-selected="true" aria-controls="backup-vol-tab" id="backup-volumes"><a
-                        href="#tabs">Backup Volumes</a></li>
-                <li role="tab" aria-controls="restore-vol-tab" id="restore-volumes"><a href="#tabs">Restore Volumes</a>
-                </li>
-            </menu>
-            <article class="window" role="tabpanel" id="backup-vol-tab">
-                <div class="window-body">
-                    <fieldset id="volume-table">
-                        <legend>Volumes</legend>
-                        <div class="sunken-panel">
-                            <table class="interactive">
-                                <thead>
-                                    <tr>
-                                        <th>Volume Name</th>
-                                        <th>Backup</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>volume1</td>
-                                        <td><button class="btn btn-primary" hx-get="/backup/volume1">Backup</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-
-                            </table>
-                        </div>
-                    </fieldset>
-                    <fieldset id="backup-table">
-                        <legend>Backups</legend>
-                    </fieldset>
-                </div>
-            </article>
-            <article role="tabpanel" hidden id="restore-vol-tab">
-
-            </article>
+        <section id="tabs" class="tabs" hx-get="/backup-volume-tab" hx-trigger="load delay:100ms" hx-target="#tabs" hx-swap="innerHTML">
         </section>
     </div>
 </div>
