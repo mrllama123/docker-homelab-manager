@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from sqlmodel import Session
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from src.db import get_session
@@ -41,6 +41,18 @@ async def volumes(request: Request):
     return templates.TemplateResponse(request, "volume_rows.html", {"volumes": volumes})
 
 
-@router.get("/backup-volume-tab", description="backup volumes tab", response_class=HTMLResponse)
+@router.get(
+    "/backup-volume-tab", description="backup volumes tab", response_class=HTMLResponse
+)
 def backup_volume_tab(request: Request):
     return templates.TemplateResponse(request, "backup_volume_tab.html")
+
+
+@router.post(
+    "/volumes/backup/{volume_name}",
+    description="create backup",
+    response_class=RedirectResponse,
+)
+def backup_volume(request: Request, volume_name: str):
+    backup = api_backup_volume(volume_name)
+    return RedirectResponse(url="/backup-volume-tab", status_code=303)
