@@ -8,11 +8,7 @@ from sqlmodel import Session
 
 from src.db import engine
 from src.docker import backup_volume, restore_volume
-from src.models import (
-    BackupFilenames,
-    Backups,
-    RestoredBackups,
-)
+from src.models import BackupFilenames, Backups, RestoredBackups
 
 TZ = os.environ.get("TZ", "UTC")
 BACKUP_DIR = os.getenv("BACKUP_DIR")
