@@ -4,7 +4,7 @@ import pytest
 from freezegun import freeze_time
 from sqlmodel import select
 
-from src.models import BackupFilenames, Backups, ErrorBackups
+from src.models import BackupFilenames, Backups
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
@@ -34,7 +34,7 @@ def test_task_backup_volume(mocker, session):
     assert backup_db.backup_id == "job_id_1"
     assert backup_db.backup_filename == f"test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.backup_name == "job_name_1"
-    assert backup_db.backup_created == dt_now.isoformat()
+    assert backup_db.created_at == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.volume_name == "test-volume"
     assert backup_db.schedule_id == None
@@ -72,7 +72,7 @@ def test_task_backup_volume_error(mocker, session):
         f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
     )
     backup_db = session.exec(
-        select(ErrorBackups).where(ErrorBackups.backup_id == "job_id_1")
+        select(Backups).where(Backups.backup_id == "job_id_1")
     ).first()
 
     assert backup_db
@@ -108,7 +108,7 @@ def test_task_backup_volume_error_schedule(mocker, session):
         f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
     )
     backup_db = session.exec(
-        select(ErrorBackups).where(ErrorBackups.backup_id == "test-uuid")
+        select(Backups).where(Backups.backup_id == "test-uuid")
     ).first()
 
     assert backup_db
@@ -144,7 +144,7 @@ def test_task_backup_volume_schedule(mocker, session):
     assert backup_db
     assert backup_db.backup_id == "test-uuid"
     assert backup_db.backup_filename == f"test-volume-{dt_now.isoformat()}.tar.gz"
-    assert backup_db.backup_created == dt_now.isoformat()
+    assert backup_db.created_at == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.volume_name == "test-volume"
     assert backup_db.schedule_id == "job_id_1"
