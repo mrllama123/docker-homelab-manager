@@ -38,7 +38,7 @@ def task_create_backup(
                 backup_id=backup_id,
                 backup_filename=backup_file,
                 backup_name=job_name,
-                backup_created=dt_now.isoformat(),
+                created_at=dt_now.isoformat(),
                 successful=True,
                 backup_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
@@ -58,7 +58,7 @@ def task_create_backup(
                 Backups(
                     backup_id=backup_id,
                     backup_name=job_name,
-                    backup_created=dt_now.isoformat(),
+                    created_at=dt_now.isoformat(),
                     successful=False,
                     error_message=str(e),
                 )
@@ -81,7 +81,7 @@ def task_restore_backup(
                 restore_id=job_id,
                 backup_filename=backup_file,
                 restore_name=job_name,
-                restored_date=dt_now.isoformat(),
+                created_at=dt_now.isoformat(),
                 successful=True,
                 restore_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
@@ -96,7 +96,7 @@ def task_restore_backup(
                     restore_id=job_id,
                     restore_name=job_name,
                     successful=False,
-                    restored_date=dt_now.isoformat(),
+                    created_at=dt_now.isoformat(),
                     error_message=str(e),
                 )
             )

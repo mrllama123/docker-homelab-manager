@@ -46,7 +46,7 @@ def test_get_backups(client, session):
         session.add(
             Backups(
                 backup_id=backup_id,
-                backup_created="2021-01-01T00:00:00+00:00",
+                created_at="2021-01-01T00:00:00+00:00",
                 backup_filename=f"{backup_id}.tar.gz",
                 backup_name="test-backup-name",
                 successful=True,
@@ -67,7 +67,7 @@ def test_get_backups(client, session):
             "successful": True,
             "error_message": None,
             "backup_name": "test-backup-name",
-            "backup_created": "2021-01-01T00:00:00+00:00",
+            "created_at": "2021-01-01T00:00:00+00:00",
         },
         {
             "schedule_id": None,
@@ -78,7 +78,7 @@ def test_get_backups(client, session):
             "backup_path": "/volumes/backup/test-backup-name.tar.gz",
             "backup_name": "test-backup-name",
             "volume_name": "test-volume",
-            "backup_created": "2021-01-01T00:00:00+00:00",
+            "created_at": "2021-01-01T00:00:00+00:00",
         },
     ]
 
@@ -95,7 +95,7 @@ def test_get_backup(client, session):
             backup_id="test-backup-id",
             backup_filename="test-backup-name.tar.gz",
             backup_name="test-backup-name",
-            backup_created="2021-01-01T00:00:00+00:00",
+            created_at="2021-01-01T00:00:00+00:00",
             successful=True,
             backup_path="/volumes/backup/test-backup-name.tar.gz",
             volume_name="test-volume",
@@ -107,7 +107,7 @@ def test_get_backup(client, session):
     assert response.json() == {
         "backup_id": "test-backup-id",
         "backup_filename": "test-backup-name.tar.gz",
-        "backup_created": "2021-01-01T00:00:00+00:00",
+        "created_at": "2021-01-01T00:00:00+00:00",
         "backup_name": "test-backup-name",
         "successful": True,
         "error_message": None,

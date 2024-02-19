@@ -34,7 +34,7 @@ def test_task_backup_volume(mocker, session):
     assert backup_db.backup_id == "job_id_1"
     assert backup_db.backup_filename == f"test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.backup_name == "job_name_1"
-    assert backup_db.backup_created == dt_now.isoformat()
+    assert backup_db.created_at == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.volume_name == "test-volume"
     assert backup_db.schedule_id == None
@@ -144,7 +144,7 @@ def test_task_backup_volume_schedule(mocker, session):
     assert backup_db
     assert backup_db.backup_id == "test-uuid"
     assert backup_db.backup_filename == f"test-volume-{dt_now.isoformat()}.tar.gz"
-    assert backup_db.backup_created == dt_now.isoformat()
+    assert backup_db.created_at == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.volume_name == "test-volume"
     assert backup_db.schedule_id == "job_id_1"

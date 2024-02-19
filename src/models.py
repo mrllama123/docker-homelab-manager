@@ -60,9 +60,9 @@ class Backups(SQLModel, table=True):
     volume_name: Optional[str] = Field(default=None)
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
-    successful: bool
+    successful: bool = True
     error_message: Optional[str] = Field(default=None)
-    backup_created: str
+    created_at: Optional[str] = Field(default=None)
 
 
 class BackupFilenames(SQLModel, table=True):
@@ -78,8 +78,6 @@ class RestoredBackups(SQLModel, table=True):
     restore_name: Optional[str] = Field(default=None)
     volume_name: Optional[str] = Field(default=None)
     backup_filename: Optional[str] = Field(default=None)
-    restored_date: Optional[str] = Field(default=None)
-    successful: bool
+    created_at: Optional[str] = Field(default=None)
+    successful: bool = True
     error_message: Optional[str] = Field(default=None)
-
-

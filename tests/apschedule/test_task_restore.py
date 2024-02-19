@@ -20,7 +20,7 @@ def test_task_restore_backup(mocker, session):
         backup_filename="test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
         backup_name="restore-test-volume-uuid-1",
         successful=True,
-        backup_created="2021-01-01T00:00:00.000000+00:00",
+        created_at="2021-01-01T00:00:00.000000+00:00",
         backup_path="/backup/test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
         volume_name="test-volume",
     )
@@ -47,7 +47,7 @@ def test_task_restore_backup(mocker, session):
     assert restore_db
     assert restore_db.restore_id == "job_id_2"
     assert restore_db.backup_filename == backup.backup_filename
-    assert restore_db.restored_date == dt_now.isoformat()
+    assert restore_db.created_at == dt_now.isoformat()
     assert restore_db.volume_name == "test-volume"
     assert restore_db.restore_name == "restore-test-volume-uuid-2"
 
@@ -66,7 +66,7 @@ def test_task_restore_backup_error(mocker, session):
         backup_id="job_id_1",
         backup_filename="test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
         backup_name="restore-test-volume-uuid-1",
-        backup_created="2021-01-01T00:00:00.000000+00:00",
+        created_at="2021-01-01T00:00:00.000000+00:00",
         backup_path="/backup/test-volume-2021-01-01T00:00:00.000000+00:00.tar.gz",
         volume_name="test-volume",
     )
@@ -87,9 +87,7 @@ def test_task_restore_backup_error(mocker, session):
     )
 
     restore_db = session.exec(
-        select(RestoredBackups).where(
-            RestoredBackups.restore_id == "job_id_2"
-        )
+        select(RestoredBackups).where(RestoredBackups.restore_id == "job_id_2")
     ).first()
 
     assert restore_db
