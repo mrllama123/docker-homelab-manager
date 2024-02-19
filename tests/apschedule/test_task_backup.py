@@ -4,7 +4,7 @@ import pytest
 from freezegun import freeze_time
 from sqlmodel import select
 
-from src.models import BackupFilenames, Backups, ErrorBackups
+from src.models import BackupFilenames, Backups
 
 
 @freeze_time(lambda: datetime.now(timezone.utc), tick=False)
@@ -72,7 +72,7 @@ def test_task_backup_volume_error(mocker, session):
         f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
     )
     backup_db = session.exec(
-        select(ErrorBackups).where(ErrorBackups.backup_id == "job_id_1")
+        select(Backups).where(Backups.backup_id == "job_id_1")
     ).first()
 
     assert backup_db
@@ -108,7 +108,7 @@ def test_task_backup_volume_error_schedule(mocker, session):
         f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
     )
     backup_db = session.exec(
-        select(ErrorBackups).where(ErrorBackups.backup_id == "test-uuid")
+        select(Backups).where(Backups.backup_id == "test-uuid")
     ).first()
 
     assert backup_db

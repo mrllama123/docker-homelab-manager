@@ -11,8 +11,6 @@ from src.docker import backup_volume, restore_volume
 from src.models import (
     BackupFilenames,
     Backups,
-    ErrorBackups,
-    ErrorRestoredBackups,
     RestoredBackups,
 )
 
@@ -31,8 +29,8 @@ def task_create_backup(
     with Session(engine) as session:
         # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
         backup_id = str(uuid.uuid4()) if is_schedule else job_id
+        dt_now = datetime.now(tz=pytz.timezone(TZ))
         try:
-            dt_now = datetime.now(tz=pytz.timezone(TZ))
             backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
             backup_volume(volume_name, BACKUP_DIR, backup_file)
 
@@ -41,6 +39,7 @@ def task_create_backup(
                 backup_filename=backup_file,
                 backup_name=job_name,
                 backup_created=dt_now.isoformat(),
+                successful=True,
                 backup_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
             )
@@ -56,9 +55,11 @@ def task_create_backup(
             logger.error(f"Error creating backup: {e}")
             session.rollback()
             session.add(
-                ErrorBackups(
+                Backups(
                     backup_id=backup_id,
                     backup_name=job_name,
+                    backup_created=dt_now.isoformat(),
+                    successful=False,
                     error_message=str(e),
                 )
             )
@@ -71,8 +72,8 @@ def task_restore_backup(
 ) -> None:
     # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
     with Session(engine) as session:
+        dt_now = datetime.now(tz=pytz.timezone(TZ))
         try:
-            dt_now = datetime.now(tz=pytz.timezone(TZ))
             logger.info("backup dir: %s", BACKUP_DIR)
             restore_volume(volume_name, BACKUP_DIR, backup_file)
 
@@ -81,6 +82,7 @@ def task_restore_backup(
                 backup_filename=backup_file,
                 restore_name=job_name,
                 restored_date=dt_now.isoformat(),
+                successful=True,
                 restore_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
             )
@@ -90,9 +92,11 @@ def task_restore_backup(
             logger.error(f"Error restoring backup: {e}")
             session.rollback()
             session.add(
-                ErrorRestoredBackups(
+                RestoredBackups(
                     restore_id=job_id,
                     restore_name=job_name,
+                    successful=False,
+                    restored_date=dt_now.isoformat(),
                     error_message=str(e),
                 )
             )
