@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlmodel import Session
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -51,8 +51,19 @@ def backup_volume_tab(request: Request):
 @router.post(
     "/volumes/backup/{volume_name}",
     description="create backup",
-    response_class=RedirectResponse,
+    response_class=HTMLResponse,
 )
 def backup_volume(request: Request, volume_name: str):
-    backup = api_backup_volume(volume_name)
-    return RedirectResponse(url="/backup-volume-tab", status_code=303)
+    try:
+        result = api_backup_volume(volume_name)
+        return templates.TemplateResponse(
+            request,
+            "notification.html",
+            {"message": f"Backup created: {result.backup_id}"},
+        )
+    except HTTPException as e:
+        return templates.TemplateResponse(
+            request, "notification.html", {"message": e.detail}
+        )
+    except Exception:
+        raise
