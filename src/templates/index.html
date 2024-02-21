@@ -1,8 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div id="notifications">
-</div>
+
 <div class="window" id="docker-homelab-manager-window">
     <div class="title-bar" id="docker-homelab-manager-title-bar">
         <div class="title-bar-text">
@@ -16,8 +15,11 @@
         </div>
     </div>
     <div class="window-body" id="docker-homelab-manager-window-body">
-        <section id="tabs" class="tabs" hx-get="/backup-volume-tab" hx-trigger="load delay:100ms" hx-target="#tabs" hx-swap="innerHTML">
+        <section id="tabs" class="tabs" hx-get="/backup-volume-tab" hx-trigger="load delay:100ms" hx-target="#tabs"
+            hx-swap="innerHTML">
         </section>
     </div>
+</div>
+<div id="notifications">
 </div>
 {% endblock %}

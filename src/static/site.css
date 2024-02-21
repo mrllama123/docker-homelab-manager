@@ -5,6 +5,19 @@
 }
 
 
+#notification-window {
+    float: unset;
+    margin: 20px;
+    width: 300px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 3;
+    right: 5px;
+    top: 5px;
+    position: absolute;
+}
+
+
 /*TODO check if there is better way to do this*/
 @media (max-width: 1000px) {
     #volume-table {
