@@ -1,11 +1,5 @@
 import pytest
-from apscheduler.jobstores.base import JobLookupError
 from fastapi.testclient import TestClient
-
-from src.db import Backups
-from src.models import BackupSchedule, ScheduleCrontab
-
-from tests.fixtures import MockAsyncResult, MockVolume
 
 
 @pytest.fixture()

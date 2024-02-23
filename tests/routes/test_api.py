@@ -1,6 +1,4 @@
-import pytest
 from apscheduler.jobstores.base import JobLookupError
-from fastapi.testclient import TestClient
 
 from src.db import Backups
 from src.models import BackupSchedule, ScheduleCrontab
@@ -346,4 +344,3 @@ def test_remove_schedule_not_found(mocker, client):
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
     mock_remove_schedule.assert_called_once_with("test-schedule")
-

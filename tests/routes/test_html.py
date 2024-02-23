@@ -1,4 +1,5 @@
 from src.models import Backups
+
 from tests.fixtures import MockAsyncResult, MockVolume
 
 
@@ -93,4 +94,3 @@ def test_backups(client, snapshot, session):
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/html; charset=utf-8"
     snapshot.assert_match(response.text.strip(), "backup_rows.html")
-
