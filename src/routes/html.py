@@ -1,29 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlmodel import Session
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+from sqlmodel import Session
+
 from src.db import get_session
-from src.models import (
-    Backups,
-    BackupSchedule,
-    CreateBackupResponse,
-    CreateBackupSchedule,
-    RestoreVolume,
-    RestoreVolumeResponse,
-    VolumeItem,
-)
-from src.routes.impl.volumes import (
-    api_backup_volume,
-    api_backups,
-    api_create_backup_schedule,
-    api_get_backup,
-    api_get_backup_schedule,
-    api_list_backup_schedules,
-    api_remove_backup_schedule,
-    api_restore_volume,
-    api_volumes,
-)
+from src.routes.impl.volumes import api_backup_volume, api_backups, api_volumes
 
 router = APIRouter(tags=["html"])
 
@@ -69,11 +50,7 @@ def backup_volume(request: Request, volume_name: str):
         raise
 
 
-@router.get(
-    "/volumes/backups", description="backup row", response_class=HTMLResponse
-)
+@router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
 async def backups(request: Request, session: Session = Depends(get_session)):
     backups = await api_backups(session)
     return templates.TemplateResponse(request, "backup_rows.html", {"backups": backups})
-
-

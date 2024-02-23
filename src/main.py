@@ -5,8 +5,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from src.apschedule.schedule import setup_scheduler
-from src.routes import api
-from src.routes import html
+from src.routes import api, html
 
 logger = logging.getLogger(__name__)
 
