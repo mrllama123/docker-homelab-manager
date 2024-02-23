@@ -8,19 +8,6 @@ from src.models import BackupSchedule, ScheduleCrontab
 from tests.fixtures import MockAsyncResult, MockVolume
 
 
-@pytest.fixture()
-def client(session) -> TestClient:
-    from src.db import get_session
-    from src.main import app
-
-    def get_session_override():
-        return session
-
-    app.dependency_overrides[get_session] = get_session_override
-    yield TestClient(app)
-    app.dependency_overrides.clear()
-
-
 def test_list_volumes(mocker, client):
     mock_get_volumes = mocker.patch(
         "src.routes.impl.volumes.get_volumes",
@@ -359,3 +346,4 @@ def test_remove_schedule_not_found(mocker, client):
     assert response.status_code == 404
     assert response.json() == {"detail": "Schedule job test-schedule does not exist"}
     mock_remove_schedule.assert_called_once_with("test-schedule")
+

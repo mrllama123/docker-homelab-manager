@@ -1,7 +1,8 @@
 {% for volume in volumes %}
 <tr>
     <td>{{ volume.name }}</td>
-    <td><button class="btn btn-primary" hx-post="/volumes/backup/{{ volume.name }}" hx-target="#notifications" > Backup</button>
+    <td><button class="btn btn-primary" hx-post="/volumes/backup/{{ volume.name }}" hx-target="#notifications">
+            Backup</button>
     </td>
 </tr>
 {% endfor %}
