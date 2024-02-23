@@ -1,0 +1,27 @@
+#docker-homelab-manager-window {
+    margin: 0;
+    max-width: 100%;
+    max-height: 100%;
+    min-height: 390px;
+}
+
+#notification-window {
+    margin: 20px;
+    width: 300px;
+    max-height: 60px;
+    cursor: pointer;
+    z-index: 4;
+    overflow-wrap: break-word;
+    right: 5px;
+    top: 5px;
+    position: absolute;
+}
+
+.sunken-panel {
+    max-height: 195px;
+
+}
+
+body {
+    background-color: #008080;
+}
