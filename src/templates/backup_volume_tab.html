@@ -14,7 +14,7 @@
 
         <p>Volumes</p>
         <div class="sunken-panel">
-            <table class="interactive">
+            <table >
                 <thead>
                     <tr>
                         <th>Volume Name</th>
@@ -22,7 +22,8 @@
                     </tr>
                 </thead>
                 <tbody id="rows" hx-get="/volumes" hx-trigger="load delay:5ms" hx-target="#rows"
-                    hx-swap="innerHTML transition:true">
+                    hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                    hx-ext="morph">
                 </tbody>
 
             </table>
@@ -30,7 +31,7 @@
 
         <p>Backups</p>
         <div class="sunken-panel">
-            <table class="interactive">
+            <table >
                 <thead>
                     <tr>
                         <th>Backup Id</th>
@@ -43,7 +44,8 @@
                     </tr>
                 </thead>
                 <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
-                    hx-target="#backup-rows" hx-swap="innerHTML transition:true">
+                    hx-target="#backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                    hx-ext="morph">
                 </tbody>
             </table>
 
