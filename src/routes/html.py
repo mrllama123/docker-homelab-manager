@@ -42,7 +42,7 @@ async def volumes(request: Request):
 
 
 @router.get(
-    "/backup-volume-tab", description="backup volumes tab", response_class=HTMLResponse
+    "/tabs/backup-volume", description="backup volumes tab", response_class=HTMLResponse
 )
 def backup_volume_tab(request: Request):
     return templates.TemplateResponse(request, "backup_volume_tab.html")
