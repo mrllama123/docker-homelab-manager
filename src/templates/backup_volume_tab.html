@@ -11,26 +11,41 @@
 </menu>
 <article class="window" role="tabpanel" id="backup-vol-tab">
     <div class="window-body">
-        <fieldset id="volume-table">
-            <legend>Volumes</legend>
-            <div class="sunken-panel">
-                <table class="interactive">
-                    <thead>
-                        <tr>
-                            <th>Volume Name</th>
-                            <th>Backup</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rows" hx-get="/volumes" hx-trigger="load delay:5ms" hx-target="#rows"
-                        hx-swap="innerHTML transition:true">
-                    </tbody>
 
-                </table>
-            </div>
-        </fieldset>
-        <fieldset id="backup-table">
-            <legend>Backups</legend>
+        <p>Volumes</p>
+        <div class="sunken-panel">
+            <table class="interactive">
+                <thead>
+                    <tr>
+                        <th>Volume Name</th>
+                        <th>Backup</th>
+                    </tr>
+                </thead>
+                <tbody id="rows" hx-get="/volumes" hx-trigger="load delay:5ms" hx-target="#rows"
+                    hx-swap="innerHTML transition:true">
+                </tbody>
 
-        </fieldset>
-    </div>
+            </table>
+        </div>
+
+        <p>Backups</p>
+        <div class="sunken-panel">
+            <table class="interactive">
+                <thead>
+                    <tr>
+                        <th>Backup Id</th>
+                        <th>Backup Name</th>
+                        <th>Volume Name</th>
+                        <th>Successful</th>
+                        <th>Error Message</th>
+                        <th>Filename</th>
+                        <th>Create Date</th>
+                    </tr>
+                </thead>
+                <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
+                    hx-target="#backup-rows" hx-swap="innerHTML transition:true">
+                </tbody>
+            </table>
+
+        </div>
 </article>

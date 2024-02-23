@@ -67,3 +67,13 @@ def backup_volume(request: Request, volume_name: str):
         )
     except Exception:
         raise
+
+
+@router.get(
+    "/volumes/backups", description="backup row", response_class=HTMLResponse
+)
+async def backups(request: Request, session: Session = Depends(get_session)):
+    backups = await api_backups(session)
+    return templates.TemplateResponse(request, "backup_rows.html", {"backups": backups})
+
+

@@ -4,7 +4,6 @@
     max-height: 100%;
 }
 
-
 #notification-window {
     margin: 20px;
     width: 300px;
@@ -17,26 +16,9 @@
     position: absolute;
 }
 
+.sunken-panel {
+    max-height: 195px;
 
-
-/*TODO check if there is better way to do this*/
-@media (max-width: 1000px) {
-    #volume-table {
-        width: 100%;
-    }
-}
-
-div #volume-table .sunken-panel {
-    height: 195px;
-
-}
-
-@media (max-width: 1000px) {
-    #backup-table {
-
-        width: 100%;
-        height: 200px;
-    }
 }
 
 body {
