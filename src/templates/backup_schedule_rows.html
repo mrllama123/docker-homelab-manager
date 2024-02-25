@@ -1,0 +1,8 @@
+{% for schedule in schedules %}
+<tr>
+    <td>{{ schedule.schedule_id }}</td>
+    <td>{{ schedule.schedule_name }}</td>
+    <td>{{ schedule.volume_name }}</td>
+    <td>{{ schedule.crontab.seconds }}, {{ schedule.crontab.minute }}, {{ schedule.crontab.hour }}, {{ schedule.crontab.day }}, {{ schedule.crontab.month }}, {{ schedule.crontab.day_of_the_week }} </td>
+</tr>
+{% endfor %}
