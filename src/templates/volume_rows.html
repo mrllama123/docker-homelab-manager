@@ -5,7 +5,7 @@
             Backup</button>
     </td>
     <td>
-        <button hx-post="/volumes/backup/schedule/{{ volume.name }}" hx-target="#create-schedule">Schedule</button>
+        <button hx-get="/volumes/backup/schedule/{{ volume.name }}" hx-target="#create-schedule">Schedule</button>
     </td>
 </tr>
 {% endfor %}
