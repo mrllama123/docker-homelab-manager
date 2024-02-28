@@ -51,11 +51,11 @@ def backup_volume(request: Request, volume_name: str):
         return templates.TemplateResponse(
             request,
             "notification.html",
-            {"message": f"Backup created: {result.backup_id}"},
+            {"message": f"Backup created: {result.backup_id}", "swap_out_of_band": False},
         )
     except HTTPException as e:
         return templates.TemplateResponse(
-            request, "notification.html", {"message": e.detail}
+            request, "notification.html", {"message": e.detail, "swap_out_of_band": False}
         )
     except Exception:
         raise
@@ -106,7 +106,7 @@ async def create_backup_schedule(
     months: Annotated[str, Form()],
     days_of_week: Annotated[str, Form()],
 ):
-    
+
     schedule = CreateBackupSchedule(
         schedule_name=schedule_name,
         volume_name=volume_name,
@@ -121,4 +121,6 @@ async def create_backup_schedule(
     )
 
     await api_create_backup_schedule(schedule)
-    return ""
+    return templates.TemplateResponse(
+        request, "notification.html", {"message": "Backup schedule created", "swap_out_of_band": True}
+    )

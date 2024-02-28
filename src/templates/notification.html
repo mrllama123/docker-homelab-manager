@@ -1,4 +1,7 @@
-<div class="window" id="notification-window" hx-ext="remove-me" remove-me="2s">
+<div class="window" id="notification-window" hx-ext="remove-me" remove-me="2s"
+{% if swap_out_of_band %}
+    hx-swap-oob="true, #notifications"
+{% endif %} >
     <div class="window-body" id="notifcation-window-body">
         <p>
             {{ message }}
