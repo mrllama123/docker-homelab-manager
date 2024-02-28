@@ -12,10 +12,11 @@
     <link href="{{ url_for('static', path='/site.css') }}" rel="stylesheet">
     <script src="{{ url_for('static', path='js/remove-me.js') }}"></script>
     <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
 
 </head>
 
-<body hx-boost="true">
+<body hx-boost="true" hx-ext="multi-swap">
     <main>
         {% block content %}{% endblock %}
     </main>
