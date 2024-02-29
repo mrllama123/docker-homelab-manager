@@ -136,6 +136,18 @@ def api_remove_backup_schedule(schedule_id: str) -> str:
     return f"Schedule {schedule_id} removed"
 
 
+def api_remove_backup_schedules(schedule_ids: str) -> str:
+    try:
+
+        for id in schedule_ids:
+            logger.info("Removing schedule %s", id)
+            delete_backup_schedule(id)
+
+    except Exception:
+        raise
+    return f"Schedules {schedule_ids} removed"
+
+
 async def api_create_backup_schedule(
     schedule_body: CreateBackupSchedule,
 ) -> BackupSchedule:

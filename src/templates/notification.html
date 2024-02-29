@@ -1,7 +1,11 @@
 <div class="window" id="notification-window" hx-ext="remove-me" remove-me="2s"
-{% if swap_out_of_band %}
+{% if create_backup_schedule %}
     hx-swap="multi:#create-schedule-window:delete,#notifications"
-{% endif %} >
+{% endif %} 
+{% if delete_backup_schedule %}
+    
+{% endif %} 
+>
     <div class="window-body" id="notifcation-window-body">
         <p>
             {{ message }}

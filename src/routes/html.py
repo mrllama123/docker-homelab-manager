@@ -9,6 +9,7 @@ from src.models import CreateBackupSchedule
 from src.routes.impl.volumes import (
     api_backup_volume,
     api_backups,
+    api_remove_backup_schedules,
     api_volumes,
     api_list_backup_schedules,
     api_create_backup_schedule,
@@ -122,5 +123,17 @@ async def create_backup_schedule(
 
     await api_create_backup_schedule(schedule)
     return templates.TemplateResponse(
-        request, "notification.html", {"message": "Backup schedule created", "swap_out_of_band": True}
+        request, "notification.html", {"message": "Backup schedule created", "create_backup_schedule": True}
     )
+
+@router.delete(
+    "/volumes/backup/schedules",
+    description="delete backup schedule",
+    response_class=HTMLResponse,
+)
+def delete_backup_schedule(request: Request, schedules: list[str]):
+    api_remove_backup_schedules(schedules)
+    return templates.TemplateResponse(
+        request, "notification.html", {"message": "Backup schedule deleted"}
+    )
+
