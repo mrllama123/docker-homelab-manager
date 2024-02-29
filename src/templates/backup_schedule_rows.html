@@ -1,8 +1,10 @@
 {% for schedule in schedules %}
-<tr>
+<tr @click='!selected.includes("{{ schedule.schedule_id }}") ? selected.push("{{ schedule.schedule_id }}"): selected = selected.filter((e) => e !== "{{ schedule.schedule_id }}")'
+    :class="selected.includes('{{ schedule.schedule_id }}') ? 'highlighted' : ''">
     <td>{{ schedule.schedule_id }}</td>
     <td>{{ schedule.schedule_name }}</td>
     <td>{{ schedule.volume_name }}</td>
-    <td>{{ schedule.crontab.seconds }}, {{ schedule.crontab.minute }}, {{ schedule.crontab.hour }}, {{ schedule.crontab.day }}, {{ schedule.crontab.month }}, {{ schedule.crontab.day_of_the_week }} </td>
+    <td>{{ schedule.crontab.seconds }}, {{ schedule.crontab.minute }}, {{ schedule.crontab.hour }}, {{
+        schedule.crontab.day }}, {{ schedule.crontab.month }}, {{ schedule.crontab.day_of_the_week }} </td>
 </tr>
 {% endfor %}
