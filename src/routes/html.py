@@ -142,9 +142,9 @@ async def create_backup_schedule(
     description="delete backup schedule",
     response_class=HTMLResponse,
 )
-def delete_backup_schedule(request: Request, selected: Annotated[list[str], Form()]):
+def delete_backup_schedule(request: Request, schedules: Annotated[list[str], Form()]):
     try:
-        api_remove_backup_schedules(selected)
+        api_remove_backup_schedules(schedules)
         return templates.TemplateResponse(
             request, "notification.html", {"message": "Backup schedule deleted"}
         )
