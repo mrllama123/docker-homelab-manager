@@ -56,7 +56,7 @@
                     <p>
                         <slot x-text="selected.length"></slot> Schedules Selected
                     </p>
-                    <button @click="htmx.ajax('DELETE', '/volumes/backup/schedules', {source: $root, target: document.body })">Delete</button>
+                    <button @click="htmx.ajax('DELETE', '/volumes/backup/schedules', {source: $root, target: '#notifications' })">Delete</button>
                     <button @click="selected = []">Cancel</button>
                 </fieldset>
             </template>

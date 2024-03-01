@@ -1,7 +1,6 @@
 <menu role="tablist" aria-label="docker-manager-tabs">
 
-    <li role="tab" class="selected" autofocus aria-selected="true"
-        aria-controls="backup-vol-tab" id="backup-volumes">
+    <li role="tab" class="selected" autofocus aria-selected="true" aria-controls="backup-vol-tab" id="backup-volumes">
         <a href="/backup-volume-tab">Backup Volumes</a>
     </li>
 
@@ -14,16 +13,16 @@
 
         <p>Volumes</p>
         <div class="sunken-panel">
-            <table >
+            <table>
                 <thead>
                     <tr>
                         <th>Volume Name</th>
                         <th>Backup</th>
+                        <th>Create schedule</th>
                     </tr>
                 </thead>
                 <tbody id="rows" hx-get="/volumes" hx-trigger="load delay:5ms" hx-target="#rows"
-                    hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
-                    hx-ext="morph">
+                    hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
                 </tbody>
 
             </table>
@@ -31,12 +30,13 @@
 
         <p>Backups</p>
         <div class="sunken-panel">
-            <table >
+            <table>
                 <thead>
                     <tr>
                         <th>Backup Id</th>
                         <th>Backup Name</th>
                         <th>Volume Name</th>
+                        <th>Schedule Id</th>
                         <th>Successful</th>
                         <th>Error Message</th>
                         <th>Filename</th>
@@ -48,6 +48,33 @@
                     hx-ext="morph">
                 </tbody>
             </table>
-
         </div>
+        <p>Backup schedules</p>
+        <form x-data="{ selected: [] }">
+            <template x-if="selected.length > 0">
+                <fieldset>
+                    <p>
+                        <slot x-text="selected.length"></slot> Schedules Selected
+                    </p>
+                    <button @click="htmx.ajax('DELETE', '/volumes/backup/schedules', {source: $root, target: '#notifications' })">Delete</button>
+                    <button @click="selected = []">Cancel</button>
+                </fieldset>
+            </template>
+            <div class="sunken-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Schedule Id</th>
+                            <th>Schedule Name</th>
+                            <th>Volume Name</th>
+                            <th>Crontab</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backup-schedule-rows" hx-get="/volumes/backup/schedules"
+                        hx-trigger="load delay:5ms, every 5s" hx-target="#backup-schedule-rows"
+                        hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
+                    </tbody>
+                </table>
+            </div>
+        </form>
 </article>

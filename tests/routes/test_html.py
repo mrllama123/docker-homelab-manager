@@ -1,4 +1,4 @@
-from src.models import Backups
+from src.models import Backups, ScheduleCrontab
 
 from tests.fixtures import MockAsyncResult, MockVolume
 
@@ -94,3 +94,48 @@ def test_backups(client, snapshot, session):
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/html; charset=utf-8"
     snapshot.assert_match(response.text.strip(), "backup_rows.html")
+
+
+def test_create_schedule(client, snapshot, mocker):
+    mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
+    mock_get_volume = mocker.patch(
+        "src.routes.impl.volumes.get_volume",
+        return_value=MockVolume(),
+    )
+    mock_create_schedule = mocker.patch(
+        "src.routes.impl.volumes.add_backup_job",
+        return_value=MockAsyncResult(),
+    )
+    response = client.post(
+        "/volumes/backup/schedule/test-volume",
+        # headers={"content-type": "application/x-www-form-urlencoded"},
+        data={
+            "schedule_name": "test-schedule-id",
+            "second": "*",
+            "minute": "*",
+            "hour": "1",
+            "day": "*",
+            "month": "*",
+            "day_of_week": "*",
+        },
+    )
+    
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "text/html; charset=utf-8"
+    snapshot.assert_match(response.text.strip(), "notification.html")
+
+    mock_get_volume.assert_called_once_with("test-volume")
+    mock_create_schedule.assert_called_once_with(
+        "test-schedule-id",
+        "test-volume",
+        ScheduleCrontab(
+            second="*",
+            minute="*",
+            hour="1",
+            day="*",
+            month="*",
+            day_of_week="*",
+        ),
+        is_schedule=True
+    )
+

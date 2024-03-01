@@ -1,3 +1,4 @@
+from apscheduler.jobstores.base import JobLookupError
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -52,11 +53,16 @@ def backup_volume(request: Request, volume_name: str):
         return templates.TemplateResponse(
             request,
             "notification.html",
-            {"message": f"Backup created: {result.backup_id}", "swap_out_of_band": False},
+            {
+                "message": f"Backup created: {result.backup_id}",
+                "swap_out_of_band": False,
+            },
         )
     except HTTPException as e:
         return templates.TemplateResponse(
-            request, "notification.html", {"message": e.detail, "swap_out_of_band": False}
+            request,
+            "notification.html",
+            {"message": e.detail, "swap_out_of_band": False},
         )
     except Exception:
         raise
@@ -100,40 +106,51 @@ async def create_backup_schedule(
     request: Request,
     volume_name: str,
     schedule_name: Annotated[str, Form()],
-    seconds: Annotated[str, Form()],
-    minutes: Annotated[str, Form()],
-    hours: Annotated[str, Form()],
-    days: Annotated[str, Form()],
-    months: Annotated[str, Form()],
-    days_of_week: Annotated[str, Form()],
+    second: Annotated[str, Form()],
+    minute: Annotated[str, Form()],
+    hour: Annotated[str, Form()],
+    day: Annotated[str, Form()],
+    month: Annotated[str, Form()],
+    day_of_week: Annotated[str, Form()],
 ):
 
     schedule = CreateBackupSchedule(
         schedule_name=schedule_name,
         volume_name=volume_name,
         crontab={
-            "seconds": seconds,
-            "minutes": minutes,
-            "hours": hours,
-            "days": days,
-            "months": months,
-            "days_of_week": days_of_week,
+            "second": second,
+            "minute": minute,
+            "hour": hour,
+            "day": day,
+            "month": month,
+            "day_of_week": day_of_week,
         },
     )
 
+    logger.info(f"create_backup_schedule: {schedule}")
+
     await api_create_backup_schedule(schedule)
     return templates.TemplateResponse(
-        request, "notification.html", {"message": "Backup schedule created", "create_backup_schedule": True}
+        request,
+        "notification.html",
+        {"message": "Backup schedule created", "create_backup_schedule": True},
     )
+
 
 @router.delete(
     "/volumes/backup/schedules",
     description="delete backup schedule",
     response_class=HTMLResponse,
 )
-def delete_backup_schedule(request: Request, schedules: list[str]):
-    api_remove_backup_schedules(schedules)
-    return templates.TemplateResponse(
-        request, "notification.html", {"message": "Backup schedule deleted"}
-    )
-
+def delete_backup_schedule(request: Request, selected: Annotated[list[str], Form()]):
+    try:
+        api_remove_backup_schedules(selected)
+        return templates.TemplateResponse(
+            request, "notification.html", {"message": "Backup schedule deleted"}
+        )
+    except JobLookupError as e:
+        return templates.TemplateResponse(
+            request, "notification.html", {"message": str(e)}
+        )
+    except Exception:
+        raise
