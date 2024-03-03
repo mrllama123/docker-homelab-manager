@@ -50,13 +50,13 @@
             </table>
         </div>
         <p>Backup schedules</p>
-        <form x-data="{ selected: [] }">
+        <form hx-replace-url="false" x-data="tableBackupSchedules">
             <template x-if="selected.length > 0">
                 <fieldset>
                     <p>
                         <slot x-text="selected.length"></slot> Schedules Selected
                     </p>
-                    <button @click="htmx.ajax('DELETE', '/volumes/backup/schedules', {source: $root, target: '#notifications' })">Delete</button>
+                    <button hx-replace-url="false" @click='deleteSelected()'>Delete</button>
                     <button @click="selected = []">Cancel</button>
                 </fieldset>
             </template>
