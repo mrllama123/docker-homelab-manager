@@ -145,8 +145,9 @@ async def create_backup_schedule(
 def delete_backup_schedule(request: Request, schedules: Annotated[list[str], Form()]):
     try:
         api_remove_backup_schedules(schedules)
+        schedules = api_list_backup_schedules()
         return templates.TemplateResponse(
-            request, "notification.html", {"message": "Backup schedule deleted"}
+            request, "backup_schedule_rows.html", {"schedules": schedules}
         )
     except JobLookupError as e:
         return templates.TemplateResponse(
