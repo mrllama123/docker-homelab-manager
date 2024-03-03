@@ -56,7 +56,7 @@
                     <p>
                         <slot x-text="selected.length"></slot> Schedules Selected
                     </p>
-                    <button hx-replace-url="false" @click='htmx.ajax("DELETE", "/volumes/backup/schedules", {source: $root, target: "#backup-schedule-rows", values: {"schedules": selected} }), selected = []'>Delete</button>
+                    <button hx-replace-url="false" @click='deleteSelected()'>Delete</button>
                     <button @click="selected = []">Cancel</button>
                 </fieldset>
             </template>

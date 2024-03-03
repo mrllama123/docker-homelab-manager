@@ -7,7 +7,19 @@ document.addEventListener('alpine:init', () => {
             } else {
                 this.selected.push(id)
             }
+        },
+        deleteSelected() {
+            htmx.ajax(
+                "DELETE",
+                "/volumes/backup/schedules",
+                {
+                    source: "closest form",
+                    target: "#backup-schedule-rows",
+                    values: { "schedules": this.selected }
+                }
+            )
+            this.selected = []
         }
-        
+
     }))
 })

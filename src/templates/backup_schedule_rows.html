@@ -1,5 +1,5 @@
 {% for schedule in schedules %}
-<tr @click='!selected.includes("{{ schedule.schedule_id }}") ? selected.push("{{ schedule.schedule_id }}"): selected = selected.filter((e) => e !== "{{ schedule.schedule_id }}")'
+<tr @click='clickRow("{{ schedule.schedule_id }}")'
     :class="selected.includes('{{ schedule.schedule_id }}') ? 'highlighted' : ''">
     <td>{{ schedule.schedule_id }}</td>
     <td>{{ schedule.schedule_name }}</td>
