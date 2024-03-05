@@ -92,6 +92,8 @@ def backup_schedules(request: Request):
     response_class=HTMLResponse,
 )
 def create_backup_schedule_form(request: Request, volume_name: str):
+    if request.headers.get("HX-Target") == "create-schedule-window":
+        return ""
     return templates.TemplateResponse(
         request, "create_backup_schedule.html", {"volume_name": volume_name}
     )
@@ -128,13 +130,23 @@ async def create_backup_schedule(
     )
 
     logger.info(f"create_backup_schedule: {schedule}")
+    try:
+        await api_create_backup_schedule(schedule)
 
-    await api_create_backup_schedule(schedule)
-    return templates.TemplateResponse(
-        request,
-        "notification.html",
-        {"message": "Backup schedule created", "create_backup_schedule": True},
-    )
+        return templates.TemplateResponse(
+            request,
+            "notification.html",
+            {"message": "Backup schedule created", "create_backup_schedule": True},
+            headers={"HX-Trigger": "reload-backup-schedule-rows"}
+        )
+    except HTTPException as e:
+        return templates.TemplateResponse(
+            request,
+            "notification.html",
+            {"message": e.detail},
+        )
+    except Exception:
+        raise
 
 
 @router.delete(
