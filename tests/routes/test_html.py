@@ -119,7 +119,7 @@ def test_create_schedule(client, snapshot, mocker):
             "day_of_week": "*",
         },
     )
-    
+
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/html; charset=utf-8"
     snapshot.assert_match(response.text.strip(), "notification.html")
@@ -136,6 +136,5 @@ def test_create_schedule(client, snapshot, mocker):
             month="*",
             day_of_week="*",
         ),
-        is_schedule=True
+        is_schedule=True,
     )
-

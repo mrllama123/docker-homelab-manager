@@ -142,7 +142,6 @@ def api_remove_backup_schedules(schedule_ids: str) -> str:
         logger.info("Removing schedule %s", id)
         delete_backup_schedule(id)
 
-
     return f"Schedules {schedule_ids} removed"
 
 
