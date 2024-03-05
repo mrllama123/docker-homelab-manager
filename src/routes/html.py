@@ -133,12 +133,13 @@ async def create_backup_schedule(
     try:
         await api_create_backup_schedule(schedule)
 
-        return templates.TemplateResponse(
-            request,
-            "notification.html",
-            {"message": "Backup schedule created", "create_backup_schedule": True},
-            headers={"HX-Trigger": "reload-backup-schedule-rows"}
-        )
+        return HTMLResponse("", headers={"HX-Trigger": "reload-backup-schedule-rows"})
+    # templates.TemplateResponse(
+    #         request,
+    #         "notification.html",
+    #         {"message": "Backup schedule created", "create_backup_schedule": True},
+    #         headers={"HX-Trigger": "reload-backup-schedule-rows"}
+    #     )
     except HTTPException as e:
         return templates.TemplateResponse(
             request,
