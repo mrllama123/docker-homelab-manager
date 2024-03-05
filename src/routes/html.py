@@ -33,14 +33,18 @@ def root(request: Request):
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
 async def volumes(request: Request):
     volumes = await api_volumes()
-    return templates.TemplateResponse(request, "volume_rows.html", {"volumes": volumes})
+    return templates.TemplateResponse(
+        request, "tabs/backup_volumes/components/volume_rows.html", {"volumes": volumes}
+    )
 
 
 @router.get(
     "/tabs/backup-volume", description="backup volumes tab", response_class=HTMLResponse
 )
 def backup_volume_tab(request: Request):
-    return templates.TemplateResponse(request, "backup_volume_tab.html")
+    return templates.TemplateResponse(
+        request, "tabs/backup_volumes/backup_volume_tab.html"
+    )
 
 
 @router.post(
@@ -72,7 +76,9 @@ def backup_volume(request: Request, volume_name: str):
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
 async def backups(request: Request, session: Session = Depends(get_session)):
     backups = await api_backups(session)
-    return templates.TemplateResponse(request, "backup_rows.html", {"backups": backups})
+    return templates.TemplateResponse(
+        request, "tabs/backup_volumes/components/backup_rows.html", {"backups": backups}
+    )
 
 
 @router.get(
@@ -83,7 +89,9 @@ async def backups(request: Request, session: Session = Depends(get_session)):
 def backup_schedules(request: Request):
     schedules = api_list_backup_schedules()
     return templates.TemplateResponse(
-        request, "backup_schedule_rows.html", {"schedules": schedules}
+        request,
+        "tabs/backup_volumes/components/backup_schedule_rows.html",
+        {"schedules": schedules},
     )
 
 
@@ -96,7 +104,9 @@ def create_backup_schedule_form(request: Request, volume_name: str):
     if request.headers.get("HX-Target") == "create-schedule-window":
         return ""
     return templates.TemplateResponse(
-        request, "create_backup_schedule.html", {"volume_name": volume_name}
+        request,
+        "tabs/backup_volumes/components/create_backup_schedule.html",
+        {"volume_name": volume_name},
     )
 
 
@@ -135,12 +145,7 @@ async def create_backup_schedule(
         await api_create_backup_schedule(schedule)
 
         return HTMLResponse("", headers={"HX-Trigger": "reload-backup-schedule-rows"})
-    # templates.TemplateResponse(
-    #         request,
-    #         "notification.html",
-    #         {"message": "Backup schedule created", "create_backup_schedule": True},
-    #         headers={"HX-Trigger": "reload-backup-schedule-rows"}
-    #     )
+
     except HTTPException as e:
         return templates.TemplateResponse(
             request,
@@ -161,7 +166,9 @@ def delete_backup_schedule(request: Request, schedules: Annotated[list[str], For
         api_remove_backup_schedules(schedules)
         schedules = api_list_backup_schedules()
         return templates.TemplateResponse(
-            request, "backup_schedule_rows.html", {"schedules": schedules}
+            request,
+            "tabs/backup_volumes/components/backup_schedule_rows.html",
+            {"schedules": schedules},
         )
     except JobLookupError as e:
         return templates.TemplateResponse(
