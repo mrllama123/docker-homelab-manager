@@ -46,6 +46,11 @@ def backup_volume_tab(request: Request):
         request, "tabs/backup_volumes/backup_volume_tab.html"
     )
 
+@router.get("/tabs/restore-volumes", description="restore volumes tab")
+def restore_volumes_tab(request: Request):
+    return templates.TemplateResponse(
+        request, "tabs/restore_volumes/restore_volume_tab.html"
+    )
 
 @router.post(
     "/volumes/backup/{volume_name}",
@@ -176,3 +181,5 @@ def delete_backup_schedule(request: Request, schedules: Annotated[list[str], For
         )
     except Exception:
         raise
+
+

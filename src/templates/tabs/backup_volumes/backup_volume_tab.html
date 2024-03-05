@@ -1,11 +1,11 @@
 <menu role="tablist" aria-label="docker-manager-tabs">
 
     <li role="tab" class="selected" autofocus aria-selected="true" aria-controls="backup-vol-tab" id="backup-volumes">
-        <a href="/backup-volume-tab">Backup Volumes</a>
+        <a hx-push-url="/" href="/tabs/backup-volume">Backup Volumes</a>
     </li>
 
     <li role="tab" aria-controls="restore-vol-tab" id="restore-volumes">
-        <a href="#tabs">Restore Volumes</a>
+        <a href="/tabs/restore-volumes">Restore Volumes</a>
     </li>
 </menu>
 <article class="window" role="tabpanel" id="backup-vol-tab">
