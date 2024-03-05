@@ -28,6 +28,11 @@ loggers:
     handlers:
       - access
     propagate: no
+  src.apschedule.schedule:
+    level: INFO
+    handlers:
+      - default
+    propagate: no
 root:
   level: DEBUG
   handlers:

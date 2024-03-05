@@ -1,0 +1,47 @@
+<div class="window" id="create-schedule-window">
+    <div class="title-bar" id="create-schedule-title-bar">
+        <div class="title-bar-text">
+            Create Schedule backup {{ volume_name }}
+        </div>
+    </div>
+    <div class="window-body" id="create-schedule-window-body">
+        <form id="create-schedule-form" hx-post="/volumes/backup/schedule/{{ volume_name }}" hx-swap="outerHTML"
+            hx-target="#create-schedule-window">
+            <div class="form-group">
+                <label for="schedule-name">Schedule Name</label>
+                <input type="text" class="form-control" id="schedule-name" name="schedule_name" required>
+            </div>
+            <div class="form-group">
+                 <fieldset>
+                    <legend>Crontab config</legend>
+                    <div class="field-row-stacked">
+                        <label for="cronjob-seconds">Seconds</label>
+                        <input id="cronjob-seconds" type="text" value="*" name="second" required />
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="cronjob-minutes">Minutes</label>
+                        <input id="cronjob-minutes" type="text" value="*" name="minute" required />
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="cronjob-hours">Hours</label>
+                        <input id="cronjob-hours" type="text" value="*" name="hour" required />
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="cronjob-days">Days</label>
+                        <input id="cronjob-days" type="text" value="*" name="day" required />
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="cronjob-months">Months</label>
+                        <input id="cronjob-months" type="text" value="*" name="month" required />
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="cronjob-days-of-week">Days of week</label>
+                        <input id="cronjob-days-of-week" type="text" value="*" name="day_of_week" required />
+                </fieldset>
+            </div>
+
+            <button>Submit</button>
+            <button hx-get="/volumes/backup/schedule/{{ volume_name }}">Cancel</button>
+        </form>
+    </div>
+</div>

@@ -1,6 +1,9 @@
-<tr>
+<tr id="test-volume">
     <td>test-volume</td>
     <td><button class="btn btn-primary" hx-post="/volumes/backup/test-volume" hx-target="#notifications">
             Backup</button>
+    </td>
+    <td>
+        <button hx-get="/volumes/backup/schedule/test-volume" hx-target="#create-schedule">Schedule</button>
     </td>
 </tr>
