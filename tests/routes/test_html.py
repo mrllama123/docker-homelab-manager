@@ -22,11 +22,7 @@ def test_volumes(client, snapshot, mocker):
     snapshot.assert_match(response.text.strip(), "volume_rows.html")
 
 
-def test_backup_volume_tab(client, snapshot):
-    response = client.get("/tabs/backup-volume")
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "text/html; charset=utf-8"
-    snapshot.assert_match(response.text.strip(), "backup_volume_tab.html")
+
 
 
 def test_backup_volume(client, snapshot, mocker):

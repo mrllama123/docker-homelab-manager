@@ -27,7 +27,11 @@ logger = logging.getLogger(__name__)
 
 @router.get("/", description="home page", response_class=HTMLResponse)
 def root(request: Request):
-    return templates.TemplateResponse(request, "index.html")
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {"tab_file_path": "tabs/backup_volumes/backup_volume_tab.html"},
+    )
 
 
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
@@ -38,19 +42,25 @@ async def volumes(request: Request):
     )
 
 
-@router.get(
-    "/tabs/backup-volume", description="backup volumes tab", response_class=HTMLResponse
-)
-def backup_volume_tab(request: Request):
-    return templates.TemplateResponse(
-        request, "tabs/backup_volumes/backup_volume_tab.html"
-    )
+# @router.get(
+#     "/tabs/backup-volume", description="backup volumes tab", response_class=HTMLResponse
+# )
+# def backup_volume_tab(request: Request):
+#     return templates.TemplateResponse(
+#         request,
+#         "index.html",
+#         {"tab_file_path": "tabs/backup_volumes/backup_volume_tab.html"},
+#     )
+
 
 @router.get("/tabs/restore-volumes", description="restore volumes tab")
 def restore_volumes_tab(request: Request):
     return templates.TemplateResponse(
-        request, "tabs/restore_volumes/restore_volume_tab.html"
+        request,
+        "index.html",
+        {"tab_file_path": "tabs/restore_volumes/restore_volume_tab.html"},
     )
+
 
 @router.post(
     "/volumes/backup/{volume_name}",
@@ -181,5 +191,3 @@ def delete_backup_schedule(request: Request, schedules: Annotated[list[str], For
         )
     except Exception:
         raise
-
-
