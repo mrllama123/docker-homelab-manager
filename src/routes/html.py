@@ -42,17 +42,6 @@ async def volumes(request: Request):
     )
 
 
-# @router.get(
-#     "/tabs/backup-volume", description="backup volumes tab", response_class=HTMLResponse
-# )
-# def backup_volume_tab(request: Request):
-#     return templates.TemplateResponse(
-#         request,
-#         "index.html",
-#         {"tab_file_path": "tabs/backup_volumes/backup_volume_tab.html"},
-#     )
-
-
 @router.get("/tabs/restore-volumes", description="restore volumes tab")
 def restore_volumes_tab(request: Request):
     return templates.TemplateResponse(
