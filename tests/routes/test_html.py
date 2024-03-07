@@ -22,9 +22,6 @@ def test_volumes(client, snapshot, mocker):
     snapshot.assert_match(response.text.strip(), "volume_rows.html")
 
 
-
-
-
 def test_backup_volume(client, snapshot, mocker):
     mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
