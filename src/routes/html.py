@@ -80,9 +80,12 @@ def backup_volume(request: Request, volume_name: str):
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
 async def backups(request: Request, session: Session = Depends(get_session)):
     backups = await api_backups(session)
-    return templates.TemplateResponse(
-        request, "tabs/backup_volumes/components/backup_rows.html", {"backups": backups}
+    path = (
+        "tabs/restore_volumes/components/backup_rows.html"
+        if "tabs/restore-volumes" in request.headers.get("HX-Current-URL")
+        else "tabs/backup_volumes/components/backup_rows.html"
     )
+    return templates.TemplateResponse(request, path, {"backups": backups})
 
 
 @router.get(
