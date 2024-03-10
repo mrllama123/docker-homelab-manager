@@ -41,7 +41,13 @@ async def api_volumes() -> list[VolumeItem]:
     ]
 
 
-async def api_backups(session: Session) -> list[Backups]:
+async def api_backups(
+    session: Session,
+    successful: bool | None = None,
+) -> list[Backups]:
+    query = select(Backups)
+    if successful is not None:
+        query = query.where(Backups.successful == successful)
     return session.exec(select(Backups)).all()
 
 
