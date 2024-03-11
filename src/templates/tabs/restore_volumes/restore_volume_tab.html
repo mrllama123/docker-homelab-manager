@@ -14,6 +14,17 @@
         <form hx-replace-url="false" x-data="tableBackupRestore">
             <template x-if="selected.length > 0">
                 <fieldset>
+                    <div class="form-group">
+                        <fieldset>
+                            <legend>Backups to restore</legend>
+                            <template x-for="(value, index) in selected" :key="index">
+                                <div class="field-row-stacked">
+                                    <label x-model="index" x-text="value.backupId"></label>
+                                    <input type="text" x-model="value.volumeName"  title="Enter volume name to restore" placeholder="Enter Volume to restore"/>
+                                </div>
+                            </template>
+                        </fieldset>
+                    </div>
                     <button hx-replace-url="false">Restore</button>
                     <button @click="selected = []">Cancel</button>
                 </fieldset>
@@ -38,7 +49,6 @@
             </div>
         </form>
         <p>Restored Volumes</p>
-
         <div class="sunken-panel">
             <table>
                 <thead>

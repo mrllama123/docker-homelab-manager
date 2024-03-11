@@ -25,11 +25,14 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('tableBackupRestore', () => ({
         selected: [],
         clickRow(id) {
-            if (this.selected.includes(id)) {
-                this.selected = this.selected.filter((item) => item !== id)
+            if (this.selected.some(item => item["backupId"] === id)){
+                this.selected = this.selected.filter((item) => item["backupId"] !== id)
             } else {
-                this.selected.push(id)
+                this.selected.push({"backupId": id, "volumeName": ""})
             }
+        },
+        isSelected(id) {
+            return this.selected.some(item => item["backupId"] === id)
         },
         restoreVolume() {
             htmx.ajax(
