@@ -8,8 +8,8 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from src.db import get_session
-from src.models import CreateBackupSchedule
-from src.routes.impl.volumes import (
+from src.models import CreateBackupResponse, CreateBackupSchedule
+from src.routes.impl.funcs import (
     api_backup_volume,
     api_backups,
     api_create_backup_schedule,
@@ -183,3 +183,13 @@ def delete_backup_schedule(request: Request, schedules: Annotated[list[str], For
         )
     except Exception:
         raise
+
+
+@router.get(
+    "/volumes/restore", description="restore volumes", response_class=HTMLResponse
+)
+def restore_volumes(
+    request: Request, volumes: Annotated[list[CreateBackupResponse], Form()], session: Session = Depends(get_session)
+):
+    backup_ids = [v.backup_id for v in volumes]
+
