@@ -9,14 +9,14 @@ from sqlmodel import Session
 
 from src.db import get_session
 from src.models import CreateBackupSchedule
-from src.routes.impl.volumes import (
+from src.routes.impl.funcs import (
     api_backup_volume,
-    api_backups,
     api_create_backup_schedule,
     api_list_backup_schedules,
     api_remove_backup_schedules,
     api_volumes,
 )
+from src.routes.impl.volumes.backups import db_list_backups
 
 router = APIRouter(tags=["html"])
 
@@ -74,8 +74,8 @@ def backup_volume(request: Request, volume_name: str):
 
 
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
-async def backups(request: Request, session: Session = Depends(get_session)):
-    backups = await api_backups(session)
+def backups(request: Request, session: Session = Depends(get_session)):
+    backups = db_list_backups(session)
     return templates.TemplateResponse(
         request, "tabs/backup_volumes/components/backup_rows.html", {"backups": backups}
     )

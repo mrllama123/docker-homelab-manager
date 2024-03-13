@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
 from src.db import get_session
@@ -11,17 +11,16 @@ from src.models import (
     RestoreVolumeResponse,
     VolumeItem,
 )
-from src.routes.impl.volumes import (
+from src.routes.impl.funcs import (
     api_backup_volume,
-    api_backups,
     api_create_backup_schedule,
-    api_get_backup,
     api_get_backup_schedule,
     api_list_backup_schedules,
     api_remove_backup_schedule,
     api_restore_volume,
     api_volumes,
 )
+from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
 
 router = APIRouter(prefix="/api", tags=["api"])
 
@@ -36,8 +35,12 @@ async def get_volumes() -> list[VolumeItem]:
     description="Get a list of all backups",
     response_model=list[Backups],
 )
-async def list_backups(session: Session = Depends(get_session)) -> list[Backups]:
-    return await api_backups(session)
+def list_backups(
+    session: Session = Depends(get_session),
+    backup_ids: list[str] | None = None,
+    successful: bool | None = None,
+) -> list[Backups]:
+    return db_list_backups(session, backup_ids, successful)
 
 
 @router.get(
@@ -45,10 +48,14 @@ async def list_backups(session: Session = Depends(get_session)) -> list[Backups]
     description="Get a backup by name",
     response_model=Backups,
 )
-async def get_backup(
-    backup_id: str, session: Session = Depends(get_session)
-) -> Backups:
-    return await api_get_backup(backup_id, session)
+def get_backup(backup_id: str, session: Session = Depends(get_session)) -> Backups:
+    backup = db_get_backup(session, backup_id)
+    if not backup:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Backup {backup_id} does not exist",
+        )
+    return backup
 
 
 @router.post(
