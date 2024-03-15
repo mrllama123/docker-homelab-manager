@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import Annotated
 
 from apscheduler.jobstores.base import JobLookupError
@@ -7,10 +8,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
+from src.apschedule.schedule import add_backup_job
 from src.db import get_session
+from src.docker import get_volume, is_volume_attached
 from src.models import CreateBackupSchedule
 from src.routes.impl.funcs import (
-    api_backup_volume,
     api_create_backup_schedule,
     api_list_backup_schedules,
     api_remove_backup_schedules,
@@ -53,24 +55,42 @@ def backup_volume_tab(request: Request):
     response_class=HTMLResponse,
 )
 def backup_volume(request: Request, volume_name: str):
-    try:
-        result = api_backup_volume(volume_name)
+
+    logger.info("backing up volume: %s", volume_name)
+    if not get_volume(volume_name):
         return templates.TemplateResponse(
             request,
             "notification.html",
             {
-                "message": f"Backup created: {result.backup_id}",
+                "message": f"Volume {volume_name} does not exist",
                 "swap_out_of_band": False,
             },
         )
-    except HTTPException as e:
+    if not is_volume_attached(volume_name):
         return templates.TemplateResponse(
             request,
             "notification.html",
-            {"message": e.detail, "swap_out_of_band": False},
+            {
+                "message": f"Volume {volume_name} is attached to a container",
+                "swap_out_of_band": False,
+            },
         )
-    except Exception:
-        raise
+
+    job = add_backup_job(f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name)
+    logger.info(
+        "backup %s started task id: %s",
+        volume_name,
+        job.id,
+        extra={"task_id": job.id},
+    )
+    return templates.TemplateResponse(
+        request,
+        "notification.html",
+        {
+            "message": f"Backup created: {job.id}",
+            "swap_out_of_band": False,
+        },
+    )
 
 
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)

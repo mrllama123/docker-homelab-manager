@@ -112,11 +112,11 @@ def test_get_backup_not_found(client):
 
 def test_create_backup_volume_not_found(mocker, client):
     mock_get_volume = mocker.patch(
-        "src.routes.impl.funcs.get_volume",
+        "src.routes.api.get_volume",
         return_value=None,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.routes.impl.funcs.add_backup_job",
+        "src.routes.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post("/api/volumes/backup/test-volume")
@@ -129,17 +129,17 @@ def test_create_backup_volume_not_found(mocker, client):
 
 
 def test_create_backup(mocker, client):
-    mocker.patch("src.routes.impl.funcs.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.api.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.routes.impl.funcs.get_volume",
+        "src.routes.api.get_volume",
         return_value=MockVolume(),
     )
     mock_is_volume_attached = mocker.patch(
-        "src.routes.impl.funcs.is_volume_attached",
+        "src.routes.api.is_volume_attached",
         return_value=True,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.routes.impl.funcs.add_backup_job",
+        "src.routes.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
 
@@ -159,15 +159,15 @@ def test_create_backup(mocker, client):
 
 def test_create_backup_volume_attached(mocker, client):
     mock_get_volume = mocker.patch(
-        "src.routes.impl.funcs.get_volume",
+        "src.routes.api.get_volume",
         return_value=MockVolume(),
     )
     mock_is_volume_attached = mocker.patch(
-        "src.routes.impl.funcs.is_volume_attached",
+        "src.routes.api.is_volume_attached",
         return_value=False,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.routes.impl.funcs.add_backup_job",
+        "src.routes.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post("/api/volumes/backup/test-volume")

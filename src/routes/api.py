@@ -1,7 +1,12 @@
+import logging
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
+from src.apschedule.schedule import add_backup_job
 from src.db import get_session
+from src.docker import get_volume, is_volume_attached
 from src.models import (
     Backups,
     BackupSchedule,
@@ -12,7 +17,6 @@ from src.models import (
     VolumeItem,
 )
 from src.routes.impl.funcs import (
-    api_backup_volume,
     api_create_backup_schedule,
     api_get_backup_schedule,
     api_list_backup_schedules,
@@ -23,6 +27,9 @@ from src.routes.impl.funcs import (
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
 
 router = APIRouter(prefix="/api", tags=["api"])
+
+
+logger = logging.getLogger(__name__)
 
 
 @router.get("/volumes", description="Get a list of all Docker volumes")
@@ -59,11 +66,34 @@ def get_backup(backup_id: str, session: Session = Depends(get_session)) -> Backu
 
 
 @router.post(
-    "/volumes/backup/{backup_id}",
+    "/volumes/backup/{volume_name}",
     description="Backup a volume",
 )
-def backup_volume(backup_id: str) -> CreateBackupResponse:
-    return api_backup_volume(backup_id)
+def backup_volume(volume_name: str) -> CreateBackupResponse:
+    logger.info("backing up volume: %s", volume_name)
+    if not get_volume(volume_name):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Volume {volume_name} does not exist",
+        )
+    if not is_volume_attached(volume_name):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Volume {volume_name} is attached to a container",
+        )
+
+    job = add_backup_job(f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name)
+    logger.info(
+        "backup %s started task id: %s",
+        volume_name,
+        job.id,
+        extra={"task_id": job.id},
+    )
+
+    return CreateBackupResponse(
+        backup_id=job.id,
+        volume_name=volume_name,
+    )
 
 
 @router.post(

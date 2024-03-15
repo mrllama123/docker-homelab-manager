@@ -40,54 +40,6 @@ async def api_volumes() -> list[VolumeItem]:
         for volume in volumes
     ]
 
-
-async def api_backups(
-    session: Session,
-    successful: bool | None = None,
-) -> list[Backups]:
-    query = select(Backups)
-    if successful is not None:
-        query = query.where(Backups.successful == successful)
-    return session.exec(select(Backups)).all()
-
-
-async def api_get_backup(backup_id: str, session: Session) -> Backups:
-    backup = session.exec(select(Backups).where(Backups.backup_id == backup_id)).first()
-    if not backup:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Backup {backup_id} does not exist",
-        )
-    return backup
-
-
-def api_backup_volume(volume_name: str) -> CreateBackupResponse:
-    logger.info("backing up volume: %s", volume_name)
-    if not get_volume(volume_name):
-        raise HTTPException(
-            status_code=404,
-            detail=f"Volume {volume_name} does not exist",
-        )
-    if not is_volume_attached(volume_name):
-        raise HTTPException(
-            status_code=409,
-            detail=f"Volume {volume_name} is attached to a container",
-        )
-
-    job = add_backup_job(f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name)
-    logger.info(
-        "backup %s started task id: %s",
-        volume_name,
-        job.id,
-        extra={"task_id": job.id},
-    )
-
-    return CreateBackupResponse(
-        backup_id=job.id,
-        volume_name=volume_name,
-    )
-
-
 def api_restore_volume(
     restore_volume: RestoreVolume,
 ) -> RestoreVolumeResponse:
