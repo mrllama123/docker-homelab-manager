@@ -4,7 +4,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from src.apschedule.schedule import add_backup_job
+from src.apschedule.schedule import add_backup_job, add_restore_job, get_backup_schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import (
@@ -18,10 +18,8 @@ from src.models import (
 )
 from src.routes.impl.funcs import (
     api_create_backup_schedule,
-    api_get_backup_schedule,
     api_list_backup_schedules,
     api_remove_backup_schedule,
-    api_restore_volume,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
 from src.routes.impl.volumes.volumes import list_volumes
@@ -101,14 +99,39 @@ def backup_volume(volume_name: str) -> CreateBackupResponse:
     description="Restore a Docker volume",
 )
 def restore_volume(restore_volume: RestoreVolume) -> RestoreVolumeResponse:
-    return api_restore_volume(restore_volume)
+    logger.info(
+        "restoring volume: %s from backup: %s",
+        restore_volume.volume_name,
+        restore_volume.backup_filename,
+    )
+    task = add_restore_job(
+        f"restore-{restore_volume.volume_name}-{str(uuid.uuid4())}",
+        restore_volume.volume_name,
+        restore_volume.backup_filename,
+    )
+    logger.info(
+        "restore of %s started task id: %s",
+        restore_volume.volume_name,
+        task.id,
+        extra={"task_id": task.id},
+    )
+    return RestoreVolumeResponse(
+        restore_id=task.id, volume_name=restore_volume.volume_name
+    )
 
 
 @router.get(
     "/volumes/schedule/backup/{schedule_id}", description="Get a backup schedule"
 )
-async def get_backup_schedule(schedule_id: str) -> BackupSchedule:
-    return api_get_backup_schedule(schedule_id)
+async def get_schedule(schedule_id: str) -> BackupSchedule:
+    logger.info("Getting schedule %s", schedule_id)
+    schedule = get_backup_schedule(schedule_id)
+    if not schedule:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Schedule job {schedule_id} does not exist",
+        )
+    return schedule
 
 
 @router.get("/volumes/schedule/backup", description="Get a list of backup schedules")
