@@ -1,22 +1,19 @@
 import logging
+import uuid
 from typing import Annotated
 
-from apscheduler.jobstores.base import JobLookupError
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
+import src.apschedule.schedule as schedule
 from src.db import get_session
+from src.docker import get_volume, is_volume_attached
 from src.models import CreateBackupSchedule
-from src.routes.impl.volumes import (
-    api_backup_volume,
-    api_backups,
-    api_create_backup_schedule,
-    api_list_backup_schedules,
-    api_remove_backup_schedules,
-    api_volumes,
-)
+from src.routes.impl.volumes.backups import db_list_backups
+from src.routes.impl.volumes.volumes import list_volumes
 
 router = APIRouter(tags=["html"])
 
@@ -31,8 +28,8 @@ def root(request: Request):
 
 
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
-async def volumes(request: Request):
-    volumes = await api_volumes()
+def volumes(request: Request):
+    volumes = list_volumes()
     return templates.TemplateResponse(
         request, "tabs/backup_volumes/components/volume_rows.html", {"volumes": volumes}
     )
@@ -53,29 +50,49 @@ def backup_volume_tab(request: Request):
     response_class=HTMLResponse,
 )
 def backup_volume(request: Request, volume_name: str):
-    try:
-        result = api_backup_volume(volume_name)
+
+    logger.info("backing up volume: %s", volume_name)
+    if not get_volume(volume_name):
         return templates.TemplateResponse(
             request,
             "notification.html",
             {
-                "message": f"Backup created: {result.backup_id}",
+                "message": f"Volume {volume_name} does not exist",
                 "swap_out_of_band": False,
             },
         )
-    except HTTPException as e:
+    if not is_volume_attached(volume_name):
         return templates.TemplateResponse(
             request,
             "notification.html",
-            {"message": e.detail, "swap_out_of_band": False},
+            {
+                "message": f"Volume {volume_name} is attached to a container",
+                "swap_out_of_band": False,
+            },
         )
-    except Exception:
-        raise
+
+    job = schedule.add_backup_job(
+        f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
+    )
+    logger.info(
+        "backup %s started task id: %s",
+        volume_name,
+        job.id,
+        extra={"task_id": job.id},
+    )
+    return templates.TemplateResponse(
+        request,
+        "notification.html",
+        {
+            "message": f"Backup created: {job.id}",
+            "swap_out_of_band": False,
+        },
+    )
 
 
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
-async def backups(request: Request, session: Session = Depends(get_session)):
-    backups = await api_backups(session)
+def backups(request: Request, session: Session = Depends(get_session)):
+    backups = db_list_backups(session)
     return templates.TemplateResponse(
         request, "tabs/backup_volumes/components/backup_rows.html", {"backups": backups}
     )
@@ -87,7 +104,7 @@ async def backups(request: Request, session: Session = Depends(get_session)):
     response_class=HTMLResponse,
 )
 def backup_schedules(request: Request):
-    schedules = api_list_backup_schedules()
+    schedules = schedule.list_backup_schedules()
     return templates.TemplateResponse(
         request,
         "tabs/backup_volumes/components/backup_schedule_rows.html",
@@ -127,7 +144,7 @@ async def create_backup_schedule(
     day_of_week: Annotated[str, Form()],
 ):
 
-    schedule = CreateBackupSchedule(
+    new_schedule = CreateBackupSchedule(
         schedule_name=schedule_name,
         volume_name=volume_name,
         crontab={
@@ -140,17 +157,31 @@ async def create_backup_schedule(
         },
     )
 
-    logger.info(f"create_backup_schedule: {schedule}")
-    try:
-        await api_create_backup_schedule(schedule)
+    logger.info(f"create_backup_schedule: {new_schedule}")
 
-        return HTMLResponse("", headers={"HX-Trigger": "reload-backup-schedule-rows"})
-
-    except HTTPException as e:
+    if not get_volume(new_schedule.volume_name):
         return templates.TemplateResponse(
             request,
             "notification.html",
-            {"message": e.detail},
+            {"message": "Volume {schedule.volume_name} does not exist"},
+        )
+
+    try:
+        job = schedule.add_backup_job(
+            new_schedule.schedule_name,
+            new_schedule.volume_name,
+            new_schedule.crontab,
+            is_schedule=True,
+        )
+        logger.info(f"create_backup_schedule: job_id: {job.id}")
+
+        return HTMLResponse("", headers={"HX-Trigger": "reload-backup-schedule-rows"})
+
+    except ConflictingIdError as e:
+        return templates.TemplateResponse(
+            request,
+            "notification.html",
+            {"message": f"Schedule job {new_schedule.schedule_name} already exists"},
         )
     except Exception:
         raise
@@ -163,8 +194,10 @@ async def create_backup_schedule(
 )
 def delete_backup_schedule(request: Request, schedules: Annotated[list[str], Form()]):
     try:
-        api_remove_backup_schedules(schedules)
-        schedules = api_list_backup_schedules()
+        for id in schedules:
+            logger.info("Removing schedule %s", id)
+            schedule.delete_backup_schedule(id)
+        schedules = schedule.list_backup_schedules()
         return templates.TemplateResponse(
             request,
             "tabs/backup_volumes/components/backup_schedule_rows.html",
