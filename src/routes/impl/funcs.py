@@ -26,20 +26,6 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 
-async def api_volumes() -> list[VolumeItem]:
-    volumes = get_volumes()
-    return [
-        {
-            "name": volume.name,
-            "labels": volume.labels or {},
-            "mountpoint": str(volume.mountpoint),
-            "options": volume.options or {},
-            "status": volume.status or {},
-            "createdAt": volume.created_at.isoformat(),
-        }
-        for volume in volumes
-    ]
-
 def api_restore_volume(
     restore_volume: RestoreVolume,
 ) -> RestoreVolumeResponse:

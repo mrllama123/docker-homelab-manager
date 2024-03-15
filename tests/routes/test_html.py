@@ -13,7 +13,7 @@ def test_root(client, snapshot):
 
 def test_volumes(client, snapshot, mocker):
     mocker.patch(
-        "src.routes.impl.funcs.get_volumes",
+        "src.routes.impl.volumes.volumes.get_volumes",
         return_value=[MockVolume()],
     )
     response = client.get("/volumes")

@@ -16,9 +16,9 @@ from src.routes.impl.funcs import (
     api_create_backup_schedule,
     api_list_backup_schedules,
     api_remove_backup_schedules,
-    api_volumes,
 )
 from src.routes.impl.volumes.backups import db_list_backups
+from src.routes.impl.volumes.volumes import list_volumes
 
 router = APIRouter(tags=["html"])
 
@@ -33,8 +33,8 @@ def root(request: Request):
 
 
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
-async def volumes(request: Request):
-    volumes = await api_volumes()
+def volumes(request: Request):
+    volumes = list_volumes()
     return templates.TemplateResponse(
         request, "tabs/backup_volumes/components/volume_rows.html", {"volumes": volumes}
     )

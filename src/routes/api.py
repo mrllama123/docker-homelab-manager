@@ -22,9 +22,9 @@ from src.routes.impl.funcs import (
     api_list_backup_schedules,
     api_remove_backup_schedule,
     api_restore_volume,
-    api_volumes,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
+from src.routes.impl.volumes.volumes import list_volumes
 
 router = APIRouter(prefix="/api", tags=["api"])
 
@@ -33,8 +33,8 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/volumes", description="Get a list of all Docker volumes")
-async def get_volumes() -> list[VolumeItem]:
-    return await api_volumes()
+def get_volumes() -> list[VolumeItem]:
+    return list_volumes()
 
 
 @router.get(

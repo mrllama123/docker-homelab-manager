@@ -8,7 +8,7 @@ from tests.fixtures import MockAsyncResult, MockVolume
 
 def test_list_volumes(mocker, client):
     mock_get_volumes = mocker.patch(
-        "src.routes.impl.funcs.get_volumes",
+        "src.routes.impl.volumes.volumes.get_volumes",
         return_value=[MockVolume()],
     )
     response = client.get("/api/volumes")
