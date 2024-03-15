@@ -13,7 +13,7 @@ def test_root(client, snapshot):
 
 def test_volumes(client, snapshot, mocker):
     mocker.patch(
-        "src.routes.impl.volumes.get_volumes",
+        "src.routes.impl.volumes.volumes.get_volumes",
         return_value=[MockVolume()],
     )
     response = client.get("/volumes")
@@ -23,17 +23,17 @@ def test_volumes(client, snapshot, mocker):
 
 
 def test_backup_volume(client, snapshot, mocker):
-    mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.html.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.routes.impl.volumes.get_volume",
+        "src.routes.html.get_volume",
         return_value=MockVolume(),
     )
     mock_is_volume_attached = mocker.patch(
-        "src.routes.impl.volumes.is_volume_attached",
+        "src.routes.html.is_volume_attached",
         return_value=True,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.routes.impl.volumes.add_backup_job",
+        "src.routes.html.schedule.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post("/volumes/backup/test_volume")
@@ -50,13 +50,13 @@ def test_backup_volume(client, snapshot, mocker):
 
 
 def test_backup_volume_error_attached(client, snapshot, mocker):
-    mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.html.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.routes.impl.volumes.get_volume",
+        "src.routes.html.get_volume",
         return_value=MockVolume(),
     )
     mock_is_volume_attached = mocker.patch(
-        "src.routes.impl.volumes.is_volume_attached",
+        "src.routes.html.is_volume_attached",
         return_value=False,
     )
     response = client.post("/volumes/backup/test_volume")
@@ -90,13 +90,13 @@ def test_backups(client, snapshot, session):
 
 
 def test_create_schedule(client, snapshot, mocker):
-    mocker.patch("src.routes.impl.volumes.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.html.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.routes.impl.volumes.get_volume",
+        "src.routes.html.get_volume",
         return_value=MockVolume(),
     )
     mock_create_schedule = mocker.patch(
-        "src.routes.impl.volumes.add_backup_job",
+        "src.routes.html.schedule.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post(
