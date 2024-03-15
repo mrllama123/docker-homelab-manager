@@ -293,7 +293,7 @@ def test_get_schedule_not_found(mocker, client):
 
 def test_list_schedule(mocker, client):
     mock_list_schedule = mocker.patch(
-        "src.routes.impl.funcs.list_backup_schedules",
+        "src.routes.api.list_backup_schedules",
         return_value=[
             BackupSchedule(
                 volume_name="test-volume",

@@ -4,7 +4,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from src.apschedule.schedule import add_backup_job, add_restore_job, get_backup_schedule
+from src.apschedule.schedule import add_backup_job, add_restore_job, get_backup_schedule, list_backup_schedules
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import (
@@ -18,7 +18,6 @@ from src.models import (
 )
 from src.routes.impl.funcs import (
     api_create_backup_schedule,
-    api_list_backup_schedules,
     api_remove_backup_schedule,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
@@ -135,8 +134,8 @@ async def get_schedule(schedule_id: str) -> BackupSchedule:
 
 
 @router.get("/volumes/schedule/backup", description="Get a list of backup schedules")
-async def list_backup_schedules() -> list[BackupSchedule]:
-    return api_list_backup_schedules()
+def api_list_backup_schedules() -> list[BackupSchedule]:
+    return  list_backup_schedules()
 
 
 @router.delete(

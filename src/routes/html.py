@@ -8,13 +8,12 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
-from src.apschedule.schedule import add_backup_job
+from src.apschedule.schedule import add_backup_job, list_backup_schedules
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import CreateBackupSchedule
 from src.routes.impl.funcs import (
     api_create_backup_schedule,
-    api_list_backup_schedules,
     api_remove_backup_schedules,
 )
 from src.routes.impl.volumes.backups import db_list_backups
@@ -107,7 +106,7 @@ def backups(request: Request, session: Session = Depends(get_session)):
     response_class=HTMLResponse,
 )
 def backup_schedules(request: Request):
-    schedules = api_list_backup_schedules()
+    schedules = list_backup_schedules()
     return templates.TemplateResponse(
         request,
         "tabs/backup_volumes/components/backup_schedule_rows.html",

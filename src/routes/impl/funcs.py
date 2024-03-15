@@ -10,7 +10,6 @@ from src.apschedule.schedule import (
     add_restore_job,
     delete_backup_schedule,
     get_backup_schedule,
-    list_backup_schedules,
 )
 from src.docker import get_volume, get_volumes, is_volume_attached
 from src.models import (
@@ -26,9 +25,7 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 
-def api_list_backup_schedules() -> list[BackupSchedule]:
-    # TODO: add filters e.g volume_name, cron schedule
-    return list_backup_schedules()
+
 
 
 def api_remove_backup_schedule(schedule_id: str) -> str:
