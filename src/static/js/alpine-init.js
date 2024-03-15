@@ -25,23 +25,23 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('tableBackupRestore', () => ({
         selected: [],
         clickRow(id) {
-            if (this.selected.some(item => item["backupId"] === id)){
-                this.selected = this.selected.filter((item) => item["backupId"] !== id)
+            if (this.selected.some(item => item["backup_id"] === id)){
+                this.selected = this.selected.filter((item) => item["backup_id"] !== id)
             } else {
-                this.selected.push({"backupId": id, "volumeName": ""})
+                this.selected.push({"backup_id": id, "volume_name": ""})
             }
         },
         isSelected(id) {
-            return this.selected.some(item => item["backupId"] === id)
+            return this.selected.some(item => item["backup_id"] === id)
         },
-        restoreVolume() {
+        restoreVolumes() {
             htmx.ajax(
                 "POST",
-                "/volumes/backup/restore",
+                "/volumes/restore",
                 {
                     source: "closest form",
                     target: "#backup-restore-rows",
-                    values: { "backups": this.selected }
+                    values: { "volumes": this.selected }
                 }
             )
             this.selected = []

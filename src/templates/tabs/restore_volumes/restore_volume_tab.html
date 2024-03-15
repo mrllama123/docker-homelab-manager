@@ -19,13 +19,13 @@
                             <legend>Backups to restore</legend>
                             <template x-for="(value, index) in selected" :key="index">
                                 <div class="field-row-stacked">
-                                    <label x-model="index" x-text="value.backupId"></label>
-                                    <input type="text" x-model="value.volumeName"  title="Enter volume name to restore" placeholder="Enter Volume to restore"/>
+                                    <label x-model="index" x-text="value.backup_id"></label>
+                                    <input type="text" x-model="value.volume_name"  title="Enter volume name to restore" placeholder="Enter Volume name to restore"/>
                                 </div>
                             </template>
                         </fieldset>
                     </div>
-                    <button hx-replace-url="false">Restore</button>
+                    <button hx-replace-url="false" @click="restoreVolumes()">Restore</button>
                     <button @click="selected = []">Cancel</button>
                 </fieldset>
             </template>
