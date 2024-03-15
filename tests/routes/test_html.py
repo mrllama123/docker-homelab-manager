@@ -40,7 +40,7 @@ def test_backup_volume(client, snapshot, mocker):
         return_value=True,
     )
     mock_create_volume_backup = mocker.patch(
-        "src.routes.html.add_backup_job",
+        "src.routes.html.schedule.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post("/volumes/backup/test_volume")
@@ -97,13 +97,13 @@ def test_backups(client, snapshot, session):
 
 
 def test_create_schedule(client, snapshot, mocker):
-    mocker.patch("src.routes.impl.funcs.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.html.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.routes.impl.funcs.get_volume",
+        "src.routes.html.get_volume",
         return_value=MockVolume(),
     )
     mock_create_schedule = mocker.patch(
-        "src.routes.impl.funcs.add_backup_job",
+        "src.routes.html.schedule.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post(

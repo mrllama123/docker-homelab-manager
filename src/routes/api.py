@@ -1,10 +1,17 @@
 import logging
 import uuid
 
+from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from src.apschedule.schedule import add_backup_job, add_restore_job, get_backup_schedule, list_backup_schedules
+from src.apschedule.schedule import (
+    add_backup_job,
+    add_restore_job,
+    delete_backup_schedule,
+    get_backup_schedule,
+    list_backup_schedules,
+)
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import (
@@ -15,10 +22,6 @@ from src.models import (
     RestoreVolume,
     RestoreVolumeResponse,
     VolumeItem,
-)
-from src.routes.impl.funcs import (
-    api_create_backup_schedule,
-    api_remove_backup_schedule,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
 from src.routes.impl.volumes.volumes import list_volumes
@@ -135,16 +138,53 @@ async def get_schedule(schedule_id: str) -> BackupSchedule:
 
 @router.get("/volumes/schedule/backup", description="Get a list of backup schedules")
 def api_list_backup_schedules() -> list[BackupSchedule]:
-    return  list_backup_schedules()
+    return list_backup_schedules()
 
 
 @router.delete(
     "/volumes/schedule/backup/{schedule_id}", description="Remove a backup schedule"
 )
 def remove_backup_schedule(schedule_id: str) -> str:
-    return api_remove_backup_schedule(schedule_id)
+    logger.info("Removing schedule %s", schedule_id)
+    try:
+        delete_backup_schedule(schedule_id)
+    except JobLookupError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Schedule job {schedule_id} does not exist",
+        ) from e
+    except Exception:
+        raise
+    return f"Schedule {schedule_id} removed"
 
 
 @router.post("/volumes/schedule/backup", description="Create a backup schedule")
 async def create_backup_schedule(schedule: CreateBackupSchedule) -> BackupSchedule:
-    return await api_create_backup_schedule(schedule)
+    if not get_volume(schedule.volume_name):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Volume {schedule.volume_name} does not exist",
+        )
+
+    try:
+        job = add_backup_job(
+            schedule.schedule_name,
+            schedule.volume_name,
+            schedule.crontab,
+            is_schedule=True,
+        )
+
+    except ConflictingIdError as e:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Schedule job {schedule.schedule_name} already exists",
+        ) from e
+    except Exception:
+        raise
+
+    return BackupSchedule(
+        schedule_id=job.id,
+        schedule_name=schedule.schedule_name,
+        volume_name=schedule.volume_name,
+        crontab=schedule.crontab,
+    )

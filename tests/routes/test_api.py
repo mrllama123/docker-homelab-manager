@@ -204,12 +204,12 @@ def test_restore_backup(mocker, client):
 
 
 def test_create_schedule(mocker, client):
-    mocker.patch("src.routes.impl.funcs.uuid", **{"uuid4.return_value": "test-uuid"})
+    mocker.patch("src.routes.api.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_get_volume = mocker.patch(
-        "src.routes.impl.funcs.get_volume",
+        "src.routes.api.get_volume",
     )
     mock_create_volume_backup = mocker.patch(
-        "src.routes.impl.funcs.add_backup_job",
+        "src.routes.api.add_backup_job",
         return_value=MockAsyncResult(),
     )
     response = client.post(
@@ -327,7 +327,7 @@ def test_list_schedule(mocker, client):
 
 def test_remove_schedule(mocker, client):
     mock_remove_schedule = mocker.patch(
-        "src.routes.impl.funcs.delete_backup_schedule",
+        "src.routes.api.delete_backup_schedule",
     )
     response = client.delete("/api/volumes/schedule/backup/test-schedule")
     assert response.status_code == 200
@@ -337,7 +337,7 @@ def test_remove_schedule(mocker, client):
 
 def test_remove_schedule_not_found(mocker, client):
     mock_remove_schedule = mocker.patch(
-        "src.routes.impl.funcs.delete_backup_schedule",
+        "src.routes.api.delete_backup_schedule",
         side_effect=JobLookupError("test-schedule"),
     )
     response = client.delete("/api/volumes/schedule/backup/test-schedule")
