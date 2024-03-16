@@ -47,4 +47,36 @@ document.addEventListener('alpine:init', () => {
             this.selected = []
         }
     }))
+    Alpine.data('draggableWindow', () => ({
+        dragging: false, 
+        offsetX: 0, 
+        offsetY: 0,
+        startDrag() {
+            if (this.$root.style.width !== '100%') {
+                this.dragging = true
+                this.offsetX = this.$event.clientX - this.$root.offsetLeft
+                this.offsetY = this.$event.clientY - this.$root.offsetTop
+            }
+        },
+        drag() {
+            if (this.dragging) {
+                this.$root.style.left = (this.$event.clientX - this.offsetX) + 'px'
+                this.$root.style.top = (this.$event.clientY - this.offsetY) + 'px'
+            }
+        },
+        stopDrag() {
+            this.dragging = false
+        },
+        expandWindow(){
+            if (this.$root.style.width === '100%') {
+                this.$root.style.width = '50%'
+                this.$root.style.left = '5px' 
+                this.$root.style.top = '5px';
+            } else {
+                this.$root.style.width = '100%'; 
+                this.$root.style.left = '0'; 
+                this.$root.style.top = '0';
+            }
+        }
+    }))
 })
