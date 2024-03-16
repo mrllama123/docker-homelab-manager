@@ -83,7 +83,32 @@ def test_backups(client, snapshot, session):
             )
         )
     session.commit()
-    response = client.get("/volumes/backups")
+    response = client.get(
+        "/volumes/backups", headers={"HX-Current-URL": "http://localhost:8080"}
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "text/html; charset=utf-8"
+    snapshot.assert_match(response.text.strip(), "backup_rows.html")
+
+
+def test_backups_restore_tab(client, snapshot, session):
+    for backup_id in ["test-backup-id-1", "test-backup-id-2"]:
+        session.add(
+            Backups(
+                backup_id=backup_id,
+                created_at="2021-01-01T00:00:00+00:00",
+                backup_filename=f"{backup_id}.tar.gz",
+                backup_name="test-backup-name",
+                successful=True,
+                backup_path="/volumes/backup/test-backup-name.tar.gz",
+                volume_name="test-volume",
+            )
+        )
+    session.commit()
+    response = client.get(
+        "/volumes/backups",
+        headers={"HX-Current-URL": "http://localhost:8080/tabs/restore-volumes"},
+    )
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/html; charset=utf-8"
     snapshot.assert_match(response.text.strip(), "backup_rows.html")
@@ -131,3 +156,40 @@ def test_create_schedule(client, snapshot, mocker):
         ),
         is_schedule=True,
     )
+
+
+def test_restore_volume(client, snapshot, mocker, session):
+    mocker.patch("src.routes.html.uuid", **{"uuid4.return_value": "test-uuid"})
+    for backup_id in ["test-backup-id-1", "test-backup-id-2"]:
+        session.add(
+            Backups(
+                backup_id=backup_id,
+                created_at="2021-01-01T00:00:00+00:00",
+                backup_filename=f"{backup_id}.tar.gz",
+                backup_name="test-backup-name",
+                successful=True,
+                backup_path="/volumes/backup/test-backup-name.tar.gz",
+                volume_name="test-volume",
+            )
+        )
+    mock_restore_volume = mocker.patch(
+        "src.routes.html.schedule.add_restore_job",
+        return_value=MockAsyncResult(),
+    )
+    response = client.post(
+        "/volumes/restore",
+        data={
+            "volumes": [
+                '{"volume_name": "test-volume", "backup_id": "test-backup-id-1"}'
+            ]
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "text/html; charset=utf-8"
+    snapshot.assert_match(response.text.strip(), "notification.html")
+    mock_restore_volume.assert_called_once_with(
+        "backup-test-volume-test-uuid", "test-volume", "test-backup-id-1.tar.gz"
+    )
+
+

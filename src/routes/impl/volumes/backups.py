@@ -16,8 +16,8 @@ def db_list_backups(
     if successful is not None:
         query = query.where(Backups.successful == successful)
 
-    return session.exec(select(Backups)).all()
+    return session.exec(query).all()
 
 
-def db_get_backup(session: Session, backup_id: str) -> Backups | None:
+def db_get_backup(session: Session, backup_id: str) -> Backups | None:  
     return session.exec(select(Backups).where(Backups.backup_id == backup_id)).first()

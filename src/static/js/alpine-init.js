@@ -40,7 +40,7 @@ document.addEventListener('alpine:init', () => {
                 "/volumes/restore",
                 {
                     source: "closest form",
-                    target: "#backup-restore-rows",
+                    target: "#restore-vol-rows",
                     values: { "volumes": this.selected }
                 }
             )

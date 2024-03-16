@@ -12,7 +12,11 @@ from sqlmodel import Session
 import src.apschedule.schedule as schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
-from src.models import CreateBackupResponse, CreateBackupSchedule, RestoreVolumeHtmlRequest
+from src.models import (
+    CreateBackupResponse,
+    CreateBackupSchedule,
+    RestoreVolumeHtmlRequest,
+)
 from src.routes.impl.volumes.backups import db_list_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
@@ -233,10 +237,11 @@ def restore_volumes(
 ):
     logger.info("restoring volumes: %s", volumes)
     volumes = [json.loads(v) for v in volumes]
-    volumes: list[RestoreVolumeHtmlRequest] = [RestoreVolumeHtmlRequest.model_validate(v) for v in volumes]
-    backup_ids = [v.backup_id for v in volumes]
+    volumes: list[RestoreVolumeHtmlRequest] = [
+        RestoreVolumeHtmlRequest.model_validate(v) for v in volumes
+    ]
 
-    backups = db_list_backups(session, backup_ids=backup_ids)
+    backups = db_list_backups(session, backup_ids=[v.backup_id for v in volumes])
 
     if not backups:
         return templates.TemplateResponse(
@@ -244,17 +249,28 @@ def restore_volumes(
             "notification.html",
             {"message": "No backups found"},
         )
-    
+
     # TODO handle multiple data sources of backups in future
-    
+
+    restore_volume_by_backup_id = {v.backup_id: v.volume_name for v in volumes}
+
+    group_backup_by_volume_name = {
+        restore_volume_by_backup_id[backup.backup_id]: backup for backup in backups
+    }
+
+    for volume_name, backup in group_backup_by_volume_name.items():
+        logger.info("restoring volume: %s", volume_name)
+        job = schedule.add_restore_job(
+            f"backup-{volume_name}-{str(uuid.uuid4())}",
+            volume_name,
+            backup.backup_filename,
+        )
+        
+        logger.info(
+            "restore %s started task id: %s",
+            volume_name,
+            job.id,
+            extra={"task_id": job.id},
+        )
 
 
-    # for backup in backups:
-    #     logger.info("restoring volume: %s", backup.volume_name)
-    #     job = schedule.add_restore_job(f"backup-{volume_name}-{str(uuid.uuid4())}", backup.volume_name, backup.backup_filename)
-    #     logger.info(
-    #         "restore %s started task id: %s",
-    #         backup.volume_name,
-    #         job.id,
-    #         extra={"task_id": job.id},
-    #     )
