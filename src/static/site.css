@@ -36,3 +36,9 @@ body {
     top: 5px;
     position: absolute;
 }
+
+#create-schedule-window .title-bar {
+    user-select: none;
+    position: relative;
+}
+

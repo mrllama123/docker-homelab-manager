@@ -1,6 +1,10 @@
-<div class="window" id="create-schedule-window">
+<!-- $el.parentElement.parentElement -->
+<div class="window" id="create-schedule-window" x-data="{ dragging: false, offsetX: 0, offsetY: 0 }" >
     <div class="title-bar" id="create-schedule-title-bar">
-        <div class="title-bar-text">
+        <div class="title-bar-text"
+            @mousedown="dragging = true; offsetX = $event.clientX - $root.offsetLeft; offsetY = $event.clientY - $root.offsetTop;"
+            @mousemove.window="if (dragging) { $root.style.left = `${$event.clientX - offsetX}px`; $root.style.top = `${$event.clientY - offsetY}px`; }"
+            @mouseup.window="dragging = false">
             Create Schedule backup {{ volume_name }}
         </div>
     </div>
@@ -12,7 +16,7 @@
                 <input type="text" class="form-control" id="schedule-name" name="schedule_name" required>
             </div>
             <div class="form-group">
-                 <fieldset>
+                <fieldset>
                     <legend>Crontab config</legend>
                     <div class="field-row-stacked">
                         <label for="cronjob-seconds">Seconds</label>
