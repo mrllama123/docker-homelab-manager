@@ -1,4 +1,4 @@
-from src.models import Backups, ScheduleCrontab, RestoredBackups
+from src.models import Backups, RestoredBackups, ScheduleCrontab
 
 from tests.fixtures import MockAsyncResult, MockVolume
 
@@ -9,6 +9,7 @@ def test_root(client, snapshot):
     assert response.headers["content-type"] == "text/html; charset=utf-8"
 
     snapshot.assert_match(response.text.strip(), "index.html")
+
 
 def test_restore_volumes_tab(client, snapshot):
     response = client.get("/tabs/restore-volumes")
@@ -199,6 +200,7 @@ def test_restore_volume(client, snapshot, mocker, session):
         "backup-test-volume-test-uuid", "test-volume", "test-backup-id-1.tar.gz"
     )
 
+
 def test_list_restored_volumes(client, snapshot, mocker, session):
     mocker.patch("src.routes.html.uuid", **{"uuid4.return_value": "test-uuid"})
     for restore_id in ["test-restore-id-1", "test-restore-id-2"]:
@@ -220,5 +222,3 @@ def test_list_restored_volumes(client, snapshot, mocker, session):
 
     assert response.headers["content-type"] == "text/html; charset=utf-8"
     snapshot.assert_match(response.text.strip(), "restore_rows.html")
-    
-

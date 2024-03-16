@@ -12,11 +12,7 @@ from sqlmodel import Session
 import src.apschedule.schedule as schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
-from src.models import (
-    CreateBackupResponse,
-    CreateBackupSchedule,
-    RestoreVolumeHtmlRequest,
-)
+from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
 from src.routes.impl.volumes.backups import db_list_backups
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
@@ -274,6 +270,7 @@ def restore_volumes(
             extra={"task_id": job.id},
         )
     return HTMLResponse("")
+
 
 @router.get(
     "/volumes/restores",

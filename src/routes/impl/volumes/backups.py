@@ -19,5 +19,5 @@ def db_list_backups(
     return session.exec(query).all()
 
 
-def db_get_backup(session: Session, backup_id: str) -> Backups | None:  
+def db_get_backup(session: Session, backup_id: str) -> Backups | None:
     return session.exec(select(Backups).where(Backups.backup_id == backup_id)).first()
