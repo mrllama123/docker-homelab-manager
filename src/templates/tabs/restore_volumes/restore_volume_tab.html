@@ -53,21 +53,22 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Backup Id</th>
-                        <th>Backup Name</th>
+                        <th>Restore Id</th>
+                        <th>Restore Name</th>
                         <th>Volume Name</th>
-                        <th>Schedule Id</th>
-                        <th>Filename</th>
+                        <th>Backup Filename</th>
+                        <th>Successful</th>
                         <th>Create Date</th>
+                        <th>Error Message</th>
                     </tr>
                 </thead>
                 <tbody id="#restore-vol-rows">
 
                 </tbody>
-                <!-- <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
-                    hx-target="#backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                <tbody id="restore-vol-rows" hx-get="/volumes/restores" hx-trigger="load delay:5ms, every 5s"
+                    hx-target="#restore-vol-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
                     hx-ext="morph">
-                </tbody> -->
+                </tbody>
             </table>
         </div>
     </div>

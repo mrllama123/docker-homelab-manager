@@ -18,6 +18,7 @@ from src.models import (
     RestoreVolumeHtmlRequest,
 )
 from src.routes.impl.volumes.backups import db_list_backups
+from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
 router = APIRouter(tags=["html"])
@@ -265,12 +266,24 @@ def restore_volumes(
             volume_name,
             backup.backup_filename,
         )
-        
+
         logger.info(
             "restore %s started task id: %s",
             volume_name,
             job.id,
             extra={"task_id": job.id},
         )
+    return HTMLResponse("")
 
-
+@router.get(
+    "/volumes/restores",
+    description="list restore backups",
+    response_class=HTMLResponse,
+)
+def restores(request: Request, session: Session = Depends(get_session)):
+    restores = db_list_restored_backups(session)
+    return templates.TemplateResponse(
+        request,
+        "tabs/restore_volumes/components/restore_rows.html",
+        {"restored_backups": restores},
+    )
