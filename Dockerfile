@@ -14,18 +14,16 @@ COPY ./pyproject.toml ./poetry.lock* /tmp/
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
-FROM python:3.11
+FROM python:3.11-alpine
 
 
 WORKDIR /code
 
+RUN apk add --no-cache docker
 
 COPY --from=requirements-stage /tmp/requirements.txt /code/requirements.txt
 
-
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
-RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*
 
 COPY ./src /code/src
 COPY ./migrations /code/migrations
