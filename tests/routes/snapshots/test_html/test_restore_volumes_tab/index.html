@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>docker homelab manager</title>
+    <meta charset="UTF-8" />
+
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"
+        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+        crossorigin="anonymous"></script>
+    <link href="http://testserver/static/site.css" rel="stylesheet">
+    <script src="http://testserver/static/js/remove-me.js"></script>
+    <script src="http://testserver/static/js/alpine-init.js"></script>
+    <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+    </head>
+
+<body hx-boost="true" hx-ext="multi-swap">
+    <main>
+        
+<div id="create-schedule"></div>
+
+<div class="window" id="docker-homelab-manager-window">
+    <div class="title-bar" id="docker-homelab-manager-title-bar">
+        <div class="title-bar-text">
+            Docker Homelab Manager
+        </div>
+
+        <div class="title-bar-controls">
+            <button aria-label="Minimize"></button>
+            <button aria-label="Maximize"></button>
+            <button aria-label="Close"></button>
+        </div>
+    </div>
+    <div class="window-body" id="docker-homelab-manager-window-body">
+        <menu role="tablist" aria-label="docker-manager-tabs">
+
+    <li role="tab" aria-controls="backup-vol-tab" id="backup-volumes">
+        <a href="/">Backup Volumes</a>
+    </li>
+
+    <li role="tab" class="selected" autofocus aria-selected="true" aria-controls="restore-vol-tab" id="restore-volumes">
+        <a href="/tabs/restore-volumes">Restore Volumes</a>
+    </li>
+</menu>
+<article class="window" role="tabpanel" id="backup-vol-tab">
+    <div class="window-body">
+        <p>Backups</p>
+        <form hx-replace-url="false" x-data="tableBackupRestore">
+            <template x-if="selected.length > 0">
+                <fieldset>
+                    <div class="form-group">
+                        <fieldset>
+                            <legend>Backups to restore</legend>
+                            <template x-for="(value, index) in selected" :key="index">
+                                <div class="field-row-stacked">
+                                    <label x-model="index" x-text="value.backup_id"></label>
+                                    <input type="text" x-model="value.volume_name"  title="Enter volume name to restore" placeholder="Enter Volume name to restore"/>
+                                </div>
+                            </template>
+                        </fieldset>
+                    </div>
+                    <button hx-replace-url="false" @click="restoreVolumes()">Restore</button>
+                    <button @click="selected = []">Cancel</button>
+                </fieldset>
+            </template>
+            <div class="sunken-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Backup Id</th>
+                            <th>Backup Name</th>
+                            <th>Volume Name</th>
+                            <th>Schedule Id</th>
+                            <th>Filename</th>
+                            <th>Create Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
+                        hx-target="#backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                        hx-ext="morph">
+                    </tbody>
+                </table>
+            </div>
+        </form>
+        <p>Restored Volumes</p>
+        <div class="sunken-panel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Restore Id</th>
+                        <th>Restore Name</th>
+                        <th>Volume Name</th>
+                        <th>Backup Filename</th>
+                        <th>Successful</th>
+                        <th>Create Date</th>
+                        <th>Error Message</th>
+                    </tr>
+                </thead>
+                <tbody id="#restore-vol-rows">
+
+                </tbody>
+                <tbody id="restore-vol-rows" hx-get="/volumes/restores" hx-trigger="load delay:5ms, every 5s"
+                    hx-target="#restore-vol-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                    hx-ext="morph">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</article>
+    </div>
+</div>
+<div id="notifications">
+</div>
+
+    </main>
+</body>
+
+</html>
