@@ -35,9 +35,86 @@
         </div>
     </div>
     <div class="window-body" id="docker-homelab-manager-window-body">
-        <section id="tabs" class="tabs" hx-get="/tabs/backup-volume" hx-trigger="load delay:100ms" hx-target="#tabs"
-            hx-swap="innerHTML">
-        </section>
+        <menu role="tablist" aria-label="docker-manager-tabs">
+
+    <li role="tab" class="selected" autofocus aria-selected="true" aria-controls="backup-vol-tab" id="backup-volumes">
+        <a href="/">Backup Volumes</a>
+    </li>
+
+    <li role="tab" aria-controls="restore-vol-tab" id="restore-volumes">
+        <a href="/tabs/restore-volumes">Restore Volumes</a>
+    </li>
+</menu>
+<article class="window" role="tabpanel" id="backup-vol-tab">
+    <div class="window-body">
+
+        <p>Volumes</p>
+        <div class="sunken-panel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Volume Name</th>
+                        <th>Backup</th>
+                        <th>Create schedule</th>
+                    </tr>
+                </thead>
+                <tbody id="rows" hx-get="/volumes" hx-trigger="load delay:5ms" hx-target="#rows"
+                    hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
+                </tbody>
+
+            </table>
+        </div>
+
+        <p>Backups</p>
+        <div class="sunken-panel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Backup Id</th>
+                        <th>Backup Name</th>
+                        <th>Volume Name</th>
+                        <th>Schedule Id</th>
+                        <th>Successful</th>
+                        <th>Error Message</th>
+                        <th>Filename</th>
+                        <th>Create Date</th>
+                    </tr>
+                </thead>
+                <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
+                    hx-target="#backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                    hx-ext="morph">
+                </tbody>
+            </table>
+        </div>
+        <p>Backup schedules</p>
+        <form hx-replace-url="false" x-data="tableBackupSchedules">
+            <template x-if="selected.length > 0">
+                <fieldset>
+                    <p>
+                        <slot x-text="selected.length"></slot> Schedules Selected
+                    </p>
+                    <button hx-replace-url="false" @click='deleteSelected()'>Delete</button>
+                    <button @click="selected = []">Cancel</button>
+                </fieldset>
+            </template>
+            <div class="sunken-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Schedule Id</th>
+                            <th>Schedule Name</th>
+                            <th>Volume Name</th>
+                            <th>Crontab</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backup-schedule-rows" hx-get="/volumes/backup/schedules"
+                        hx-trigger="load delay:5ms,  reload-backup-schedule-rows from:body" hx-target="#backup-schedule-rows"
+                        hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
+                    </tbody>
+                </table>
+            </div>
+        </form>
+</article>
     </div>
 </div>
 <div id="notifications">

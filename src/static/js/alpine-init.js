@@ -22,4 +22,29 @@ document.addEventListener('alpine:init', () => {
         }
 
     }))
+    Alpine.data('tableBackupRestore', () => ({
+        selected: [],
+        clickRow(id) {
+            if (this.selected.some(item => item["backup_id"] === id)){
+                this.selected = this.selected.filter((item) => item["backup_id"] !== id)
+            } else {
+                this.selected.push({"backup_id": id, "volume_name": ""})
+            }
+        },
+        isSelected(id) {
+            return this.selected.some(item => item["backup_id"] === id)
+        },
+        restoreVolumes() {
+            htmx.ajax(
+                "POST",
+                "/volumes/restore",
+                {
+                    source: "closest form",
+                    target: "#notifications",
+                    values: { "volumes": this.selected }
+                }
+            )
+            this.selected = []
+        }
+    }))
 })

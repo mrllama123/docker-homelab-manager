@@ -1,0 +1,11 @@
+{% for restored_backup in restored_backups %}
+<tr>
+    <td>{{ restored_backup.restore_id }}</td>
+    <td>{{ restored_backup.restore_name }}</td>
+    <td>{{ restored_backup.volume_name }}</td>
+    <td>{{ restored_backup.backup_filename }}</td>
+    <td>{{ restored_backup.successful }}</td>
+    <td>{{ restored_backup.created_at }}</td>
+    <td>{{ restored_backup.error_message }}</td>
+</tr>
+{% endfor %}

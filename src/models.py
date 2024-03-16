@@ -28,6 +28,11 @@ class RestoreVolume(BaseModel):
     backup_filename: str
 
 
+class RestoreVolumeHtmlRequest(BaseModel):
+    backup_id: str
+    volume_name: str
+
+
 class ScheduleCrontab(BaseModel):
     seconds: str = "*"
     minute: str = "*"

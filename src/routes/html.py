@@ -1,3 +1,4 @@
+import json
 import logging
 import uuid
 from typing import Annotated
@@ -11,8 +12,9 @@ from sqlmodel import Session
 import src.apschedule.schedule as schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
-from src.models import CreateBackupSchedule
+from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
 from src.routes.impl.volumes.backups import db_list_backups
+from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
 router = APIRouter(tags=["html"])
@@ -24,7 +26,11 @@ logger = logging.getLogger(__name__)
 
 @router.get("/", description="home page", response_class=HTMLResponse)
 def root(request: Request):
-    return templates.TemplateResponse(request, "index.html")
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {"tab_file_path": "tabs/backup_volumes/backup_volume_tab.html"},
+    )
 
 
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
@@ -35,12 +41,12 @@ def volumes(request: Request):
     )
 
 
-@router.get(
-    "/tabs/backup-volume", description="backup volumes tab", response_class=HTMLResponse
-)
-def backup_volume_tab(request: Request):
+@router.get("/tabs/restore-volumes", description="restore volumes tab")
+def restore_volumes_tab(request: Request):
     return templates.TemplateResponse(
-        request, "tabs/backup_volumes/backup_volume_tab.html"
+        request,
+        "index.html",
+        {"tab_file_path": "tabs/restore_volumes/restore_volume_tab.html"},
     )
 
 
@@ -92,10 +98,17 @@ def backup_volume(request: Request, volume_name: str):
 
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
 def backups(request: Request, session: Session = Depends(get_session)):
-    backups = db_list_backups(session)
-    return templates.TemplateResponse(
-        request, "tabs/backup_volumes/components/backup_rows.html", {"backups": backups}
+    backups = (
+        db_list_backups(session, successful=True)
+        if "tabs/restore-volumes" in request.headers.get("HX-Current-URL")
+        else db_list_backups(session)
     )
+    path = (
+        "tabs/restore_volumes/components/backup_rows.html"
+        if "tabs/restore-volumes" in request.headers.get("HX-Current-URL")
+        else "tabs/backup_volumes/components/backup_rows.html"
+    )
+    return templates.TemplateResponse(request, path, {"backups": backups})
 
 
 @router.get(
@@ -209,3 +222,65 @@ def delete_backup_schedule(request: Request, schedules: Annotated[list[str], For
         )
     except Exception:
         raise
+
+
+@router.post(
+    "/volumes/restore", description="restore volumes", response_class=HTMLResponse
+)
+def restore_volumes(
+    request: Request,
+    volumes: Annotated[list[str], Form()],
+    session: Session = Depends(get_session),
+):
+    logger.info("restoring volumes: %s", volumes)
+    volumes = [json.loads(v) for v in volumes]
+    volumes: list[RestoreVolumeHtmlRequest] = [
+        RestoreVolumeHtmlRequest.model_validate(v) for v in volumes
+    ]
+
+    backups = db_list_backups(session, backup_ids=[v.backup_id for v in volumes])
+
+    if not backups:
+        return templates.TemplateResponse(
+            request,
+            "notification.html",
+            {"message": "No backups found"},
+        )
+
+    # TODO handle multiple data sources of backups in future
+
+    restore_volume_by_backup_id = {v.backup_id: v.volume_name for v in volumes}
+
+    group_backup_by_volume_name = {
+        restore_volume_by_backup_id[backup.backup_id]: backup for backup in backups
+    }
+
+    for volume_name, backup in group_backup_by_volume_name.items():
+        logger.info("restoring volume: %s", volume_name)
+        job = schedule.add_restore_job(
+            f"backup-{volume_name}-{str(uuid.uuid4())}",
+            volume_name,
+            backup.backup_filename,
+        )
+
+        logger.info(
+            "restore %s started task id: %s",
+            volume_name,
+            job.id,
+            extra={"task_id": job.id},
+        )
+    return HTMLResponse("")
+
+
+@router.get(
+    "/volumes/restores",
+    description="list restore backups",
+    response_class=HTMLResponse,
+)
+def restores(request: Request, session: Session = Depends(get_session)):
+    restores = db_list_restored_backups(session)
+    return templates.TemplateResponse(
+        request,
+        "tabs/restore_volumes/components/restore_rows.html",
+        {"restored_backups": restores},
+    )

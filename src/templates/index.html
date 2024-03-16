@@ -16,9 +16,7 @@
         </div>
     </div>
     <div class="window-body" id="docker-homelab-manager-window-body">
-        <section id="tabs" class="tabs" hx-get="/tabs/backup-volume" hx-trigger="load delay:100ms" hx-target="#tabs"
-            hx-swap="innerHTML">
-        </section>
+        {% include tab_file_path %}
     </div>
 </div>
 <div id="notifications">
