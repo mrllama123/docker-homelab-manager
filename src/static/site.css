@@ -25,3 +25,14 @@
 body {
     background-color: #008080;
 }
+
+#create-schedule-window {
+    margin: 10px;
+    max-width: 100%;
+    max-height: 500px;
+    cursor: pointer;
+    z-index: 10;
+    left: 5px;
+    top: 5px;
+    position: absolute;
+}
