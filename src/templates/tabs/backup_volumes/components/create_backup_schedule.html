@@ -1,11 +1,11 @@
 <!-- $el.parentElement.parentElement -->
-<div class="window" id="create-schedule-window" x-data="{ dragging: false, offsetX: 0, offsetY: 0 }" >
-    <div class="title-bar" id="create-schedule-title-bar">
-        <div class="title-bar-text"
-            @dblclick="if ($root.style.width === '100%') { $root.style.width = '50%'; $root.style.left = '5px'; $root.style.top = '5px'; } else { $root.style.width = '100%'; $root.style.left = '0'; $root.style.top = '0'; }"
-            @mousedown="dragging = true; offsetX = $event.clientX - $root.offsetLeft; offsetY = $event.clientY - $root.offsetTop;"
-            @mousemove.window="if (dragging) { $root.style.left = `${$event.clientX - offsetX}px`; $root.style.top = `${$event.clientY - offsetY}px`; }"
-            @mouseup.window="dragging = false">
+<div class="window" id="create-schedule-window" x-data="{ dragging: false, offsetX: 0, offsetY: 0 }">
+    <div class="title-bar" id="create-schedule-title-bar"
+        @dblclick="if ($root.style.width === '100%') { $root.style.width = '50%'; $root.style.left = '5px'; $root.style.top = '5px'; } else { $root.style.width = '100%'; $root.style.left = '0'; $root.style.top = '0'; }"
+        @mousedown="dragging = true; offsetX = $event.clientX - $root.offsetLeft; offsetY = $event.clientY - $root.offsetTop;"
+        @mousemove.window="if (dragging) { $root.style.left = `${$event.clientX - offsetX}px`; $root.style.top = `${$event.clientY - offsetY}px`; }"
+        @mouseup.window="dragging = false">
+        <div class="title-bar-text">
             Create Schedule backup {{ volume_name }}
         </div>
     </div>
@@ -44,7 +44,7 @@
                         <input id="cronjob-days-of-week" type="text" value="*" name="day_of_week" required />
                 </fieldset>
             </div>
-           
+
             <button>Submit</button>
             <button hx-get="/volumes/backup/schedule/{{ volume_name }}">Cancel</button>
         </form>
