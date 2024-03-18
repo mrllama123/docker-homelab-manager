@@ -15,9 +15,9 @@
             <button aria-label="Close"></button>
         </div>
     </div>
-    <div class="window-body" id="docker-homelab-manager-window-body">
-        {% include tab_file_path %}
-    </div>
+    <section id="tabs" class="tabs" hx-replace-url="false" hx-get="/tabs/backup-volumes" hx-trigger="load delay:100ms" hx-target="#tabs"
+        hx-swap="innerHTML">
+    </section>
 </div>
 <div id="notifications">
 </div>

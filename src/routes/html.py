@@ -29,7 +29,6 @@ def root(request: Request):
     return templates.TemplateResponse(
         request,
         "index.html",
-        {"tab_file_path": "tabs/backup_volumes/backup_volume_tab.html"},
     )
 
 
@@ -45,8 +44,15 @@ def volumes(request: Request):
 def restore_volumes_tab(request: Request):
     return templates.TemplateResponse(
         request,
-        "index.html",
-        {"tab_file_path": "tabs/restore_volumes/restore_volume_tab.html"},
+        "tabs/restore_volumes/restore_volume_tab.html",
+    )
+
+
+@router.get("/tabs/backup-volumes", description="backup volumes tab")
+def backup_volumes_tab(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "tabs/backup_volumes/backup_volume_tab.html",
     )
 
 
