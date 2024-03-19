@@ -3,7 +3,7 @@
 {% block content %}
 <div id="create-schedule"></div>
 
-<div class="window" id="docker-homelab-manager-window" x-init="load()" x-data="draggableWindow">
+<div class="window" id="docker-homelab-manager-window" x-data="draggableWindow">
     <div class="title-bar" id="docker-homelab-manager-title-bar" @dblclick="expandWindow()" @mousedown="startDrag()"
         @mousemove.window="drag()" @mouseup.window="stopDrag()">
         <div class="title-bar-text">
@@ -16,9 +16,9 @@
             <button aria-label="Close"></button>
         </div>
     </div>
-    <div class="window-body" id="docker-homelab-manager-window-body">
-        {% include tab_file_path %}
-    </div>
+    <section id="tabs" class="tabs" hx-replace-url="false" :hx-get="`/tabs/${mainWindowState.tabState}`" hx-trigger="load delay:100ms" hx-target="#tabs"
+        hx-swap="innerHTML">
+    </section>
 </div>
 <div id="notifications">
 </div>
