@@ -72,7 +72,7 @@
                     </thead>
                     <tbody id="backup-schedule-rows" hx-get="/volumes/backup/schedules"
                         hx-trigger="load delay:5ms,  reload-backup-schedule-rows from:body" hx-target="#backup-schedule-rows"
-                        hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
+                        hx-swap="morph:innerHTML, innerHTML transition:true" hx-ext="morph">
                     </tbody>
                 </table>
             </div>

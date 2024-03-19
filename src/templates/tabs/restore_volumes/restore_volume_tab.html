@@ -1,11 +1,13 @@
 <menu role="tablist" aria-label="docker-manager-tabs">
 
     <li role="tab" aria-controls="backup-vol-tab" id="backup-volumes">
-        <a @click.prevent="$store.windowState.switchTab('backup-volumes')" href="/tabs/backup-volumes">Backup Volumes</a>
+        <a @click.prevent="$store.windowState.switchTab('backup-volumes')" href="/tabs/backup-volumes">Backup
+            Volumes</a>
     </li>
 
     <li role="tab" class="selected" autofocus aria-selected="true" aria-controls="restore-vol-tab" id="restore-volumes">
-        <a  @click.prevent="$store.windowState.switchTab('restore-volumes')" href="/tabs/restore-volumes">Restore Volumes</a>
+        <a @click.prevent="$store.windowState.switchTab('restore-volumes')" href="/tabs/restore-volumes">Restore
+            Volumes</a>
     </li>
 </menu>
 <article class="window" role="tabpanel" id="backup-vol-tab">
@@ -20,7 +22,8 @@
                             <template x-for="(value, index) in selected" :key="index">
                                 <div class="field-row-stacked">
                                     <label x-model="index" x-text="value.backup_id"></label>
-                                    <input type="text" x-model="value.volume_name"  title="Enter volume name to restore" placeholder="Enter Volume name to restore"/>
+                                    <input type="text" x-model="value.volume_name" title="Enter volume name to restore"
+                                        placeholder="Enter Volume name to restore" />
                                 </div>
                             </template>
                         </fieldset>
@@ -42,7 +45,7 @@
                         </tr>
                     </thead>
                     <tbody id="success-backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
-                        hx-target="#success-backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                        hx-target="#success-backup-rows" hx-swap="morph:innerHTML, innerHTML transition:true"
                         hx-ext="morph">
                     </tbody>
                 </table>
@@ -66,8 +69,7 @@
 
                 </tbody>
                 <tbody id="restore-vol-rows" hx-get="/volumes/restores" hx-trigger="load delay:5ms, every 5s"
-                    hx-target="#restore-vol-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
-                    hx-ext="morph">
+                    hx-target="#restore-vol-rows" hx-swap="morph:innerHTML, innerHTML transition:true" hx-ext="morph">
                 </tbody>
             </table>
         </div>
