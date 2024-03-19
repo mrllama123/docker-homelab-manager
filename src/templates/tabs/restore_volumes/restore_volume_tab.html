@@ -41,8 +41,8 @@
                             <th>Create Date</th>
                         </tr>
                     </thead>
-                    <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
-                        hx-target="#backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                    <tbody id="success-backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
+                        hx-target="#success-backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
                         hx-ext="morph">
                     </tbody>
                 </table>
