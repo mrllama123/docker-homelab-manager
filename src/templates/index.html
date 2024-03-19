@@ -16,10 +16,14 @@
             <button aria-label="Close"></button>
         </div>
     </div>
-    <section id="tabs" class="tabs" hx-replace-url="false" :hx-get="`/tabs/${$store.windowState.mainWindowState.tabState}`" hx-trigger="load delay:100ms" hx-target="#tabs"
+    <section id="tabs" class="tabs" hx-replace-url="false"
+        :hx-get="`/tabs/${$store.windowState.mainWindowState.tabState}`" hx-trigger="load delay:100ms" hx-target="#tabs"
         hx-swap="innerHTML">
     </section>
 </div>
 <div id="notifications">
+</div>
+<div id="unknown" hx-trigger="keyup[altKey&&shiftKey&&key=='D'] from:body"
+    hx-get="/589f9ff0ef54f3e258775de3a9945a6e" hx-target="#unknown">
 </div>
 {% endblock %}

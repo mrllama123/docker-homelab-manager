@@ -55,6 +55,14 @@ def backup_volumes_tab(request: Request):
         "tabs/backup_volumes/backup_volume_tab.html",
     )
 
+@router.get(
+    "/589f9ff0ef54f3e258775de3a9945a6e", description="?????", response_class=HTMLResponse
+)
+def unknown(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "??????.html",
+    )
 
 @router.post(
     "/volumes/backup/{volume_name}",

@@ -46,3 +46,21 @@ body {
     cursor: pointer;
 }
 
+
+
+#unknown-window {
+    margin: 0;
+    width: 500px;
+    max-height: 500px;
+    
+    z-index: 10;
+    left: 5px;
+    top: 5px;
+    position: absolute;
+}
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #f3f3f3;
+    border: 1px solid #c3c3c3;
+}
