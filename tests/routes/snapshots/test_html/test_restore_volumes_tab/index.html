@@ -1,48 +1,11 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>docker homelab manager</title>
-    <meta charset="UTF-8" />
-
-    <link rel="stylesheet" href="https://unpkg.com/98.css">
-    <script src="https://unpkg.com/htmx.org@1.9.10"
-        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-        crossorigin="anonymous"></script>
-    <link href="http://testserver/static/site.css" rel="stylesheet">
-    <script src="http://testserver/static/js/remove-me.js"></script>
-    <script src="http://testserver/static/js/alpine-init.js"></script>
-    <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
-    </head>
-
-<body hx-boost="true" hx-ext="multi-swap">
-    <main>
-        
-<div id="create-schedule"></div>
-
-<div class="window" id="docker-homelab-manager-window">
-    <div class="title-bar" id="docker-homelab-manager-title-bar">
-        <div class="title-bar-text">
-            Docker Homelab Manager
-        </div>
-
-        <div class="title-bar-controls">
-            <button aria-label="Minimize"></button>
-            <button aria-label="Maximize"></button>
-            <button aria-label="Close"></button>
-        </div>
-    </div>
-    <div class="window-body" id="docker-homelab-manager-window-body">
-        <menu role="tablist" aria-label="docker-manager-tabs">
+<menu role="tablist" aria-label="docker-manager-tabs">
 
     <li role="tab" aria-controls="backup-vol-tab" id="backup-volumes">
-        <a href="/">Backup Volumes</a>
+        <a @click.prevent="switchTab('backup-volumes')" href="/tabs/backup-volumes">Backup Volumes</a>
     </li>
 
     <li role="tab" class="selected" autofocus aria-selected="true" aria-controls="restore-vol-tab" id="restore-volumes">
-        <a href="/tabs/restore-volumes">Restore Volumes</a>
+        <a  @click.prevent="switchTab('restore-volumes')" href="/tabs/restore-volumes">Restore Volumes</a>
     </li>
 </menu>
 <article class="window" role="tabpanel" id="backup-vol-tab">
@@ -111,12 +74,3 @@
     </div>
 
 </article>
-    </div>
-</div>
-<div id="notifications">
-</div>
-
-    </main>
-</body>
-
-</html>

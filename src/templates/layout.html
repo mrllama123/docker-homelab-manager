@@ -11,11 +11,16 @@
         crossorigin="anonymous"></script>
     <link href="{{ url_for('static', path='/site.css') }}" rel="stylesheet">
     <script src="{{ url_for('static', path='js/remove-me.js') }}"></script>
-    <script src="{{ url_for('static', path='js/alpine-init.js') }}"></script>
     <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
-    </head>
+    <script defer src="{{ url_for('static', path='js/alpine-init.js') }}"></script>
+    <!-- Alpine Plugins -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Alpine Core -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+</head>
 
 <body hx-boost="true" hx-ext="multi-swap">
     <main>
