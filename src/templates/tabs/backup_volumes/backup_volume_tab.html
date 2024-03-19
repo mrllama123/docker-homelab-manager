@@ -1,11 +1,11 @@
 <menu role="tablist" aria-label="docker-manager-tabs">
 
     <li role="tab" class="selected" autofocus aria-selected="true" aria-controls="backup-vol-tab" id="backup-volumes">
-        <a @click.prevent="switchTab('backup')" href="/">Backup Volumes</a>
+        <a @click.prevent="$store.windowState.switchTab('backup')" href="/">Backup Volumes</a>
     </li>
 
     <li role="tab" aria-controls="restore-vol-tab" id="restore-volumes">
-        <a @click.prevent="switchTab('restore-volumes')" href="/tabs/restore-volumes">Restore Volumes</a>
+        <a @click.prevent="$store.windowState.switchTab('restore-volumes')" href="/tabs/restore-volumes">Restore Volumes</a>
     </li>
 </menu>
 <article class="window" role="tabpanel" id="backup-vol-tab">

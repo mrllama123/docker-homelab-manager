@@ -16,7 +16,7 @@
             <button aria-label="Close"></button>
         </div>
     </div>
-    <section id="tabs" class="tabs" hx-replace-url="false" :hx-get="`/tabs/${mainWindowState.tabState}`" hx-trigger="load delay:100ms" hx-target="#tabs"
+    <section id="tabs" class="tabs" hx-replace-url="false" :hx-get="`/tabs/${$store.windowState.mainWindowState.tabState}`" hx-trigger="load delay:100ms" hx-target="#tabs"
         hx-swap="innerHTML">
     </section>
 </div>

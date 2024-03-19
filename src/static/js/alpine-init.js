@@ -51,7 +51,7 @@ document.addEventListener('alpine:init', () => {
         dragging: false, 
         offsetX: 0, 
         offsetY: 0,
-        load() {
+        init() {
             let windowPosition = JSON.parse(localStorage.getItem(`${this.$root.id}windowPosition`));
             if (windowPosition) {
                 this.$root.style.left = windowPosition.left;
@@ -103,10 +103,11 @@ document.addEventListener('alpine:init', () => {
             }
         }
     }))
-    Alpine.data('mainWindowState', () => ({
+    
+    Alpine.store('windowState', {
         mainWindowState: Alpine.$persist({tabState: "backup-volumes"}),
         switchTab(tab) {
             this.mainWindowState.tabState = tab
         }
-    }))
+    });
 })
