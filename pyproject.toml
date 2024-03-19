@@ -23,7 +23,7 @@ homepage = "https://github.com/mrllama123/docker-homelab-manager"
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
 fastapi = { extras = ["all"], version = "^0.109.2" }
-uvicorn = { extras = ["standard"], version = "^0.27.1" }
+uvicorn = { extras = ["standard"], version = "^0.28.1" }
 python-on-whales = "^0.68.0"
 sqlmodel = "^0.0.14"
 apscheduler = "^3.10.4"
