@@ -22,7 +22,7 @@
                     </tr>
                 </thead>
                 <tbody id="rows" hx-get="/volumes" hx-trigger="load delay:5ms" hx-target="#rows"
-                    hx-swap="morph:innerHTML" hx-ext="morph">
+                hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
                 </tbody>
 
             </table>
@@ -44,7 +44,7 @@
                     </tr>
                 </thead>
                 <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
-                    hx-target="#backup-rows" hx-swap="morph:innerHTML, innerHTML"
+                    hx-target="#backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
                     hx-ext="morph">
                 </tbody>
             </table>
@@ -72,7 +72,7 @@
                     </thead>
                     <tbody id="backup-schedule-rows" hx-get="/volumes/backup/schedules"
                         hx-trigger="load delay:5ms,  reload-backup-schedule-rows from:body" hx-target="#backup-schedule-rows"
-                        hx-swap="morph:innerHTML, innerHTML transition:true" hx-ext="morph">
+                        hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
                     </tbody>
                 </table>
             </div>

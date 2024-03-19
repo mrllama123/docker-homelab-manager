@@ -45,7 +45,7 @@
                         </tr>
                     </thead>
                     <tbody id="success-backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
-                        hx-target="#success-backup-rows" hx-swap="morph:innerHTML, innerHTML transition:true"
+                        hx-target="#success-backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
                         hx-ext="morph">
                     </tbody>
                 </table>
@@ -69,7 +69,7 @@
 
                 </tbody>
                 <tbody id="restore-vol-rows" hx-get="/volumes/restores" hx-trigger="load delay:5ms, every 5s"
-                    hx-target="#restore-vol-rows" hx-swap="morph:innerHTML, innerHTML transition:true" hx-ext="morph">
+                    hx-target="#restore-vol-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
                 </tbody>
             </table>
         </div>
