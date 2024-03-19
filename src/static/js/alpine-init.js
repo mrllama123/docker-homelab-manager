@@ -47,10 +47,67 @@ document.addEventListener('alpine:init', () => {
             this.selected = []
         }
     }))
-    Alpine.data('mainWindowState', () => ({
+    Alpine.data('draggableWindow', () => ({
+        dragging: false, 
+        offsetX: 0, 
+        offsetY: 0,
+        init() {
+            let windowPosition = JSON.parse(localStorage.getItem(`${this.$root.id}windowPosition`));
+            if (windowPosition) {
+                this.$root.style.left = windowPosition.left;
+                this.$root.style.top = windowPosition.top;
+                this.$root.style.width = windowPosition.width;
+                this.$root.style.height = windowPosition.height;
+            }
+        },
+        startDrag() {
+            if (!this.$root.style.width ||  this.$root.style.width !== '100%') {
+                this.dragging = true
+                this.offsetX = this.$event.clientX - this.$root.offsetLeft
+                this.offsetY = this.$event.clientY - this.$root.offsetTop
+            } 
+        },
+        drag() {
+            if (this.dragging) {
+                this.$root.style.left = (this.$event.clientX - this.offsetX) + 'px'
+                this.$root.style.top = (this.$event.clientY - this.offsetY) + 'px'
+            }
+        },
+        stopDrag() {
+            this.dragging = false
+            let windowPosition = { 
+                left: this.$root.style.left,
+                top: this.$root.style.top,
+                width: this.$root.style.width,
+                height: this.$root.style.height
+            };
+            localStorage.setItem(`${this.$root.id}windowPosition`, JSON.stringify(windowPosition));
+        },
+        expandWindow(){
+            if (!this.$root.style.width || this.$root.style.width === '100%') {
+                this.$root.style.width = '50%'
+                this.$root.style.left = '5px' 
+                this.$root.style.top = '5px';
+                let windowPosition = { 
+                    left: this.$root.style.left,
+                    top: this.$root.style.top,
+                    width: this.$root.style.width,
+                    height: this.$root.style.height
+                };
+                localStorage.setItem(`${this.$root.id}windowPosition`, JSON.stringify(windowPosition));
+            } else {
+                this.$root.style.width = '100%'; 
+                this.$root.style.left = '0'; 
+                this.$root.style.top = '0';
+                localStorage.removeItem(`${this.$root.id}windowPosition`);
+            }
+        }
+    }))
+    
+    Alpine.store('windowState', {
         mainWindowState: Alpine.$persist({tabState: "backup-volumes"}),
         switchTab(tab) {
             this.mainWindowState.tabState = tab
         }
-    }))
+    });
 })

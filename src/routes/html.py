@@ -106,12 +106,12 @@ def backup_volume(request: Request, volume_name: str):
 def backups(request: Request, session: Session = Depends(get_session)):
     backups = (
         db_list_backups(session, successful=True)
-        if "tabs/restore-volumes" in request.headers.get("HX-Current-URL")
+        if request.headers.get("HX-Target") == "success-backup-rows"
         else db_list_backups(session)
     )
     path = (
         "tabs/restore_volumes/components/backup_rows.html"
-        if "tabs/restore-volumes" in request.headers.get("HX-Current-URL")
+        if request.headers.get("HX-Target") == "success-backup-rows"
         else "tabs/backup_volumes/components/backup_rows.html"
     )
     return templates.TemplateResponse(request, path, {"backups": backups})
