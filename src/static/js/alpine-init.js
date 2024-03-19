@@ -47,4 +47,10 @@ document.addEventListener('alpine:init', () => {
             this.selected = []
         }
     }))
+    Alpine.data('mainWindowState', () => ({
+        mainWindowState: Alpine.$persist({tabState: "backup-volumes"}),
+        switchTab(tab) {
+            this.mainWindowState.tabState = tab
+        }
+    }))
 })
