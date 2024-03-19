@@ -61,7 +61,7 @@ def backup_volumes_tab(request: Request):
 def unknown(request: Request):
     return templates.TemplateResponse(
         request,
-        "??????.html",
+        "unknown/loading.html",
     )
 
 @router.post(

@@ -46,11 +46,20 @@ body {
     cursor: pointer;
 }
 
-
+#loading-window {
+    margin: 0;
+    width: 500px;
+    height: 60px;
+    
+    z-index: 10;
+    left: 50%;
+    top: 50%;
+    position: absolute;
+}
 
 #unknown-window {
     margin: 0;
-    width: 500px;
+    max-width: 100%;
     max-height: 500px;
     
     z-index: 10;
