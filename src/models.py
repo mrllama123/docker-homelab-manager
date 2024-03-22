@@ -86,3 +86,14 @@ class RestoredBackups(SQLModel, table=True):
     created_at: Optional[str] = Field(default=None)
     successful: bool = True
     error_message: Optional[str] = Field(default=None)
+
+
+class UnknownLoadingJobBase(SQLModel):
+    progress: int = Field(default=0)
+
+
+class UnknownLoadingJob(UnknownLoadingJobBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+
+
+
