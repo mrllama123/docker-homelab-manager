@@ -4,7 +4,7 @@ import uuid
 from typing import Annotated
 
 from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
@@ -13,6 +13,7 @@ import src.apschedule.schedule as schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
+from src.routes.impl.unknown.loading_job import create_loading_job, get_loading_job
 from src.routes.impl.volumes.backups import db_list_backups
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
@@ -55,14 +56,56 @@ def backup_volumes_tab(request: Request):
         "tabs/backup_volumes/backup_volume_tab.html",
     )
 
+
 @router.get(
-    "/589f9ff0ef54f3e258775de3a9945a6e", description="?????", response_class=HTMLResponse
+    "/589f9ff0ef54f3e258775de3a9945a6e",
+    description="?????",
+    response_class=HTMLResponse,
 )
 def unknown(request: Request):
     return templates.TemplateResponse(
         request,
         "unknown/loading.html",
     )
+
+
+@router.post(
+    "/589f9ff0ef54f3e258775de3a9945a6e/job",
+    description="Initialise loading unknown",
+    response_class=HTMLResponse,
+)
+def unknown_progress(request: Request, session: Session = Depends(get_session)):
+
+    loading_job = create_loading_job(session)
+    return templates.TemplateResponse(
+        request,
+        "unknown/components/progress_bar.html",
+        {"loading_amount": str(loading_job.progress), "job_id": loading_job.id},
+    )
+
+
+@router.get(
+    "/589f9ff0ef54f3e258775de3a9945a6e/job/{job_id}",
+    description="Initialise loading unknown",
+    response_class=HTMLResponse,
+)
+def unknown_progress(
+    request: Request, job_id: str, session: Session = Depends(get_session)
+):
+    loading_job = get_loading_job(session, job_id)
+    if not loading_job:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Job {job_id} does not exist",
+        )
+    new_progress = loading_job.progress + 10
+    
+    return templates.TemplateResponse(
+        request,
+        "unknown/components/progress_bar.html",
+        {"loading_amount": str(loading_job.progress), "job_id": loading_job.id},
+    )
+
 
 @router.post(
     "/volumes/backup/{volume_name}",
