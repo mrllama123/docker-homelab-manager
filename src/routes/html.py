@@ -63,10 +63,15 @@ def backup_volumes_tab(request: Request):
 
 @router.get(
     "/589f9ff0ef54f3e258775de3a9945a6e",
-    description="?????",
+    description="unknown",
     response_class=HTMLResponse,
 )
 def unknown(request: Request):
+    if request.headers.get("HX-Target") == "loading-window":
+        return templates.TemplateResponse(
+            request,
+            "unknown/store_window.html",
+        )
     return templates.TemplateResponse(
         request,
         "unknown/loading.html",
@@ -102,12 +107,6 @@ def unknown_progress(
             status_code=404,
             detail=f"Job {job_id} does not exist",
         )
-    if loading_job.progress == 100:
-        return templates.TemplateResponse(
-            request,
-            "unknown/components/progress_bar.html",
-            {"loading_amount": str(loading_job.progress), "job_id": loading_job.id},
-        )
 
     new_progress = loading_job.progress + 10
 
@@ -117,7 +116,7 @@ def unknown_progress(
         request,
         "unknown/components/progress_bar.html",
         {"loading_amount": str(new_progress), "job_id": loading_job.id},
-        headers={"HX-Trigger": "unknown-load-done"},
+        headers=(None if new_progress < 100 else {"HX-Trigger": "unknown-load-done"}),
     )
 
 

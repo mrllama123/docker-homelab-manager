@@ -1,7 +1,6 @@
-<div class="window" id="loading-window" x-data="draggableWindow">
-    <div class="title-bar" id="loading-title-bar"
-        @mousedown="startDrag()"
-        @mousemove.window="drag()"
+<div class="window" id="loading-window" x-data="draggableWindow" hx-trigger="unknown-load-done from:body"
+    hx-target="#loading-window" hx-get="/589f9ff0ef54f3e258775de3a9945a6e" hx-swap="outerHTML">
+    <div class="title-bar" id="loading-title-bar" @mousedown="startDrag()" @mousemove.window="drag()"
         @mouseup.window="stopDrag()">
         <div class="title-bar-text">
             Loading
@@ -9,7 +8,8 @@
     </div>
     <div class="window-body" id="loading-window-body">
         <!-- <p>Hi all Anderson here, apology's for the the rather uh interesting method to getting to our store but the SCP foundation has been really getting on our tail. Anyway uh happy shopping</p> -->
-        <div hx-post="/589f9ff0ef54f3e258775de3a9945a6e/job" hx-trigger="load delay:100ms" hx-target="this" hx-swap="outerHTML" >
+        <div hx-post="/589f9ff0ef54f3e258775de3a9945a6e/job" hx-trigger="load delay:100ms" hx-target="this"
+            hx-swap="outerHTML">
         </div>
     </div>
 </div>
