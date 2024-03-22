@@ -18,10 +18,8 @@ def update_loading_job(
     session: Session, job_id: int, progress: int
 ) -> UnknownLoadingJob | None:
     job_db = session.get(UnknownLoadingJob, job_id)
-    job_data = job.model_dump(exclude_unset=True)
-    job_db. (job_data)
-    # if job:
-    #     job.progress = progress
-    #     session.add(job)
-    #     session.commit()
-    # return job
+    if job_db:
+        job_db.progress = progress
+        session.add(job_db)
+        session.commit()
+    return job_db

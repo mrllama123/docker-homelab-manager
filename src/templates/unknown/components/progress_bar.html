@@ -1,6 +1,6 @@
 <div class="progress-bar-container"
-    hx-post="{{'/589f9ff0ef54f3e258775de3a9945a6e/job' if job_id else f'/589f9ff0ef54f3e258775de3a9945a6e/job/{job_id}' }}"
-    hx-trigger="{{ 'none' if  loading_amount == '100' else 'every 600ms' }}" hx-target="this">
+    hx-get="/589f9ff0ef54f3e258775de3a9945a6e/job/{{ job_id }}"
+    hx-trigger="{{ 'none' if  loading_amount == '100' else 'every 600ms' }}" hx-target="this" hx-swap="outerHTML">
     <div class="progress-bar" style="height: 20px; background-color: #000080; width: {{ loading_amount or '0' }}%; ">
     </div>
 </div>

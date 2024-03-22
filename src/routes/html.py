@@ -13,7 +13,11 @@ import src.apschedule.schedule as schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
-from src.routes.impl.unknown.loading_job import create_loading_job, get_loading_job
+from src.routes.impl.unknown.loading_job import (
+    create_loading_job,
+    get_loading_job,
+    update_loading_job,
+)
 from src.routes.impl.volumes.backups import db_list_backups
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
@@ -98,12 +102,22 @@ def unknown_progress(
             status_code=404,
             detail=f"Job {job_id} does not exist",
         )
+    if loading_job.progress == 100:
+        return templates.TemplateResponse(
+            request,
+            "unknown/components/progress_bar.html",
+            {"loading_amount": str(loading_job.progress), "job_id": loading_job.id},
+        )
+
     new_progress = loading_job.progress + 10
-    
+
+    update_loading_job(session, job_id, new_progress)
+
     return templates.TemplateResponse(
         request,
         "unknown/components/progress_bar.html",
-        {"loading_amount": str(loading_job.progress), "job_id": loading_job.id},
+        {"loading_amount": str(new_progress), "job_id": loading_job.id},
+        headers={"HX-Trigger": "unknown-load-done"},
     )
 
 
