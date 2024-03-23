@@ -83,13 +83,15 @@ def unknown(request: Request):
     description="Initialise loading unknown",
     response_class=HTMLResponse,
 )
-def unknown_progress(request: Request, session: Session = Depends(get_session)):
+def unknown_progress(
+    request: Request,
+):
 
-    loading_job = create_loading_job(session)
+    job_id = create_loading_job()
     return templates.TemplateResponse(
         request,
         "unknown/components/progress_bar.html",
-        {"loading_amount": str(loading_job.progress), "job_id": loading_job.id},
+        {"loading_amount": str(0), "job_id": job_id},
     )
 
 
@@ -98,24 +100,23 @@ def unknown_progress(request: Request, session: Session = Depends(get_session)):
     description="Initialise loading unknown",
     response_class=HTMLResponse,
 )
-def unknown_progress(
-    request: Request, job_id: str, session: Session = Depends(get_session)
-):
-    loading_job = get_loading_job(session, job_id)
-    if not loading_job:
+def unknown_progress(request: Request, job_id: str):
+    loading_job = get_loading_job(job_id)
+    logger.info("loading_job: %s", loading_job)
+    if loading_job is None:
         raise HTTPException(
             status_code=404,
             detail=f"Job {job_id} does not exist",
         )
 
-    new_progress = loading_job.progress + 10
+    new_progress = loading_job + 10
 
-    update_loading_job(session, job_id, new_progress)
+    update_loading_job(job_id, new_progress)
 
     return templates.TemplateResponse(
         request,
         "unknown/components/progress_bar.html",
-        {"loading_amount": str(new_progress), "job_id": loading_job.id},
+        {"loading_amount": str(new_progress), "job_id": job_id},
         headers=(None if new_progress < 100 else {"HX-Trigger": "unknown-load-done"}),
     )
 
