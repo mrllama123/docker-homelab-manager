@@ -1,0 +1,15 @@
+{% for backup in backups %}
+<tr @click='clickRow("{{ backup.backup_id }}")'
+    :class="isSelected('{{ backup.backup_id  }}') ? 'highlighted' : ''">
+    <td>{{ backup.backup_id }}</td>
+    <td>{{ backup.backup_name }}</td>
+    <td>{{ backup.volume_name }}</td>
+    <td>{{ backup.schedule_id or "" }}</td>
+    {% if backup_vol_tab %}
+    <td>{{ backup.successful }}</td>
+    <td>{{ backup.error_message or "" }}</td>
+    {% endif %}
+    <td>{{ backup.backup_filename }}</td>
+    <td>{{ backup.created_at }}</td>
+</tr>
+{% endfor %}

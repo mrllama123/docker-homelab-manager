@@ -1,4 +1,4 @@
-<!-- $el.parentElement.parentElement -->
+{% if show_create_schedule_window %}
 <div class="window" id="create-schedule-window" x-data="draggableWindow">
     <div class="title-bar" id="create-schedule-title-bar"
         @mousedown="startDrag()"
@@ -49,3 +49,4 @@
         </form>
     </div>
 </div>
+{% endif %}

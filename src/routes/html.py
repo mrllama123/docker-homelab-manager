@@ -32,7 +32,7 @@ def root(request: Request):
 
 
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
-@htmx("tabs/backup_volumes/components/volume_row")
+@htmx("tabs/backup_volumes/components/volume_rows", "index")
 def volumes(request: Request):
     return {"volumes": list_volumes()}
     # volumes = list_volumes()
@@ -91,19 +91,22 @@ def backup_volume(request: Request, volume_name: str):
 
 
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
-@htmx("tabs/backup_volumes/components/backup_rows")
+@htmx("backup_rows")
 def backups(request: Request, session: Session = Depends(get_session)):
-    backups = (
-        db_list_backups(session, successful=True)
-        if request.headers.get("HX-Target") == "success-backup-rows"
-        else db_list_backups(session)
-    )
-    path = (
-        "tabs/restore_volumes/components/backup_rows.html"
-        if request.headers.get("HX-Target") == "success-backup-rows"
-        else "tabs/backup_volumes/components/backup_rows.html"
-    )
-    return templates.TemplateResponse(request, path, {"backups": backups})
+    # backups = (
+    #     db_list_backups(session, successful=True)
+    #     if request.headers.get("HX-Target") == "success-backup-rows"
+    #     else db_list_backups(session)
+    # )
+    backups = db_list_backups(session)
+    return {"backups": backups, "backup_vol_tab": True}
+
+    # path = (
+    #     "tabs/restore_volumes/components/backup_rows.html"
+    #     if request.headers.get("HX-Target") == "success-backup-rows"
+    #     else "tabs/backup_volumes/components/backup_rows.html"
+    # )
+    # return templates.TemplateResponse(request, path, {"backups": backups})
 
 
 @router.get(
@@ -111,13 +114,15 @@ def backups(request: Request, session: Session = Depends(get_session)):
     description="backup schedules rows",
     response_class=HTMLResponse,
 )
+@htmx("tabs/backup_volumes/components/backup_schedule_rows")
 def backup_schedules(request: Request):
     schedules = schedule.list_backup_schedules()
-    return templates.TemplateResponse(
-        request,
-        "tabs/backup_volumes/components/backup_schedule_rows.html",
-        {"schedules": schedules},
-    )
+    return {"schedules": schedules}
+    # return templates.TemplateResponse(
+    #     request,
+    #     "tabs/backup_volumes/components/backup_schedule_rows.html",
+    #     {"schedules": schedules},
+    # )
 
 
 @router.get(
@@ -125,14 +130,16 @@ def backup_schedules(request: Request):
     description="create backup schedule",
     response_class=HTMLResponse,
 )
+@htmx("tabs/backup_volumes/components/create_backup_schedule")
 def create_backup_schedule_form(request: Request, volume_name: str):
     if request.headers.get("HX-Target") == "create-schedule-window":
-        return ""
-    return templates.TemplateResponse(
-        request,
-        "tabs/backup_volumes/components/create_backup_schedule.html",
-        {"volume_name": volume_name},
-    )
+        return {}
+    return {"volume_name": volume_name, "show_create_schedule_window": True}
+    # return templates.TemplateResponse(
+    #     request,
+    #     "tabs/backup_volumes/components/create_backup_schedule.html",
+    #     {"volume_name": volume_name},
+    # )
 
 
 @router.post(
