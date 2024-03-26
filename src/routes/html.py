@@ -16,44 +16,45 @@ from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
 from src.routes.impl.volumes.backups import db_list_backups
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
+from fastapi_htmx import htmx, htmx_init
 
 router = APIRouter(tags=["html"])
 
-templates = Jinja2Templates(directory="src/templates")
+htmx_init(templates=Jinja2Templates(directory="src/templates"), file_extension="html")
 
 logger = logging.getLogger(__name__)
 
 
 @router.get("/", description="home page", response_class=HTMLResponse)
+@htmx("index", "index")
 def root(request: Request):
-    return templates.TemplateResponse(
-        request,
-        "index.html",
-    )
+    pass
 
 
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
+@htmx("tabs/backup_volumes/components/volume_row")
 def volumes(request: Request):
-    volumes = list_volumes()
-    return templates.TemplateResponse(
-        request, "tabs/backup_volumes/components/volume_rows.html", {"volumes": volumes}
-    )
+    return {"volumes": list_volumes()}
+    # volumes = list_volumes()
+    # return templates.TemplateResponse(
+    #     request, "tabs/backup_volumes/components/volume_rows.html", {"volumes": volumes}
+    # )
 
 
 @router.get("/tabs/restore-volumes", description="restore volumes tab")
+@htmx("tabs/restore_volumes/restore_volume_tab")
 def restore_volumes_tab(request: Request):
-    return templates.TemplateResponse(
-        request,
-        "tabs/restore_volumes/restore_volume_tab.html",
-    )
+    pass
+    # return templates.TemplateResponse(
+    #     request,
+    #     "tabs/restore_volumes/restore_volume_tab.html",
+    # )
 
 
 @router.get("/tabs/backup-volumes", description="backup volumes tab")
+@htmx("tabs/backup_volumes/backup_volume_tab")
 def backup_volumes_tab(request: Request):
-    return templates.TemplateResponse(
-        request,
-        "tabs/backup_volumes/backup_volume_tab.html",
-    )
+    pass
 
 
 @router.post(
@@ -61,27 +62,19 @@ def backup_volumes_tab(request: Request):
     description="create backup",
     response_class=HTMLResponse,
 )
+@htmx("notification")
 def backup_volume(request: Request, volume_name: str):
 
     logger.info("backing up volume: %s", volume_name)
     if not get_volume(volume_name):
-        return templates.TemplateResponse(
-            request,
-            "notification.html",
-            {
-                "message": f"Volume {volume_name} does not exist",
-                "swap_out_of_band": False,
-            },
-        )
+        return {
+            "message": f"Volume {volume_name} does not exist",
+        }
+
     if not is_volume_attached(volume_name):
-        return templates.TemplateResponse(
-            request,
-            "notification.html",
-            {
-                "message": f"Volume {volume_name} is attached to a container",
-                "swap_out_of_band": False,
-            },
-        )
+        return {
+            "message": f"Volume {volume_name} is attached to a container",
+        }
 
     job = schedule.add_backup_job(
         f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
@@ -92,17 +85,13 @@ def backup_volume(request: Request, volume_name: str):
         job.id,
         extra={"task_id": job.id},
     )
-    return templates.TemplateResponse(
-        request,
-        "notification.html",
-        {
-            "message": f"Backup created: {job.id}",
-            "swap_out_of_band": False,
-        },
-    )
+    return {
+        "message": f"Backup created: {job.id}",
+    }
 
 
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
+@htmx("tabs/backup_volumes/components/backup_rows")
 def backups(request: Request, session: Session = Depends(get_session)):
     backups = (
         db_list_backups(session, successful=True)
