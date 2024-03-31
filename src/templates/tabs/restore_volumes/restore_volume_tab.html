@@ -44,7 +44,7 @@
                             <th>Create Date</th>
                         </tr>
                     </thead>
-                    <tbody id="success-backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
+                    <tbody id="success-backup-rows" hx-get="/volumes/backups" hx-trigger="load, every 5s"
                         hx-target="#success-backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
                         hx-ext="morph">
                     </tbody>
@@ -68,7 +68,7 @@
                 <tbody id="#restore-vol-rows">
 
                 </tbody>
-                <tbody id="restore-vol-rows" hx-get="/volumes/restores" hx-trigger="load delay:5ms, every 5s"
+                <tbody id="restore-vol-rows" hx-get="/volumes/restores" hx-trigger="load, every 5s"
                     hx-target="#restore-vol-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
                 </tbody>
             </table>
