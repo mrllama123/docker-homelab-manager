@@ -16,9 +16,12 @@
             <button aria-label="Close"></button>
         </div>
     </div>
-    <section id="tabs" class="tabs" hx-replace-url="false" :hx-get="`/tabs/${$store.windowState.mainWindowState.tabState}`" hx-trigger="load" hx-target="#tabs"
-        hx-swap="innerHTML">
-    </section>
+    <div class="window-body" id="docker-homelab-manager-window-body">
+        <section id="tabs" class="tabs" hx-replace-url="false"
+            :hx-get="`/tabs/${$store.windowState.mainWindowState.tabState}`" hx-trigger="load" hx-target="#tabs"
+            hx-swap="innerHTML">
+        </section>
+    </div>
 </div>
 <div id="notifications">
 </div>

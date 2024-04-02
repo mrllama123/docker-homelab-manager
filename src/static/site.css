@@ -1,5 +1,4 @@
 #docker-homelab-manager-window {
-    margin: 0;
     left: 0px;
     top: 0px;
     position: absolute;
@@ -8,7 +7,14 @@
     max-width: 100%;
     max-height: 100%;
     min-height: 390px;
+    display: inline-table;
 }
+
+#docker-homelab-manager-window-body {
+
+    display: inline-flexbox;
+}
+
 
 #notification-window {
     margin: 20px;
