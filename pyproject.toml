@@ -58,6 +58,7 @@ api-dev = { cmd = "uvicorn src.api:app --reload --log-config=src/config/log_conf
 local-dev = ["migrate", "api-dev"]
 dev = "docker compose -f docker-compose-dev.yml  up  --build"
 clear-cache = { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
+download-assets = { script="scripts:download_frontend_assets" }
 
 
 [tool.poe.tasks.migrate]
