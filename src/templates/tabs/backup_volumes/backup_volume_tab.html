@@ -21,8 +21,8 @@
                         <th>Create schedule</th>
                     </tr>
                 </thead>
-                <tbody id="rows" hx-get="/volumes" hx-trigger="load delay:5ms" hx-target="#rows"
-                hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
+                <tbody id="rows" hx-get="/volumes" hx-trigger="load" hx-target="#rows"
+                hx-swap="innerHTML" hx-swap="morph:innerHTML" hx-ext="morph">
                 </tbody>
 
             </table>
@@ -43,8 +43,8 @@
                         <th>Create Date</th>
                     </tr>
                 </thead>
-                <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load delay:5ms, every 5s"
-                    hx-target="#backup-rows" hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML"
+                <tbody id="backup-rows" hx-get="/volumes/backups" hx-trigger="load, every 5s"
+                    hx-target="#backup-rows" hx-swap="innerHTML" hx-swap="morph:innerHTML"
                     hx-ext="morph">
                 </tbody>
             </table>
@@ -71,8 +71,8 @@
                         </tr>
                     </thead>
                     <tbody id="backup-schedule-rows" hx-get="/volumes/backup/schedules"
-                        hx-trigger="load delay:5ms,  reload-backup-schedule-rows from:body" hx-target="#backup-schedule-rows"
-                        hx-swap="innerHTML transition:true" hx-swap="morph:innerHTML" hx-ext="morph">
+                        hx-trigger="load,  reload-backup-schedule-rows from:body" hx-target="#backup-schedule-rows"
+                        hx-swap="innerHTML" hx-swap="morph:innerHTML" hx-ext="morph">
                     </tbody>
                 </table>
             </div>
