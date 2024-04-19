@@ -6,19 +6,17 @@
     <meta charset="UTF-8" />
 
     <link rel="stylesheet" href="https://unpkg.com/98.css">
-    <script src="https://unpkg.com/htmx.org@1.9.10"
-        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-        crossorigin="anonymous"></script>
+    <script src="http://testserver/static/js/htmx.min.js"></script>
     <link href="http://testserver/static/site.css" rel="stylesheet">
     <script src="http://testserver/static/js/remove-me.js"></script>
-    <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
+    <script src="http://testserver/static/js/idiomorph-ext.min.js"></script>
+    <script src="http://testserver/static/js/multi-swap.js"></script>
     <!-- Alpine Plugins -->
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="http://testserver/static/js/alpinejs.persist-plugin.js"></script>
     <script defer src="http://testserver/static/js/alpine-init.js"></script>
 
     <!-- Alpine Core -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="http://testserver/static/js/alpinejs.js"></script>
 
 </head>
 
@@ -40,9 +38,12 @@
             <button aria-label="Close"></button>
         </div>
     </div>
-    <section id="tabs" class="tabs" hx-replace-url="false" :hx-get="`/tabs/${$store.windowState.mainWindowState.tabState}`" hx-trigger="load delay:100ms" hx-target="#tabs"
-        hx-swap="innerHTML">
-    </section>
+    <div class="window-body" id="docker-homelab-manager-window-body">
+        <section id="tabs" class="tabs" hx-replace-url="false"
+            :hx-get="`/tabs/${$store.windowState.mainWindowState.tabState}`" hx-trigger="load" hx-target="#tabs"
+            hx-swap="innerHTML">
+        </section>
+    </div>
 </div>
 <div id="notifications">
 </div>
