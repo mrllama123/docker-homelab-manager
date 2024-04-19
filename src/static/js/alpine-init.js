@@ -84,6 +84,7 @@ document.addEventListener('alpine:init', () => {
             localStorage.setItem(`${this.$root.id}windowPosition`, JSON.stringify(windowPosition));
         },
         expandWindow(){
+            // TODO there could be a better way to handle not being able to expand the window in smaller window sizes
             const style = window.getComputedStyle(this.$root);
             const widthPx = parseInt(style.width);
             const isMiniumWidth = widthPx < 629;
