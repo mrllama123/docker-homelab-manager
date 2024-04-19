@@ -36,7 +36,7 @@ body {
     margin: 0;
     max-width: 100%;
     max-height: 500px;
-    
+
     z-index: 10;
     left: 5px;
     top: 5px;
@@ -48,4 +48,3 @@ body {
     position: relative;
     cursor: pointer;
 }
-
