@@ -8,20 +8,37 @@
     <div class="window-body" id="unknown-window-body">
         <p>Hi all Anderson here, apology's for the the rather uh interesting method to getting to our store but the SCP
             foundation has been really getting on our tail. Anyway uh happy shopping</p>
-        <fieldset>
-            <legend>Category's</legend>
-            <div class="field-row">
-                <input id="radio-robotics" checked type="radio" name="fieldset-example">
-                <label for="radio-robotics">robotics</label>
-            </div>
-            <div class="field-row">
-                <input id="radio-software" type="radio" name="fieldset-example">
-                <label for="radio-software">Software</label>
-            </div>
-            <div class="field-row">
-                <input id="radio-vehicles" type="radio" name="fieldset-example">
-                <label for="radio-vehicles">Vehicles</label>
-            </div>
-        </fieldset>
+        <aside>
+            <ul class="tree-view">
+                <li>
+                    <details open>
+                        <summary>Robotics</summary>
+                        <ul>
+                            <li><a href="#robot-test-1" hx-replace-url="false">Test 1</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <summary>
+                        <details>
+                            <summary>Software</summary>
+                            <ul>
+                                <li><a href="#software-test-1" hx-replace-url="false">Test 1</a></li>
+                            </ul>
+                        </details>
+                    </summary>
+                </li>
+                <li>
+                    <summary>
+                        <details>
+                            <summary>Vehicles</summary>
+                            <ul>
+                                <li><a href="#vehicles-test-1" hx-replace-url="false">Test 1</a></li>
+                            </ul>
+                        </details>
+                    </summary>
+                </li>
+            </ul>
+        </aside>
     </div>
 </div>

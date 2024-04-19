@@ -9,7 +9,20 @@
 }
 
 
+aside {
+    width: 200px;
+    /* position: fixed; */
+    top: 0;
+    bottom: 0;
+    padding: 8px;
+    display: flex;
+    /* align-items: stretch; */
+}
 
+aside .tree-view {
+    width: 100%;
+    overflow-y: scroll;
+  }
 
 #notification-window {
     margin: 20px;
