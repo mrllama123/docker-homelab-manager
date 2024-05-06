@@ -66,7 +66,11 @@ def backup_volumes_tab(request: Request):
     description="unknown",
     response_class=HTMLResponse,
 )
-def unknown(request: Request):
+def unknown(
+    request: Request,
+):
+    if request.headers.get("HX-Trigger") == "unknown-window-title-close-button":
+        return ""
     if request.headers.get("HX-Target") == "loading-window":
         return templates.TemplateResponse(
             request,
@@ -109,7 +113,7 @@ def unknown_progress(request: Request, job_id: str):
             detail=f"Job {job_id} does not exist",
         )
 
-    new_progress = loading_job + 10
+    new_progress = loading_job + 90
 
     update_loading_job(job_id, new_progress)
 
