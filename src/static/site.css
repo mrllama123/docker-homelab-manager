@@ -3,9 +3,12 @@
     top: 0px;
     position: absolute;
     width: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    min-height: 390px;
+    min-height: 700px;
+}
+
+#docker-homelab-manager-window  article {
+    position: relative;
+    min-height: 700px;
 }
 
 
