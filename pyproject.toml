@@ -54,7 +54,7 @@ pylint = { cmd = "pylint src", help = "Run pylint on codebase" }
 check_black = { cmd = "black src --check" }
 check_imports = { cmd = "isort --check-only --profile=black src" }
 lint = ["check_black", "check_imports", "pylint"]
-api-dev = { cmd = "fastapi dev src/main.py --reload", help = "Run the API in dev mode", envfile = ".env" }
+api-dev = { cmd = "uvicorn src.api:app --reload --log-config=src/config/log_config.yaml", help = "Run the API in dev mode", envfile = ".env" }
 local-dev = ["migrate", "api-dev"]
 dev = "docker compose -f docker-compose-dev.yml  up  --build"
 clear-cache = { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
