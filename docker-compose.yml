@@ -16,9 +16,9 @@ services:
 
       # non rootless docker
       - /var/run/docker.sock:/var/run/docker.sock
-    command:  uvicorn src.main:app --host 0.0.0.0 --port 80 --log-config=src/config/log_config.yaml
+    command:  fastapi run src/main.py --host 0.0.0.0 --port 80
     # run this when there is a database table change
-    #command: "sh -c 'alembic upgrade head && uvicorn src.api:app --host 0.0.0.0 --port 80 --log-config=src/config/log_config.yaml'"
+    #command: "sh -c 'alembic upgrade head && uvicorn src.api:app --host 0.0.0.0 --port 80
     environment:
       - APSCHEDULE_JOBSTORE_URL=sqlite:////db/scheduler.db
       - DATABASE_URL=sqlite:////db/database.db
