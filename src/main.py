@@ -1,13 +1,13 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.apschedule.schedule import setup_scheduler
 from src.routes import api, html
-from fastapi.middleware.cors import CORSMiddleware
-import os
 
 logger = logging.getLogger(__name__)
 CORS_ORIGINS = (
