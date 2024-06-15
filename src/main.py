@@ -14,7 +14,9 @@ CORS_ORIGINS = (
     os.getenv("CORS_ORIGINS").split(",") if os.getenv("CORS_ORIGINS") else ["*"]
 )
 
-logger.info(f"CORS allow_origins: {CORS_ORIGINS}")
+logger.info("CORS allow_origins: %s", CORS_ORIGINS)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     scheduler = setup_scheduler()
