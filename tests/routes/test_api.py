@@ -1,7 +1,7 @@
 from apscheduler.jobstores.base import JobLookupError
 
 from src.db import Backups
-from src.models import BackupSchedule, ScheduleCrontab
+from src.models import BackupSchedule, ScheduleCrontab, RestoredBackups
 
 from tests.fixtures import MockAsyncResult, MockVolume
 
@@ -201,6 +201,44 @@ def test_restore_backup(mocker, client):
     mock_create_volume_backup.assert_called_once_with(
         "restore-test-volume-test-uuid", "test-volume", "test-backup-name.tar.gz"
     )
+
+def test_get_restored_volume(client, session):
+    for restore_id in ["test-restore-id-1", "test-restore-id-2"]:
+        session.add(
+            RestoredBackups(
+                restore_id=restore_id,
+                restore_name="test-restore-name",
+                created_at="2021-01-01T00:00:00+00:00",
+                backup_filename=f"{restore_id}.tar.gz",
+                volume_name="test-volume",
+            )
+        )
+    session.commit()
+
+    response = client.get("/api/volumes/restores")
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "restore_id": "test-restore-id-1",
+            "restore_name": "test-restore-name",
+            "volume_name": "test-volume",
+            "successful": True,
+            'error_message': None,
+            "backup_filename": "test-restore-id-1.tar.gz",
+            "created_at": "2021-01-01T00:00:00+00:00",
+        },
+        {
+            "restore_id": "test-restore-id-2",
+            "restore_name": "test-restore-name",
+            "volume_name": "test-volume",
+            "successful": True,
+            'error_message': None,
+            "backup_filename": "test-restore-id-2.tar.gz",
+            "created_at": "2021-01-01T00:00:00+00:00",
+        },
+    ]
+
 
 
 def test_create_schedule(mocker, client):

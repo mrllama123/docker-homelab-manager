@@ -21,9 +21,11 @@ from src.models import (
     CreateBackupSchedule,
     RestoreVolume,
     RestoreVolumeResponse,
+    RestoredBackups,
     VolumeItem,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
+from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -120,6 +122,14 @@ def restore_volume(restore_volume: RestoreVolume) -> RestoreVolumeResponse:
     return RestoreVolumeResponse(
         restore_id=task.id, volume_name=restore_volume.volume_name
     )
+
+
+@router.get(
+    "/volumes/restores",
+    description="Get a list of all volumes that have been restored from a backup",
+)
+def api_list_restores(session: Session = Depends(get_session)) -> list[RestoredBackups]:
+    return db_list_restored_backups(session)
 
 
 @router.get(
