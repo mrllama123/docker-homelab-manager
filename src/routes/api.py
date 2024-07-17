@@ -128,8 +128,13 @@ def restore_volume(restore_volume: RestoreVolume) -> RestoreVolumeResponse:
     "/volumes/restores",
     description="Get a list of all volumes that have been restored from a backup",
 )
-def api_list_restores(session: Session = Depends(get_session)) -> list[RestoredBackups]:
-    return db_list_restored_backups(session)
+def api_list_restores(
+    created_at: str | None = None, session: Session = Depends(get_session)
+) -> list[RestoredBackups]:
+    params = {}
+    if created_at:
+        params["created_at"] = created_at
+    return db_list_restored_backups(session, **params)
 
 
 @router.get(
