@@ -80,6 +80,125 @@ def test_get_restored_volume_filter_created_at(client, session):
     ]
 
 
+def test_get_restored_volume_filter_successful_false_empty(client, session):
+    restore_db = [
+        RestoredBackups(
+            restore_id="test-restore-id-1",
+            restore_name="test-restore-name",
+            created_at="2021-01-01T00:00:00+00:00",
+            backup_filename="test-restore-id-1.tar.gz",
+            volume_name="test-volume",
+        ),
+        RestoredBackups(
+            restore_id="test-restore-id-2",
+            restore_name="test-restore-name",
+            created_at="2021-01-06T00:00:00+00:00",
+            backup_filename="test-restore-id-2.tar.gz",
+            volume_name="test-volume",
+        ),
+    ]
+    for restore in restore_db:
+        session.add(restore)
+
+    session.commit()
+
+    response = client.get("/api/volumes/restores", params={"restore_successful": False})
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_get_restored_volume_filter_successful_true_empty(client, session):
+    restore_db = [
+        RestoredBackups(
+            restore_id="test-restore-id-1",
+            restore_name="test-restore-name",
+            created_at="2021-01-01T00:00:00+00:00",
+            backup_filename="test-restore-id-1.tar.gz",
+            volume_name="test-volume",
+            successful=False,
+        ),
+        RestoredBackups(
+            restore_id="test-restore-id-2",
+            restore_name="test-restore-name",
+            created_at="2021-01-06T00:00:00+00:00",
+            backup_filename="test-restore-id-2.tar.gz",
+            volume_name="test-volume",
+            successful=False,
+        ),
+    ]
+
+    for restore in restore_db:
+        session.add(restore)
+
+    session.commit()
+
+    response = client.get("/api/volumes/restores", params={"restore_successful": True})
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_get_restored_volume_filter_successful_false(client, session):
+    restore_db = [
+        RestoredBackups(
+            restore_id="test-restore-id-1",
+            restore_name="test-restore-name",
+            created_at="2021-01-01T00:00:00+00:00",
+            backup_filename="test-restore-id-1.tar.gz",
+            volume_name="test-volume",
+            successful=False,
+        ),
+        RestoredBackups(
+            restore_id="test-restore-id-2",
+            restore_name="test-restore-name",
+            created_at="2021-01-06T00:00:00+00:00",
+            backup_filename="test-restore-id-2.tar.gz",
+            volume_name="test-volume",
+        ),
+    ]
+
+    for restore in restore_db:
+        session.add(restore)
+
+    session.commit()
+
+    response = client.get("/api/volumes/restores", params={"restore_successful": False})
+
+    assert response.status_code == 200
+    assert response.json() == [restore_db[0].model_dump()]
+
+def test_get_restored_volume_filter_successful_true(client, session):
+
+    restore_db = [
+        RestoredBackups(
+            restore_id="test-restore-id-1",
+            restore_name="test-restore-name",
+            created_at="2021-01-01T00:00:00+00:00",
+            backup_filename="test-restore-id-1.tar.gz",
+            volume_name="test-volume",
+            successful=False,
+        ),
+        RestoredBackups(
+            restore_id="test-restore-id-2",
+            restore_name="test-restore-name",
+            created_at="2021-01-06T00:00:00+00:00",
+            backup_filename="test-restore-id-2.tar.gz",
+            volume_name="test-volume",
+        ),
+    ]
+
+    for restore in restore_db:
+        session.add(restore)
+    
+    session.commit()
+
+    response = client.get("/api/volumes/restores", params={"restore_successful": True})
+
+    assert response.status_code == 200
+    assert response.json() == [restore_db[1].model_dump()]
+
+
 def test_restore_backup(mocker, client):
     mocker.patch("src.routes.api.uuid", **{"uuid4.return_value": "test-uuid"})
     mock_create_volume_backup = mocker.patch(
