@@ -37,7 +37,7 @@ def test_task_backup_volume(mocker, session):
     assert backup_db.created_at == dt_now.isoformat()
     assert backup_db.backup_path == f"/backup/test-volume-{dt_now.isoformat()}.tar.gz"
     assert backup_db.volume_name == "test-volume"
-    assert backup_db.schedule_id == None
+    assert backup_db.schedule_id is None
 
     db_backup_filenames = session.exec(
         select(BackupFilenames).where(BackupFilenames.backup_id == "job_id_1")

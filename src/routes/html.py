@@ -196,7 +196,7 @@ async def create_backup_schedule(
 
         return HTMLResponse("", headers={"HX-Trigger": "reload-backup-schedule-rows"})
 
-    except ConflictingIdError as e:
+    except ConflictingIdError:
         return templates.TemplateResponse(
             request,
             "notification.html",

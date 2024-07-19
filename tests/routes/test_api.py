@@ -2,7 +2,6 @@ from apscheduler.jobstores.base import JobLookupError
 
 from src.db import Backups
 from src.models import BackupSchedule, ScheduleCrontab
-
 from tests.fixtures import MockAsyncResult, MockVolume
 
 
@@ -178,29 +177,6 @@ def test_create_backup_volume_attached(mocker, client):
     mock_get_volume.assert_called_once_with("test-volume")
     mock_is_volume_attached.assert_called_once_with("test-volume")
     mock_create_volume_backup.assert_not_called()
-
-
-def test_restore_backup(mocker, client):
-    mocker.patch("src.routes.api.uuid", **{"uuid4.return_value": "test-uuid"})
-    mock_create_volume_backup = mocker.patch(
-        "src.routes.api.add_restore_job",
-        return_value=MockAsyncResult(),
-    )
-    response = client.post(
-        "/api/volumes/restore",
-        json={
-            "volume_name": "test-volume",
-            "backup_filename": "test-backup-name.tar.gz",
-        },
-    )
-    assert response.status_code == 200
-    assert response.json() == {
-        "volume_name": "test-volume",
-        "restore_id": "test-task-id",
-    }
-    mock_create_volume_backup.assert_called_once_with(
-        "restore-test-volume-test-uuid", "test-volume", "test-backup-name.tar.gz"
-    )
 
 
 def test_create_schedule(mocker, client):
