@@ -5,6 +5,8 @@ from src.models import Backups
 
 def db_list_backups(
     session: Session,
+    offset: int = 0,
+    limit: int = 100,
     backup_ids: list[str] | None = None,
     successful: bool | None = None,
 ) -> list[Backups]:
@@ -16,7 +18,7 @@ def db_list_backups(
     if successful is not None:
         query = query.where(Backups.successful == successful)
 
-    return session.exec(query).all()
+    return session.exec(query.offset(offset).limit(limit)).all()
 
 
 def db_get_backup(session: Session, backup_id: str) -> Backups | None:

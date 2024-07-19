@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 
 from src.apschedule.schedule import (
@@ -48,8 +48,10 @@ def list_backups(
     session: Session = Depends(get_session),
     backup_ids: list[str] | None = None,
     successful: bool | None = None,
+    offset: int = 0,
+    limit: int = Query(default=100, le=100),
 ) -> list[Backups]:
-    return db_list_backups(session, backup_ids, successful)
+    return db_list_backups(session, offset, limit, backup_ids, successful)
 
 
 @router.get(
