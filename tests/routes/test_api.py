@@ -2,7 +2,6 @@ from apscheduler.jobstores.base import JobLookupError
 
 from src.db import Backups
 from src.models import BackupSchedule, ScheduleCrontab
-
 from tests.fixtures import MockAsyncResult, MockVolume
 
 

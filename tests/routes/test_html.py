@@ -1,5 +1,4 @@
 from src.models import Backups, RestoredBackups, ScheduleCrontab
-
 from tests.fixtures import MockAsyncResult, MockVolume
 
 
@@ -16,6 +15,7 @@ def test_restore_volumes_tab(client, snapshot):
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/html; charset=utf-8"
     snapshot.assert_match(response.text.strip(), "index.html")
+
 
 def test_backup_volumes_tab(client, snapshot):
     response = client.get("/tabs/backup-volumes")

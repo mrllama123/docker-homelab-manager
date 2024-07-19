@@ -1,6 +1,7 @@
 import json
-import requests
 import os
+
+import requests
 
 
 def download_frontend_assets():
@@ -28,7 +29,7 @@ def download_frontend_assets():
         {
             "url": "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js",
             "path": os.path.join("src", "static", "js", "alpinejs.js"),
-        }
+        },
     ]
     print("downloading assets: ", json.dumps(assets, indent=2))
     for asset in assets:
@@ -41,5 +42,3 @@ def download_frontend_assets():
                         file.write(chunk)
 
     print("all done")
-
-
