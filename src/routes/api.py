@@ -131,6 +131,7 @@ def restore_volume(restore_volume: RestoreVolume) -> RestoreVolumeResponse:
 def api_list_restores(
     created_at: str | None = None,
     restore_successful: bool | None = None,
+    backup_filename: str | None = None,
     session: Session = Depends(get_session),
 ) -> list[RestoredBackups]:
     params = {}
@@ -138,6 +139,8 @@ def api_list_restores(
         params["created_at"] = created_at
     if restore_successful is not None:
         params["successful"] = restore_successful
+    if backup_filename:
+        params["backup_filename"] = backup_filename
     return db_list_restored_backups(session, **params)
 
 
