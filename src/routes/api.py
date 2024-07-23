@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlmodel import Session
 
 from src.apschedule.schedule import (
@@ -19,12 +19,17 @@ from src.models import (
     BackupSchedule,
     CreateBackupResponse,
     CreateBackupSchedule,
+    ListBackupsResponse,
     RestoredBackups,
     RestoreVolume,
     RestoreVolumeResponse,
     VolumeItem,
 )
-from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
+from src.routes.impl.volumes.backups import (
+    db_get_backup,
+    db_list_backups,
+    db_get_backup_table_count,
+)
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
@@ -42,16 +47,48 @@ def get_volumes() -> list[VolumeItem]:
 @router.get(
     "/volumes/backup",
     description="Get a list of all backups",
-    response_model=list[Backups],
 )
 def list_backups(
-    session: Session = Depends(get_session),
-    backup_ids: list[str] | None = None,
+    request: Request,
+    response: Response,
     successful: bool | None = None,
-    offset: int = 0,
-    limit: int = Query(default=100, le=100),
-) -> list[Backups]:
-    return db_list_backups(session, offset, limit, backup_ids, successful)
+    session: Session = Depends(get_session),
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=100, le=100),
+) -> ListBackupsResponse:
+    offset = (page - 1) * size
+    total_items = db_get_backup_table_count(session)
+    total_pages = round((total_items + (size - 1)) / size)
+    items = db_list_backups(session, offset, size, successful=successful)
+    next_page = page + 1 if page < total_pages else None
+    if next_page:
+        next_page_header = f'<{request.url}?page={next_page}&size={size}>; rel="next"'
+        last_page_header = f'<{request.url}?page={total_pages}&size={size}>; rel="last"'
+        prev_page_header = (
+            f'<{request.url}?page={page - 1}&size={size}>; rel="prev"'
+            if page > 1
+            else None
+        )
+        # TODO: make this better as feels gross to do it this way but need to go to bed :(
+        if prev_page_header:
+            response.headers["link"] = (
+                f"{next_page_header}, {prev_page_header}, {last_page_header}"
+            )
+        else:
+            response.headers["link"] = f"{next_page_header}, {last_page_header}"
+
+    else:
+        response.headers["link"] = (
+            f'<{request.url}?page=1&size={size}>; rel="first", <{request.url}?page={total_pages}&size={size}>; rel="last"'
+        )
+
+    return ListBackupsResponse(
+        backups=items,
+        total_items=total_items,
+        total_pages=total_pages,
+        page=page,
+        size=size,
+    )
 
 
 @router.get(

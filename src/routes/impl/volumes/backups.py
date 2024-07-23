@@ -1,4 +1,4 @@
-from sqlmodel import Session, or_, select
+from sqlmodel import Session, or_, select, func
 
 from src.models import Backups
 
@@ -23,3 +23,7 @@ def db_list_backups(
 
 def db_get_backup(session: Session, backup_id: str) -> Backups | None:
     return session.exec(select(Backups).where(Backups.backup_id == backup_id)).first()
+
+
+def db_get_backup_table_count(session: Session) -> int:
+    return session.exec(select(func.count()).select_from(Backups)).one()
