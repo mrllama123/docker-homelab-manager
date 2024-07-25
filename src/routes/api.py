@@ -25,6 +25,7 @@ from src.models import (
     RestoreVolumeResponse,
     VolumeItem,
 )
+from src.routes.impl.api.responce import generate_paginated_list_link_header
 from src.routes.impl.volumes.backups import (
     db_get_backup,
     db_list_backups,
@@ -44,6 +45,8 @@ def get_volumes() -> list[VolumeItem]:
     return list_volumes()
 
 
+
+
 @router.get(
     "/volumes/backup",
     description="Get a list of all backups",
@@ -60,27 +63,10 @@ def list_backups(
     total_items = db_get_backup_table_count(session)
     total_pages = round((total_items + (size - 1)) / size)
     items = db_list_backups(session, offset, size, successful=successful)
-    next_page = page + 1 if page < total_pages else None
-    if next_page:
-        next_page_header = f'<{request.url}?page={next_page}&size={size}>; rel="next"'
-        last_page_header = f'<{request.url}?page={total_pages}&size={size}>; rel="last"'
-        prev_page_header = (
-            f'<{request.url}?page={page - 1}&size={size}>; rel="prev"'
-            if page > 1
-            else None
-        )
-        # TODO: make this better as feels gross to do it this way but need to go to bed :(
-        if prev_page_header:
-            response.headers["link"] = (
-                f"{next_page_header}, {prev_page_header}, {last_page_header}"
-            )
-        else:
-            response.headers["link"] = f"{next_page_header}, {last_page_header}"
 
-    else:
-        response.headers["link"] = (
-            f'<{request.url}?page=1&size={size}>; rel="first", <{request.url}?page={total_pages}&size={size}>; rel="last"'
-        )
+    response.headers["link"] = generate_paginated_list_link_header(
+        request, page, size, total_pages
+    )
 
     return ListBackupsResponse(
         backups=items,
