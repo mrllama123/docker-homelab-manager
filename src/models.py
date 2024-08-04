@@ -1,7 +1,9 @@
-from typing import Optional
+from enum import Enum
+from typing import Optional, Annotated, Self
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr, model_validator
 from sqlmodel import Field, SQLModel
+import uuid
 
 
 class VolumeItem(BaseModel):
@@ -86,3 +88,35 @@ class RestoredBackups(SQLModel, table=True):
     created_at: Optional[str] = Field(default=None)
     successful: bool = True
     error_message: Optional[str] = Field(default=None)
+
+
+class SshKeyTypes(str, Enum):
+    RSA = "rsa"
+    ED25519 = "ed25519"
+    ECDSA = "ecdsa"
+    DSA = "dsa"
+
+
+class SftpBackupSource(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(index=True, unique=True)
+    hostname: str = Field(index=True, unique=True)
+    port: int = Field(gt=0, lt=65536)
+    password: str | None = None
+    ssh_key_type: SshKeyTypes | None = None
+    ssh_key: str | None = None
+
+    @model_validator(mode="after")
+    def check_ssh_config_set(self) -> Self:
+        if not self.password and not self.ssh_key:
+            raise ValueError("either password or ssh key must be set")
+
+        # ensure that ssh_key is set when ssh_key_type is set
+        check_ssh_key_type_null = not self.ssh_key_type and self.ssh_key
+        check_ssh_key_null = self.ssh_key_type and not self.ssh_key
+
+        if check_ssh_key_null or check_ssh_key_type_null:
+            raise ValueError(
+                "if setting ssh key both ssh key and ssh key type need to be selected"
+            )
+        return self
