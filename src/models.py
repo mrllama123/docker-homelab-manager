@@ -97,8 +97,7 @@ class SshKeyTypes(str, Enum):
     DSA = "dsa"
 
 
-class SftpBackupSource(SQLModel, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+class SftpBackupSourceBase(SQLModel):
     name: str = Field(index=True, unique=True)
     hostname: str = Field(index=True, unique=True)
     port: int = Field(gt=0, lt=65536)
@@ -120,3 +119,11 @@ class SftpBackupSource(SQLModel, table=True):
                 "if setting ssh key both ssh key and ssh key type need to be selected"
             )
         return self
+
+
+class SftpBackupSourceCreate(SftpBackupSourceBase):
+    pass
+
+
+class SftpBackupSource(SftpBackupSourceBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
