@@ -101,6 +101,7 @@ class SftpBackupSourceBase(SQLModel):
     name: str = Field(index=True, unique=True)
     hostname: str = Field(index=True, unique=True)
     port: int = Field(gt=0, lt=65536)
+    username: str = Field()
     password: str | None = None
     ssh_key_type: SshKeyTypes | None = None
     ssh_key: str | None = None
@@ -123,6 +124,14 @@ class SftpBackupSourceBase(SQLModel):
 
 class SftpBackupSourceCreate(SftpBackupSourceBase):
     pass
+
+
+class SftpBackupSourcePublic(SftpBackupSourceBase):
+    """
+    model of what is displayed to the api
+    """
+
+    id: uuid.UUID
 
 
 class SftpBackupSource(SftpBackupSourceBase, table=True):

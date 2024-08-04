@@ -22,9 +22,13 @@ from src.models import (
     RestoredBackups,
     RestoreVolume,
     RestoreVolumeResponse,
+    SftpBackupSource,
+    SftpBackupSourceCreate,
+    SftpBackupSourcePublic,
     VolumeItem,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
+from src.routes.impl.volumes.db import db_create_sftp_backup_source
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
@@ -210,3 +214,10 @@ async def create_backup_schedule(schedule: CreateBackupSchedule) -> BackupSchedu
         volume_name=schedule.volume_name,
         crontab=schedule.crontab,
     )
+
+
+@router.post("/volumes/backups/source", description="Create a backup source")
+def create_sftp_backup_source(
+    backup_source: SftpBackupSourceCreate, session: Session = Depends(get_session)
+) -> SftpBackupSourcePublic:
+    return db_create_sftp_backup_source(session, backup_source)
