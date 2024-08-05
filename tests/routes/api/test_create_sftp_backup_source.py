@@ -1,6 +1,5 @@
 from sqlmodel import select
 from src.models import SftpBackupSourceCreate, SftpBackupSource
-from src.routes.impl.crypto import verify_hash_string
 
 
 def test_create_sftp_backup_source_password(client, session):
@@ -24,8 +23,4 @@ def test_create_sftp_backup_source_password(client, session):
     assert response_data.get("username") == "root"
     assert response_data.get("id")
     assert response_data.get("password") == "verysecretpassword"
-    # hashed_password = response_data.get("password")
-
-    # assert verify_hash_string("verysecretpassword", hashed_password)
-
     assert len(list(session.exec(select(SftpBackupSource)).all())) == 1
