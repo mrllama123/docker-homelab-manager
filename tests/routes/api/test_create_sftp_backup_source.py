@@ -92,3 +92,23 @@ def test_create_sftp_backup_source_invalid_ssh_key_type(client, session):
         response_data["detail"][0]["msg"]
         == "Value error, if setting ssh key both ssh key and ssh key type need to be selected"
     )
+
+
+def test_create_sftp_backup_no_password_ssh_key(client, session):
+    response = client.post(
+        "/api/volumes/backups/source",
+        json=dict(
+            name="test-sftp",
+            hostname="127.0.0.1",
+            port=22,
+            username="root",
+        ),
+    )
+    assert response.status_code == 422
+    response_data = response.json()
+    assert response_data["detail"][0]["type"] == "value_error"
+    assert (
+        response_data["detail"][0]["msg"]
+        == "Value error, either password or ssh key must be set"
+    )
+
