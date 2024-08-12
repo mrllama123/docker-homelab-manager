@@ -56,7 +56,7 @@ def test_list_sftp_backup_sources(client, session):
         assert data["ssh_key_type"] in [SshKeyTypes.RSA, SshKeyTypes.ED25519]
 
 
-def test_li_sftp_backup_source_empty(client, session):
+def test_list_sftp_backup_source_empty(client, session):
     response = client.get("/api/volumes/backups/sources")
     assert response.status_code == 200
     data = response.json()
