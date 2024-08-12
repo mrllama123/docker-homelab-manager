@@ -30,6 +30,7 @@ from src.models import (
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
 from src.routes.impl.volumes.db import (
     db_create_sftp_backup_source,
+    db_delete_sftp_backup_source,
     db_get_sftp_backup_source,
     db_list_sftp_backup_sources,
 )
@@ -245,3 +246,18 @@ def get_backup_source(
             detail=f"Backup source {source_id} does not exist",
         )
     return result
+
+
+@router.delete(
+    "/volumes/backups/source/{source_id}", description="Delete a backup source"
+)
+def delete_backup_source(
+    source_id: str, session: Session = Depends(get_session)
+) -> str:
+    if not db_get_sftp_backup_source(session, source_id):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Backup source {source_id} does not exist",
+        )
+    db_delete_sftp_backup_source(session, source_id)
+    return f"Backup source {source_id} deleted"
