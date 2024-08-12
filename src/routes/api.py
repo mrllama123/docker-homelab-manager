@@ -28,7 +28,7 @@ from src.models import (
     VolumeItem,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
-from src.routes.impl.volumes.db import db_create_sftp_backup_source
+from src.routes.impl.volumes.db import db_create_sftp_backup_source, db_list_sftp_backup_sources
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
@@ -221,3 +221,10 @@ def create_sftp_backup_source(
     backup_source: SftpBackupSourceCreate, session: Session = Depends(get_session)
 ) -> SftpBackupSourcePublic:
     return db_create_sftp_backup_source(session, backup_source)
+
+
+@router.get("/volumes/backups/sources", description="List backup sources")
+def list_backup_sources(
+    session: Session = Depends(get_session),
+) -> list[SftpBackupSourcePublic]:
+    return db_list_sftp_backup_sources(session)
