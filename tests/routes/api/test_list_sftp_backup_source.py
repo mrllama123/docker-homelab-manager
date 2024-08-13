@@ -1,4 +1,4 @@
-from src.models import SftpBackupSourceCreate, SftpBackupSource, SshKeyTypes
+from src.models import SftpBackupSource, SshKeyTypes
 
 
 def test_list_sftp_backup_sources(client, session):

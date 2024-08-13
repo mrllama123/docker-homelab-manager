@@ -22,7 +22,6 @@ from src.models import (
     RestoredBackups,
     RestoreVolume,
     RestoreVolumeResponse,
-    SftpBackupSource,
     SftpBackupSourceCreate,
     SftpBackupSourcePublic,
     VolumeItem,

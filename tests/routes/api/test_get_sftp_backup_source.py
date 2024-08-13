@@ -1,5 +1,5 @@
 import uuid
-from sqlmodel import select
+
 from src.models import SftpBackupSource, SshKeyTypes
 
 

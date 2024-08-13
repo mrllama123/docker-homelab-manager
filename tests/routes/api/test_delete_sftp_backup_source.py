@@ -1,6 +1,9 @@
 import uuid
+
 from sqlmodel import select
-from src.models import SftpBackupSourceCreate, SftpBackupSource, SshKeyTypes
+
+from src.models import SftpBackupSource, SshKeyTypes
+
 
 def test_delete_sftp_backup_source(session, client):
     sftp_source = SftpBackupSource(
@@ -11,7 +14,7 @@ def test_delete_sftp_backup_source(session, client):
         ssh_key="testprivatekey",
         ssh_key_type=SshKeyTypes.RSA,
     )
-    
+
     session.add(sftp_source)
     session.commit()
 
@@ -23,6 +26,7 @@ def test_delete_sftp_backup_source(session, client):
     statement = select(SftpBackupSource).where(SftpBackupSource.id == sftp_source.id)
     result = session.exec(statement)
     assert result.first() is None
+
 
 def test_delete_sftp_backup_source_not_found(client):
     id = str(uuid.uuid4())

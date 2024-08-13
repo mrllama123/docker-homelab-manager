@@ -1,9 +1,9 @@
-from enum import Enum
-from typing import Optional, Annotated, Self
-
-from pydantic import BaseModel, SecretStr, model_validator
-from sqlmodel import Field, SQLModel
 import uuid
+from enum import Enum
+from typing import Optional, Self
+
+from pydantic import BaseModel, model_validator
+from sqlmodel import Field, SQLModel
 
 
 class VolumeItem(BaseModel):

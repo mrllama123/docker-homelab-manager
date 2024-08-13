@@ -13,10 +13,12 @@ def db_create_sftp_backup_source(
     session.refresh(db_sftp_backup_source)
     return db_sftp_backup_source
 
+
 def db_delete_sftp_backup_source(session: Session, id: str) -> None:
     backup_source = session.get(SftpBackupSource, id)
     session.delete(backup_source)
     session.commit()
+
 
 def db_get_sftp_backup_source(session: Session, id: str) -> SftpBackupSource | None:
     return session.get(SftpBackupSource, id)
