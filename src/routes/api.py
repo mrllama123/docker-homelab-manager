@@ -22,9 +22,17 @@ from src.models import (
     RestoredBackups,
     RestoreVolume,
     RestoreVolumeResponse,
+    SftpBackupSourceCreate,
+    SftpBackupSourcePublic,
     VolumeItem,
 )
 from src.routes.impl.volumes.backups import db_get_backup, db_list_backups
+from src.routes.impl.volumes.db import (
+    db_create_sftp_backup_source,
+    db_delete_sftp_backup_source,
+    db_get_sftp_backup_source,
+    db_list_sftp_backup_sources,
+)
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
 
@@ -210,3 +218,45 @@ async def create_backup_schedule(schedule: CreateBackupSchedule) -> BackupSchedu
         volume_name=schedule.volume_name,
         crontab=schedule.crontab,
     )
+
+
+@router.post("/volumes/backups/source", description="Create a backup source")
+def create_sftp_backup_source(
+    backup_source: SftpBackupSourceCreate, session: Session = Depends(get_session)
+) -> SftpBackupSourcePublic:
+    return db_create_sftp_backup_source(session, backup_source)
+
+
+@router.get("/volumes/backups/sources", description="List backup sources")
+def list_backup_sources(
+    session: Session = Depends(get_session),
+) -> list[SftpBackupSourcePublic]:
+    return db_list_sftp_backup_sources(session)
+
+
+@router.get("/volumes/backups/source/{source_id}", description="Get a backup source")
+def get_backup_source(
+    source_id: str, session: Session = Depends(get_session)
+) -> SftpBackupSourcePublic:
+    result = db_get_sftp_backup_source(session, source_id)
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Backup source {source_id} does not exist",
+        )
+    return result
+
+
+@router.delete(
+    "/volumes/backups/source/{source_id}", description="Delete a backup source"
+)
+def delete_backup_source(
+    source_id: str, session: Session = Depends(get_session)
+) -> str:
+    if not db_get_sftp_backup_source(session, source_id):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Backup source {source_id} does not exist",
+        )
+    db_delete_sftp_backup_source(session, source_id)
+    return f"Backup source {source_id} deleted"
