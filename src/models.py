@@ -4,7 +4,7 @@ from typing import Optional, Self
 
 from pydantic import BaseModel, model_validator
 from sqlmodel import Field, SQLModel
-from pydantic.types import Path
+
 
 class VolumeItem(BaseModel):
     name: str

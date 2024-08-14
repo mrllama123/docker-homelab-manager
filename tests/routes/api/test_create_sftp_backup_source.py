@@ -13,7 +13,7 @@ def test_create_sftp_backup_source_password(client, session):
             port=22,
             username="root",
             password="verysecretpassword",
-            remote_path="/usr/nas/share"
+            remote_path="/usr/nas/share",
         ).model_dump(),
     )
 
