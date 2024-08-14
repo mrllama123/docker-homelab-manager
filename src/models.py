@@ -105,6 +105,7 @@ class SftpBackupSourceBase(SQLModel):
     password: str | None = None
     ssh_key_type: SshKeyTypes | None = None
     ssh_key: str | None = None
+    remote_path: str
 
     @model_validator(mode="after")
     def check_ssh_config_set(self) -> Self:

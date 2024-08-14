@@ -13,6 +13,7 @@ def test_create_sftp_backup_source_password(client, session):
             port=22,
             username="root",
             password="verysecretpassword",
+            remote_path="/usr/nas/share",
         ).model_dump(),
     )
 
@@ -35,6 +36,7 @@ def test_create_sftp_backup_source_ssh_key(client, session):
             hostname="127.0.0.1",
             port=22,
             username="root",
+            remote_path="/usr/nas/share",
             ssh_key_type=SshKeyTypes.RSA,
             ssh_key="-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEA6NF8iallvQVp22WDkTkyrtvPruB2uZjYGT1+XWFYe9z\nRUtxr0Yl/e/H+B33IqU4ZinVTnQx2Kb+M3AX4+sO7m484zTbo7AAACTk+EGeCIb5O\nunaf6h8mJPIy/u8=\n-----END RSA PRIVATE KEY-----\n",
         ).model_dump(),
@@ -43,6 +45,7 @@ def test_create_sftp_backup_source_ssh_key(client, session):
     response_data = response.json()
     assert response_data.get("name") == "test-sftp"
     assert response_data.get("hostname") == "127.0.0.1"
+    assert response_data.get("remote_path") == "/usr/nas/share"
     assert response_data.get("port") == 22
     assert response_data.get("username") == "root"
     assert response_data.get("ssh_key_type") == SshKeyTypes.RSA
@@ -62,6 +65,7 @@ def test_create_sftp_backup_source_invalid_ssh_key(client, session):
             "hostname": "127.0.0.1",
             "port": 22,
             "username": "root",
+            "remote_path": "/usr/nas/share",
             "ssh_key_type": SshKeyTypes.RSA,
         },
     )
@@ -82,6 +86,7 @@ def test_create_sftp_backup_source_invalid_ssh_key_type(client, session):
             "hostname": "127.0.0.1",
             "port": 22,
             "username": "root",
+            "remote_path": "/usr/nas/share",
             "ssh_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEA6NF8iallvQVp22WDkTkyrtvPruB2uZjYGT1+XWFYe9z\nRUtxr0Yl/e/H+B33IqU4ZinVTnQx2Kb+M3AX4+sO7m484zTbo7AAACTk+EGeCIb5O\nunaf6h8mJPIy/u8=\n-----END RSA PRIVATE KEY-----\n",
         },
     )
@@ -103,6 +108,7 @@ def test_create_sftp_backup_no_password_ssh_key(client, session):
             "hostname": "127.0.0.1",
             "port": 22,
             "username": "root",
+            "remote_path": "/usr/nas/share",
         },
     )
     assert response.status_code == 422
