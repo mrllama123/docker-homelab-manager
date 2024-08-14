@@ -11,6 +11,7 @@ def test_delete_sftp_backup_source(session, client):
         hostname="sftp.example.com",
         port=22,
         username="testuser",
+        remote_path="/usr/nas/share",
         ssh_key="testprivatekey",
         ssh_key_type=SshKeyTypes.RSA,
     )

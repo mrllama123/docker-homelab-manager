@@ -4,7 +4,7 @@ from typing import Optional, Self
 
 from pydantic import BaseModel, model_validator
 from sqlmodel import Field, SQLModel
-
+from pydantic.types import Path
 
 class VolumeItem(BaseModel):
     name: str
@@ -105,6 +105,7 @@ class SftpBackupSourceBase(SQLModel):
     password: str | None = None
     ssh_key_type: SshKeyTypes | None = None
     ssh_key: str | None = None
+    remote_path: str
 
     @model_validator(mode="after")
     def check_ssh_config_set(self) -> Self:
