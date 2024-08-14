@@ -1,12 +1,13 @@
 from sqlmodel import Session, or_, select
 
-from src.models import Backups
+from src.models import BackUpStatus, Backups
 
 
 def db_list_backups(
     session: Session,
     backup_ids: list[str] | None = None,
     successful: bool | None = None,
+    status: BackUpStatus | None = None,
 ) -> list[Backups]:
     query = select(Backups)
     if backup_ids:
@@ -15,6 +16,9 @@ def db_list_backups(
         )
     if successful is not None:
         query = query.where(Backups.successful == successful)
+
+    if status:
+        query = query.where(Backups.status == status)
 
     return session.exec(query).all()
 

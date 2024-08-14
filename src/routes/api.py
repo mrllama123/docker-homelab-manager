@@ -15,6 +15,7 @@ from src.apschedule.schedule import (
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import (
+    BackUpStatus,
     Backups,
     BackupSchedule,
     CreateBackupResponse,
@@ -56,8 +57,9 @@ def list_backups(
     session: Session = Depends(get_session),
     backup_ids: list[str] | None = None,
     successful: bool | None = None,
+    status: BackUpStatus | None = None,
 ) -> list[Backups]:
-    return db_list_backups(session, backup_ids, successful)
+    return db_list_backups(session, backup_ids, successful, status)
 
 
 @router.get(

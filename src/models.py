@@ -59,6 +59,11 @@ class BackupSchedule(BaseModel):
 
 # db models
 
+class BackUpStatus(Enum):
+    Created = "Created"
+    InProgress = "InProgress"
+    Processed = "Processed"
+    Errored =  "Errored"
 
 class Backups(SQLModel, table=True):
     backup_id: Optional[str] = Field(default=None, primary_key=True)
@@ -68,8 +73,10 @@ class Backups(SQLModel, table=True):
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
     successful: bool = True
+    status: BackUpStatus = BackUpStatus.Created
     error_message: Optional[str] = Field(default=None)
     created_at: Optional[str] = Field(default=None)
+
 
 
 class BackupFilenames(SQLModel, table=True):
