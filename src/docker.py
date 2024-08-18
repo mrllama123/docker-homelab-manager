@@ -68,7 +68,7 @@ def backup_volume(volume_name: str, backup_dir: str, filename: str) -> None:
         remove=True,
         volumes=[(volume, "/source"), (backup_dir, "/dest")],
     )
-    if not os.path.exists(os.path.join("/backup", filename)):
+    if not os.path.exists(os.path.join(backup_dir, filename)):
         raise RuntimeError("Backup failed")
 
 
