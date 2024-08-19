@@ -77,12 +77,14 @@ cmd = "alembic downgrade ${revision}"
 help = "Run alembic migration on ${revision}"
 envfile = ".env"
 args = [{ name = "revision", positional = true, default = "-1" }]
+env = { DATABASE_URL = "sqlite:///${DB_DIR}/database.db" }
 
 
 [tool.poe.tasks.revision]
 cmd = 'alembic revision --autogenerate  -m "${message}"'
 help = "Create a new alembic migration revision"
 envfile = ".env"
+env = { DATABASE_URL = "sqlite:///${DB_DIR}/database.db" }
 args = [
     { name = "message", positional = true, multiple = true, type = "string" },
 ]
