@@ -10,15 +10,7 @@ logger = logging.getLogger(__name__)
 
 @lru_cache
 def get_docker_client() -> DockerClient:
-    if is_docker_rootless():
-        return DockerClient(
-            host=f'unix://{os.getenv("XDG_RUNTIME_DIR")}/docker.sock',
-        )
     return DockerClient()
-
-
-def is_docker_rootless() -> bool:
-    return not os.path.exists("/var/run/docker.sock")
 
 
 def get_volumes() -> list[Volume]:
