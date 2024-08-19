@@ -60,7 +60,7 @@ download-assets = { script="scripts:download_frontend_assets" }
 
 
 [tool.poe.tasks.api-dev]
-shell = "mkdir -p ${BACKUP_DIR} && uvicorn src.main:app --reload --log-config=src/config/log_config.yaml"
+shell = "mkdir -p ${BACKUP_DIR} && uvicorn src.main:app --reload --reload-dir src --reload-exclude *__pycache__* --log-config=src/config/log_config.yaml"
 help = "Run the API in dev mode"
 envfile = ".env"
 env = { APSCHEDULE_JOBSTORE_URL = "sqlite:///${DB_DIR}/scheduler.db", DATABASE_URL = "sqlite:///${DB_DIR}/database.db" }

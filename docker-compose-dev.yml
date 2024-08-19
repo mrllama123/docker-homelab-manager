@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     #command:  uvicorn src.api:app --host 0.0.0.0 --port 80 --reload --log-config=src/config/log_config.yaml
     # run this when there is a database table change
-    command: "sh -c 'alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 80 --reload --log-config=src/config/log_config.yaml'"
+    command: "sh -c 'alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 80 --reload --reload-dir src --reload-exclude *__pycache__* --log-config=src/config/log_config.yaml'"
     environment:
       - APSCHEDULE_JOBSTORE_URL=sqlite:////db/scheduler.db
       - DATABASE_URL=sqlite:////db/database.db
