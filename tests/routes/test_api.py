@@ -26,45 +26,23 @@ def test_list_volumes(mocker, client):
 
 
 def test_get_backups(client, session):
-    for backup_id in ["test-backup-id-1", "test-backup-id-2"]:
-        session.add(
-            Backups(
-                backup_id=backup_id,
-                created_at="2021-01-01T00:00:00+00:00",
-                backup_filename=f"{backup_id}.tar.gz",
-                backup_name="test-backup-name",
-                successful=True,
-                backup_path="/volumes/backup/test-backup-name.tar.gz",
-                volume_name="test-volume",
-            )
+    backups = [
+        Backups(
+            backup_id=backup_id,
+            created_at="2021-01-01T00:00:00+00:00",
+            backup_filename=f"{backup_id}.tar.gz",
+            backup_name="test-backup-name",
+            successful=True,
+            backup_path="/volumes/backup/test-backup-name.tar.gz",
+            volume_name="test-volume",
         )
+        for backup_id in ["test-backup-id-1", "test-backup-id-2"]
+    ]
+    session.add_all(backups)
     session.commit()
     response = client.get("/api/volumes/backup")
     assert response.status_code == 200
-    assert response.json() == [
-        {
-            "schedule_id": None,
-            "backup_filename": "test-backup-id-1.tar.gz",
-            "backup_id": "test-backup-id-1",
-            "backup_path": "/volumes/backup/test-backup-name.tar.gz",
-            "volume_name": "test-volume",
-            "successful": True,
-            "error_message": None,
-            "backup_name": "test-backup-name",
-            "created_at": "2021-01-01T00:00:00+00:00",
-        },
-        {
-            "schedule_id": None,
-            "backup_filename": "test-backup-id-2.tar.gz",
-            "backup_id": "test-backup-id-2",
-            "successful": True,
-            "error_message": None,
-            "backup_path": "/volumes/backup/test-backup-name.tar.gz",
-            "backup_name": "test-backup-name",
-            "volume_name": "test-volume",
-            "created_at": "2021-01-01T00:00:00+00:00",
-        },
-    ]
+    assert response.json() == [backup.model_dump(mode="json") for backup in backups]
 
 
 def test_get_no_backups(client):
@@ -74,31 +52,20 @@ def test_get_no_backups(client):
 
 
 def test_get_backup(client, session):
-    session.add(
-        Backups(
-            backup_id="test-backup-id",
-            backup_filename="test-backup-name.tar.gz",
-            backup_name="test-backup-name",
-            created_at="2021-01-01T00:00:00+00:00",
-            successful=True,
-            backup_path="/volumes/backup/test-backup-name.tar.gz",
-            volume_name="test-volume",
-        )
+    backup = Backups(
+        backup_id="test-backup-id",
+        backup_filename="test-backup-name.tar.gz",
+        backup_name="test-backup-name",
+        created_at="2021-01-01T00:00:00+00:00",
+        successful=True,
+        backup_path="/volumes/backup/test-backup-name.tar.gz",
+        volume_name="test-volume",
     )
+    session.add(backup)
     session.commit()
     response = client.get("/api/volumes/backup/test-backup-id")
     assert response.status_code == 200
-    assert response.json() == {
-        "backup_id": "test-backup-id",
-        "backup_filename": "test-backup-name.tar.gz",
-        "created_at": "2021-01-01T00:00:00+00:00",
-        "backup_name": "test-backup-name",
-        "successful": True,
-        "error_message": None,
-        "backup_path": "/volumes/backup/test-backup-name.tar.gz",
-        "volume_name": "test-volume",
-        "schedule_id": None,
-    }
+    assert response.json() == backup.model_dump(mode="json")
 
 
 def test_get_backup_not_found(client):
