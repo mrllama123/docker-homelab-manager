@@ -33,8 +33,12 @@ loggers:
     handlers:
       - default
     propagate: no
+  watchfiles.main:
+    level: INFO
+    handlers:
+    propagate: no
 root:
-  level: DEBUG
+  level: INFO
   handlers:
     - default
   propagate: no
