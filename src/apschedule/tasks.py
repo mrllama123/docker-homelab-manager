@@ -8,7 +8,7 @@ from sqlmodel import Session
 
 from src.db import engine
 from src.docker import backup_volume, restore_volume
-from src.models import BackupFilenames, Backups, RestoredBackups, BackUpStatus
+from src.models import BackupFilenames, Backups, BackUpStatus, RestoredBackups
 
 TZ = os.environ.get("TZ", "UTC")
 BACKUP_DIR = os.getenv("BACKUP_DIR")
@@ -38,7 +38,7 @@ def task_create_backup(
                 successful=True,
                 backup_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
-                status=BackUpStatus.Processed
+                status=BackUpStatus.Processed,
             )
 
             if is_schedule:
@@ -58,7 +58,7 @@ def task_create_backup(
                     created_at=dt_now.isoformat(),
                     successful=False,
                     error_message=str(e),
-                    status=BackUpStatus.Errored
+                    status=BackUpStatus.Errored,
                 )
             )
             session.commit()

@@ -7,10 +7,9 @@ Create Date: 2024-08-19 20:29:35.812921
 """
 
 from typing import Sequence, Union
-import sqlmodel
-from alembic import op
-import sqlalchemy as sa
 
+import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "9724dd6f04cf"
@@ -28,7 +27,7 @@ def upgrade() -> None:
                 "status",
                 sa.Enum(
                     "Created", "InProgress", "Processed", "Errored", name="backupstatus"
-                )
+                ),
             )
         )
     op.execute("UPDATE backups SET status = 'Processed' WHERE successful = 1")
