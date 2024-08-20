@@ -1,6 +1,6 @@
 import logging
-import os
 from functools import lru_cache
+from pathlib import Path
 
 from python_on_whales import DockerClient, DockerException, Volume
 
@@ -15,15 +15,13 @@ def get_docker_client() -> DockerClient:
 
 def get_volumes() -> list[Volume]:
     client = get_docker_client()
-    volumes = client.volume.list()
-    return volumes
+    return client.volume.list()
 
 
 def get_volume(volume_name: str) -> Volume | None:
     client = get_docker_client()
     try:
-        volume = client.volume.inspect(volume_name)
-        return volume
+        return client.volume.inspect(volume_name)
     except DockerException:
         return None
     except Exception as e:
@@ -42,12 +40,12 @@ def backup_volume(volume_name: str, backup_dir: str, filename: str) -> None:
     volume = get_volume(volume_name)
 
     if not volume:
-        raise ValueError(f"Volume {volume_name} does not exist")
+        raise ValueError("Volume %s does not exist", volume_name)
 
     logger.info(
         "Backing up volume %s to %s",
         volume_name,
-        os.path.join(backup_dir, filename),
+        Path(backup_dir) / filename,
     )
     client.run(
         image="busybox",
@@ -62,7 +60,7 @@ def backup_volume(volume_name: str, backup_dir: str, filename: str) -> None:
         remove=True,
         volumes=[(volume, "/source"), (backup_dir, "/dest")],
     )
-    if not os.path.exists(os.path.join(backup_dir, filename)):
+    if not Path.exists(Path(backup_dir) / filename):
         raise RuntimeError("Backup failed")
 
 
@@ -80,5 +78,5 @@ def restore_volume(volume_name: str, backup_dir: str, filename: str) -> None:
         remove=True,
         volumes=[(volume_name, "/dest"), (backup_dir, "/source")],
     )
-    if not os.path.exists(os.path.join("/backup", filename)):
+    if not Path.exists(Path("/backup") / filename):
         raise RuntimeError("Restore failed")
