@@ -1947,13 +1947,13 @@ dev = ["atomicwrites (==1.4.1)", "attrs (==23.2.0)", "coverage (==7.4.1)", "hatc
 
 [[package]]
 name = "python-on-whales"
-version = "0.71.0"
+version = "0.72.0"
 description = "A Docker client for Python, designed to be fun and intuitive!"
 optional = false
 python-versions = "<4,>=3.8"
 files = [
-    {file = "python_on_whales-0.71.0-py3-none-any.whl", hash = "sha256:9d23c025e2e887f8336fbdd324ce764e72e60f7db2d0599601e8f6ddac1cae2d"},
-    {file = "python_on_whales-0.71.0.tar.gz", hash = "sha256:0967be1b716f4a40e44a4b3bf091f721b494205425c1215f64a1a612eb932900"},
+    {file = "python_on_whales-0.72.0-py3-none-any.whl", hash = "sha256:092b440f43a34bbe90536b82a41ae3c199018dfc66d7e0dc52d4d659b82683c2"},
+    {file = "python_on_whales-0.72.0.tar.gz", hash = "sha256:280da91724ae728ac2baf503584938ecfdee2f83bb88e65413eed14b1fe74d41"},
 ]
 
 [package.dependencies]
@@ -3017,4 +3017,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<4.0"
-content-hash = "89590d6525dc81b4085b46b2f24bdaea6406b40644558581ecc0d91ed78cb064"
+content-hash = "66544f9a0fed7661ab7c95e750fda3769f51aa90fcfd45edcf384bb2b7c2db76"
