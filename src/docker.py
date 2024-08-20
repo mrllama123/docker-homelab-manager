@@ -24,8 +24,8 @@ def get_volume(volume_name: str) -> Volume | None:
         return client.volume.inspect(volume_name)
     except DockerException:
         return None
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
 
 def is_volume_attached(volume_name: str) -> bool:

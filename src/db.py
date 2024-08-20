@@ -2,7 +2,7 @@ import os
 
 from sqlmodel import Session, SQLModel, create_engine
 
-from src.models import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from src.models import *  # pylint: disable=wildcard-import, unused-wildcard-import  # noqa: F403
 
 sqlite_url = os.environ.get("DATABASE_URL", "sqlite://")
 

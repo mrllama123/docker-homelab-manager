@@ -23,7 +23,7 @@ SCHEDULER = None
 
 
 def setup_scheduler() -> AsyncIOScheduler:
-    global SCHEDULER
+    global SCHEDULER  # noqa: PLW0603
     jobstores = {"default": SQLAlchemyJobStore(url=APSCHEDULE_JOBSTORE_URL)}
     SCHEDULER = AsyncIOScheduler(jobstores=jobstores, timezone=TZ)
     SCHEDULER.start()

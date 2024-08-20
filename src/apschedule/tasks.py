@@ -2,6 +2,7 @@ import logging
 import os
 import uuid
 from datetime import datetime
+from pathlib import Path
 
 import pytz
 from sqlmodel import Session
@@ -36,7 +37,7 @@ def task_create_backup(
                 backup_name=job_name,
                 created_at=dt_now.isoformat(),
                 successful=True,
-                backup_path=os.path.join(BACKUP_DIR, backup_file),
+                backup_path=Path(BACKUP_DIR) / backup_file,
                 volume_name=volume_name,
                 status=BackUpStatus.PROCESSED,
             )
@@ -49,7 +50,6 @@ def task_create_backup(
             session.add(backup)
             session.commit()
         except Exception as e:
-            logger.error(f"Error creating backup: {e}")
             session.rollback()
             session.add(
                 Backups(
@@ -84,13 +84,12 @@ def task_restore_backup(
                 restore_name=job_name,
                 created_at=dt_now.isoformat(),
                 successful=True,
-                restore_path=os.path.join(BACKUP_DIR, backup_file),
+                restore_path=Path(BACKUP_DIR) / backup_file,
                 volume_name=volume_name,
             )
             session.add(backup)
             session.commit()
         except Exception as e:
-            logger.error(f"Error restoring backup: {e}")
             session.rollback()
             session.add(
                 RestoredBackups(
