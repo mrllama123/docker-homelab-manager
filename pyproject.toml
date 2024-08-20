@@ -148,7 +148,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 # Same as Black.
-line-length = 88
+line-length = 108
 target-version = "py38"
 [tool.ruff.lint]
 select = ["ALL"]
