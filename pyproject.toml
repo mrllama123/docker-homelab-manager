@@ -47,23 +47,58 @@ ipykernel = "^6.29.0"
 pytest-snapshot = "^0.9.0"
 
 [tool.poe.tasks]
-# Code linting
-mypy = { cmd = "mypy src --strict", help = "Run MyPy on codebase" }
-pylint = { cmd = "pylint src", help = "Run pylint on codebase" }
-check_black = { cmd = "black src --check" }
-check_imports = { cmd = "isort --check-only --profile=black src" }
-lint = ["check_black", "check_imports", "pylint"]
-local-dev = ["migrate", "api-dev"]
-dev = "docker compose -f docker-compose-dev.yml  up  --build"
-clear-cache = { cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +', help = "Clear python cache" }
-download-assets = { script="scripts:download_frontend_assets" }
+###
+# Lint/Formatting tasks
+###
 
+[tool.poe.tasks.check_black]
+cmd = "black --check src"
+
+[tool.poe.tasks.check_imports]
+cmd = "isort --check-only --profile=black src"
+
+[tool.poe.tasks.pylint]
+cmd = "pylint src"
+help = "Run pylint on codebase"
+
+[tool.poe.tasks.lint]
+sequence = ["check_black", "check_imports", "pylint"]
+
+[tool.poe.tasks.format]
+shell = "shed"
+help = "Format code"
+
+[tool.poe.tasks.clear-cache]
+cmd = 'sudo find . -type d -name "__pycache__" -exec rm -r {} +'
+help = "Clear python cache"
+
+###
+# Dev tasks
+###
+
+
+[tool.poe.tasks.local-dev]
+sequence = ["migrate", "api-dev"]
+help = "run api locally without docker"
+
+[tool.poe.tasks.dev]
+cmd = "docker compose -f docker-compose-dev.yml  up  --build"
+help = "run api on docker"
+
+[tool.poe.tasks.download-assets]
+script = "scripts:download_frontend_assets"
+help = "download frontend assets"
 
 [tool.poe.tasks.api-dev]
 shell = "mkdir -p ${BACKUP_DIR} && uvicorn src.main:app --reload --reload-dir src --reload-exclude *__pycache__* --log-config=src/config/log_config.yaml"
 help = "Run the API in dev mode"
 envfile = ".env"
 env = { APSCHEDULE_JOBSTORE_URL = "sqlite:///${DB_DIR}/scheduler.db", DATABASE_URL = "sqlite:///${DB_DIR}/database.db" }
+
+
+###
+# Database tasks
+###
 
 [tool.poe.tasks.migrate]
 shell = "mkdir -p ${DB_DIR} && alembic upgrade ${revision}"
@@ -79,7 +114,6 @@ envfile = ".env"
 args = [{ name = "revision", positional = true, default = "-1" }]
 env = { DATABASE_URL = "sqlite:///${DB_DIR}/database.db" }
 
-
 [tool.poe.tasks.revision]
 cmd = 'alembic revision --autogenerate  -m "${message}"'
 help = "Create a new alembic migration revision"
@@ -89,10 +123,9 @@ args = [
     { name = "message", positional = true, multiple = true, type = "string" },
 ]
 
-
-[tool.poe.tasks.format]
-shell = "shed"
-help = "Format code"
+###
+# Test tasks
+###
 
 [tool.poe.tasks.test]
 cmd = "pytest -vvv --cov=src"
