@@ -126,7 +126,7 @@ class SftpBackupSourceBase(SQLModel):
 
         if check_ssh_key_null or check_ssh_key_type_null:
             raise ValueError(
-                "if setting ssh key both ssh key and ssh key type need to be selected"
+                "if setting ssh key both ssh key and ssh key type need to be selected",
             )
         return self
 

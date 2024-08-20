@@ -45,7 +45,9 @@ def backup_volume(volume_name: str, backup_dir: str, filename: str) -> None:
         raise ValueError(f"Volume {volume_name} does not exist")
 
     logger.info(
-        "Backing up volume %s to %s", volume_name, os.path.join(backup_dir, filename)
+        "Backing up volume %s to %s",
+        volume_name,
+        os.path.join(backup_dir, filename),
     )
     client.run(
         image="busybox",

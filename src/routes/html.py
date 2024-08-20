@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
-import src.apschedule.schedule as schedule
+from src.apschedule import schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
@@ -36,7 +36,9 @@ def root(request: Request):
 def volumes(request: Request):
     volumes = list_volumes()
     return templates.TemplateResponse(
-        request, "tabs/backup_volumes/components/volume_rows.html", {"volumes": volumes}
+        request,
+        "tabs/backup_volumes/components/volume_rows.html",
+        {"volumes": volumes},
     )
 
 
@@ -84,7 +86,8 @@ def backup_volume(request: Request, volume_name: str):
         )
 
     job = schedule.add_backup_job(
-        f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
+        f"backup-{volume_name}-{uuid.uuid4()!s}",
+        volume_name,
     )
     logger.info(
         "backup %s started task id: %s",
@@ -224,14 +227,18 @@ def delete_backup_schedule(request: Request, schedules: Annotated[list[str], For
         )
     except JobLookupError as e:
         return templates.TemplateResponse(
-            request, "notification.html", {"message": str(e)}
+            request,
+            "notification.html",
+            {"message": str(e)},
         )
     except Exception:
         raise
 
 
 @router.post(
-    "/volumes/restore", description="restore volumes", response_class=HTMLResponse
+    "/volumes/restore",
+    description="restore volumes",
+    response_class=HTMLResponse,
 )
 def restore_volumes(
     request: Request,
@@ -264,7 +271,7 @@ def restore_volumes(
     for volume_name, backup in group_backup_by_volume_name.items():
         logger.info("restoring volume: %s", volume_name)
         job = schedule.add_restore_job(
-            f"backup-{volume_name}-{str(uuid.uuid4())}",
+            f"backup-{volume_name}-{uuid.uuid4()!s}",
             volume_name,
             backup.backup_filename,
         )

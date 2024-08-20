@@ -44,7 +44,7 @@ def task_create_backup(
             if is_schedule:
                 backup.schedule_id = job_id
             session.add(
-                BackupFilenames(backup_filename=backup_file, backup_id=backup_id)
+                BackupFilenames(backup_filename=backup_file, backup_id=backup_id),
             )
             session.add(backup)
             session.commit()
@@ -59,14 +59,17 @@ def task_create_backup(
                     successful=False,
                     error_message=str(e),
                     status=BackUpStatus.ERRORED,
-                )
+                ),
             )
             session.commit()
             raise
 
 
 def task_restore_backup(
-    volume_name: str, backup_file: str, job_id: str, job_name: str | None = None
+    volume_name: str,
+    backup_file: str,
+    job_id: str,
+    job_name: str | None = None,
 ) -> None:
     # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
     with Session(engine) as session:
@@ -96,7 +99,7 @@ def task_restore_backup(
                     successful=False,
                     created_at=dt_now.isoformat(),
                     error_message=str(e),
-                )
+                ),
             )
             session.commit()
             raise
