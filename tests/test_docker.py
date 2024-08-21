@@ -14,7 +14,7 @@ def test_backup_volume(mocker):
     )
     mock_volume = mocker.MagicMock()
     mock_get_volume = mocker.patch("src.docker.get_volume", return_value=mock_volume)
-    mock_exists = mocker.patch("src.docker.os.path.exists", return_value=True)
+    mock_exists = mocker.patch("src.docker.Path", **{"exists.return_value": True})
     from src.docker import backup_volume
 
     # Set up test data
@@ -29,7 +29,7 @@ def test_backup_volume(mocker):
     mock_get_docker_client.assert_called_once()
     mock_get_volume.assert_called_once_with(volume_name)
 
-    mock_exists.assert_called_once_with(f"/backup/{backup_file}")
+    mock_exists.assert_any_call("/backup")
     mock_docker_client.run.assert_called_once_with(
         image="busybox",
         command=[
@@ -53,7 +53,7 @@ def test_backup_volume_failure_backup_not_found(mocker):
     )
     mock_volume = mocker.MagicMock()
     mock_get_volume = mocker.patch("src.docker.get_volume", return_value=mock_volume)
-    mock_exists = mocker.patch("src.docker.os.path.exists", return_value=False)
+    mock_exists = mocker.patch("src.docker.Path", **{"exists.return_value": False})
     from src.docker import backup_volume
 
     # Set up test data
@@ -69,7 +69,7 @@ def test_backup_volume_failure_backup_not_found(mocker):
     mock_get_docker_client.assert_called_once()
     mock_get_volume.assert_called_once_with(volume_name)
 
-    mock_exists.assert_called_once_with(f"/backup/{backup_file}")
+    mock_exists.assert_any_call("/backup")
     mock_docker_client.run.assert_called_once_with(
         image="busybox",
         command=[
@@ -88,10 +88,10 @@ def test_backup_volume_failure_backup_not_found(mocker):
 def test_backup_volume_failure_volume_not_found(mocker):
     mock_docker_client = mocker.MagicMock()
     mock_get_docker_client = mocker.patch(
-        "src.docker.get_docker_client", return_value=mock_docker_client
+        "src.docker.get_docker_client", return_value=mock_docker_client,
     )
     mock_get_volume = mocker.patch("src.docker.get_volume", return_value=None)
-    mock_exists = mocker.patch("src.docker.os.path.exists", return_value=True)
+    mock_exists = mocker.patch("src.docker.Path", **{"exists.return_value": True})
     from src.docker import backup_volume
 
     # Set up test data
@@ -117,7 +117,7 @@ def test_restore_volume(mocker):
     mock_get_docker_client = mocker.patch(
         "src.docker.get_docker_client", return_value=mock_docker_client
     )
-    mock_exists = mocker.patch("src.docker.os.path.exists", return_value=True)
+    mock_exists = mocker.patch("src.docker.Path", **{"exists.return_value": True})
 
     from src.docker import restore_volume
 
@@ -130,7 +130,7 @@ def test_restore_volume(mocker):
 
     # # Assert the function calls and behavior
     mock_get_docker_client.assert_called_once()
-    mock_exists.assert_called_once_with(f"/backup/{filename}")
+    mock_exists.assert_any_call("/backup")
     mock_docker_client.run.assert_called_once_with(
         image="busybox",
         command=[
@@ -151,7 +151,7 @@ def test_restore_volume_not_found(mocker):
     mock_get_docker_client = mocker.patch(
         "src.docker.get_docker_client", return_value=mock_docker_client
     )
-    mock_exists = mocker.patch("src.docker.os.path.exists", return_value=False)
+    mock_exists = mocker.patch("src.docker.Path", **{"exists.return_value": False})
     from src.docker import restore_volume
 
     # Set up test data
@@ -164,7 +164,7 @@ def test_restore_volume_not_found(mocker):
 
     # # Assert the function calls and behavior
     mock_get_docker_client.assert_called_once()
-    mock_exists.assert_called_once_with(f"/backup/{filename}")
+    mock_exists.assert_any_call("/backup")
     mock_docker_client.run.assert_called_once_with(
         image="busybox",
         command=[

@@ -37,7 +37,7 @@ def task_create_backup(
                 backup_name=job_name,
                 created_at=dt_now.isoformat(),
                 successful=True,
-                backup_path=Path(BACKUP_DIR) / backup_file,
+                backup_path=str(Path(BACKUP_DIR) / backup_file),
                 volume_name=volume_name,
                 status=BackUpStatus.PROCESSED,
             )
@@ -84,7 +84,7 @@ def task_restore_backup(
                 restore_name=job_name,
                 created_at=dt_now.isoformat(),
                 successful=True,
-                restore_path=Path(BACKUP_DIR) / backup_file,
+                backup_path=str(Path(BACKUP_DIR) / backup_file),
                 volume_name=volume_name,
             )
             session.add(backup)

@@ -40,7 +40,8 @@ def backup_volume(volume_name: str, backup_dir: str, filename: str) -> None:
     volume = get_volume(volume_name)
 
     if not volume:
-        raise ValueError("Volume %s does not exist", volume_name)
+        msg = f"Volume {volume_name} does not exist"
+        raise ValueError(msg)
 
     logger.info(
         "Backing up volume %s to %s",
