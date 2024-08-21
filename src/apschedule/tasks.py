@@ -2,6 +2,7 @@ import logging
 import os
 import uuid
 from datetime import datetime
+from pathlib import Path
 
 import pytz
 from sqlmodel import Session
@@ -36,7 +37,7 @@ def task_create_backup(
                 backup_name=job_name,
                 created_at=dt_now.isoformat(),
                 successful=True,
-                backup_path=os.path.join(BACKUP_DIR, backup_file),
+                backup_path=str(Path(BACKUP_DIR) / backup_file),
                 volume_name=volume_name,
                 status=BackUpStatus.Processed,
             )
@@ -44,12 +45,11 @@ def task_create_backup(
             if is_schedule:
                 backup.schedule_id = job_id
             session.add(
-                BackupFilenames(backup_filename=backup_file, backup_id=backup_id)
+                BackupFilenames(backup_filename=backup_file, backup_id=backup_id),
             )
             session.add(backup)
             session.commit()
         except Exception as e:
-            logger.error(f"Error creating backup: {e}")
             session.rollback()
             session.add(
                 Backups(
@@ -66,7 +66,10 @@ def task_create_backup(
 
 
 def task_restore_backup(
-    volume_name: str, backup_file: str, job_id: str, job_name: str | None = None
+    volume_name: str,
+    backup_file: str,
+    job_id: str,
+    job_name: str | None = None,
 ) -> None:
     # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
     with Session(engine) as session:
@@ -81,13 +84,12 @@ def task_restore_backup(
                 restore_name=job_name,
                 created_at=dt_now.isoformat(),
                 successful=True,
-                restore_path=os.path.join(BACKUP_DIR, backup_file),
+                backup_path=str(Path(BACKUP_DIR) / backup_file),
                 volume_name=volume_name,
             )
             session.add(backup)
             session.commit()
         except Exception as e:
-            logger.error(f"Error restoring backup: {e}")
             session.rollback()
             session.add(
                 RestoredBackups(
@@ -96,7 +98,7 @@ def task_restore_backup(
                     successful=False,
                     created_at=dt_now.isoformat(),
                     error_message=str(e),
-                )
+                ),
             )
             session.commit()
             raise

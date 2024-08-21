@@ -94,7 +94,7 @@ def backup_volume(volume_name: str) -> CreateBackupResponse:
             detail=f"Volume {volume_name} is attached to a container",
         )
 
-    job = add_backup_job(f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name)
+    job = add_backup_job(f"backup-{volume_name}-{uuid.uuid4()!s}", volume_name)
     logger.info(
         "backup %s started task id: %s",
         volume_name,
@@ -119,7 +119,7 @@ def restore_volume(restore_volume: RestoreVolume) -> RestoreVolumeResponse:
         restore_volume.backup_filename,
     )
     task = add_restore_job(
-        f"restore-{restore_volume.volume_name}-{str(uuid.uuid4())}",
+        f"restore-{restore_volume.volume_name}-{uuid.uuid4()!s}",
         restore_volume.volume_name,
         restore_volume.backup_filename,
     )
@@ -130,7 +130,8 @@ def restore_volume(restore_volume: RestoreVolume) -> RestoreVolumeResponse:
         extra={"task_id": task.id},
     )
     return RestoreVolumeResponse(
-        restore_id=task.id, volume_name=restore_volume.volume_name
+        restore_id=task.id,
+        volume_name=restore_volume.volume_name,
     )
 
 
@@ -155,7 +156,8 @@ def api_list_restores(
 
 
 @router.get(
-    "/volumes/schedule/backup/{schedule_id}", description="Get a backup schedule"
+    "/volumes/schedule/backup/{schedule_id}",
+    description="Get a backup schedule",
 )
 async def get_schedule(schedule_id: str) -> BackupSchedule:
     logger.info("Getting schedule %s", schedule_id)
@@ -174,7 +176,8 @@ def api_list_backup_schedules() -> list[BackupSchedule]:
 
 
 @router.delete(
-    "/volumes/schedule/backup/{schedule_id}", description="Remove a backup schedule"
+    "/volumes/schedule/backup/{schedule_id}",
+    description="Remove a backup schedule",
 )
 def remove_backup_schedule(schedule_id: str) -> str:
     logger.info("Removing schedule %s", schedule_id)
@@ -224,7 +227,8 @@ async def create_backup_schedule(schedule: CreateBackupSchedule) -> BackupSchedu
 
 @router.post("/volumes/backups/source", description="Create a backup source")
 def create_sftp_backup_source(
-    backup_source: SftpBackupSourceCreate, session: Session = Depends(get_session)
+    backup_source: SftpBackupSourceCreate,
+    session: Session = Depends(get_session),
 ) -> SftpBackupSourcePublic:
     return db_create_sftp_backup_source(session, backup_source)
 
@@ -238,7 +242,8 @@ def list_backup_sources(
 
 @router.get("/volumes/backups/source/{source_id}", description="Get a backup source")
 def get_backup_source(
-    source_id: str, session: Session = Depends(get_session)
+    source_id: str,
+    session: Session = Depends(get_session),
 ) -> SftpBackupSourcePublic:
     result = db_get_sftp_backup_source(session, source_id)
     if not result:
@@ -250,10 +255,12 @@ def get_backup_source(
 
 
 @router.delete(
-    "/volumes/backups/source/{source_id}", description="Delete a backup source"
+    "/volumes/backups/source/{source_id}",
+    description="Delete a backup source",
 )
 def delete_backup_source(
-    source_id: str, session: Session = Depends(get_session)
+    source_id: str,
+    session: Session = Depends(get_session),
 ) -> str:
     if not db_get_sftp_backup_source(session, source_id):
         raise HTTPException(

@@ -57,12 +57,17 @@ cmd = "black --check src"
 [tool.poe.tasks.check_imports]
 cmd = "isort --check-only --profile=black src"
 
-[tool.poe.tasks.pylint]
-cmd = "pylint src"
-help = "Run pylint on codebase"
+[tool.poe.tasks.ruff-fix]
+cmd = "ruff check src --fix"
+help = "Ruff autofix"
+
+[tool.poe.tasks.ruff]
+cmd = "ruff check src"
+help = "Run Ruff on codebase"
+
 
 [tool.poe.tasks.lint]
-sequence = ["check_black", "check_imports", "pylint"]
+sequence = ["check_black", "check_imports", "ruff"]
 
 [tool.poe.tasks.format]
 shell = "shed"
@@ -140,57 +145,34 @@ help = "Simply run test suite and update snapshots"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
+
+[tool.ruff]
 # Same as Black.
-line-length = 88
+line-length = 108
+target-version = "py38"
+[tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-    # "D",    # "No docs"
+    "D",   # "No docs"
     "T20", # "Don't use print or pprint"
     # "ANN",  # Type annotation errors (or the lack of it)
     "ANN101", # The type annotation for `self` is inferred
+    "ANN201", #  Missing return type annotation for public function
     "FBT",    # I actually don't know why this exists
-    # and it seems useless so ignore it
-    # Fix doc rule conflicts
-    "D203",
-    "D213",
-]
-target-version = ["py38"]
+    "FA", # FA flake8-future-annotations only needed if suppporting python < 3.9
+    "A001", # Variable is shadowing a Python builtin
+    "A002", # Check for function arguments that use the same names as builtins
+    "TD", # TODO checks
+    "FIX002", # line conatins TODO 
+    "PLR0913", # too many arguments
+    "EM101", # Checks for the use of string literals in exception constructors
+    "TRY003", # Avoid specifying long messages outside the exception class
+    "N815"# Variable in class scope should not be mixedCase 
 
-[tool.pylint.messages_control]
-disable = [
-    "arguments-differ",
-    "attribute-defined-outside-init",
-    "blacklisted-name",
-    "duplicate-code",
-    "fixme",
-    "import-error",
-    "no-member",
-    "no-name-in-module",
-    "protected-access",
-    "stop-iteration-return",
-    "too-few-public-methods",
-    "too-many-arguments",
-    "too-many-branches",
-    "too-many-instance-attributes",
-    "too-many-lines",
-    "too-many-locals",
-    "too-many-return-statements",
-    "too-many-statements",
-    "abstract-method",
-    "chained-comparison",
-    "eval-used",
-    "exec-used",
-    "expression-not-assigned",
-    "global-statement",
-    "missing-docstring",
-    "missing-function-docstring",
-    "redefined-argument-from-local",
-    "redefined-outer-name",
-    "reimported",
-    "too-many-ancestors",
-    "unexpected-special-method-signature",
-    "consider-using-from-import",
-    "try-except-raise",
-    "line-too-long",
 ]
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "D", "ANN"]
+"docs/conf.py" = ["INP001", "A001"]
+[tool.ruff.lint.flake8-bugbear]
+# Allow default arguments like, e.g., `data: List[str] = fastapi.Query(None)`.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]

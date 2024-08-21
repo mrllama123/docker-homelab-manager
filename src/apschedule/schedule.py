@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 APSCHEDULE_JOBSTORE_URL = os.environ.get(
-    "APSCHEDULE_JOBSTORE_URL", "sqlite:///example.sqlite"
+    "APSCHEDULE_JOBSTORE_URL",
+    "sqlite:///example.sqlite",
 )
 TZ = os.environ.get("TZ", "UTC")
 
@@ -22,7 +23,7 @@ SCHEDULER = None
 
 
 def setup_scheduler() -> AsyncIOScheduler:
-    global SCHEDULER
+    global SCHEDULER  # noqa: PLW0603
     jobstores = {"default": SQLAlchemyJobStore(url=APSCHEDULE_JOBSTORE_URL)}
     SCHEDULER = AsyncIOScheduler(jobstores=jobstores, timezone=TZ)
     SCHEDULER.start()

@@ -25,7 +25,7 @@ def test_task_backup_volume(mocker, session):
         f"test-volume-{datetime.now(timezone.utc).isoformat()}.tar.gz",
     )
     backup_db = session.exec(
-        select(Backups).where(Backups.backup_id == "job_id_1")
+        select(Backups).where(Backups.backup_id == "job_id_1"),
     ).first()
 
     dt_now = datetime.now(timezone.utc)
@@ -40,7 +40,7 @@ def test_task_backup_volume(mocker, session):
     assert backup_db.schedule_id is None
 
     db_backup_filenames = session.exec(
-        select(BackupFilenames).where(BackupFilenames.backup_id == "job_id_1")
+        select(BackupFilenames).where(BackupFilenames.backup_id == "job_id_1"),
     ).first()
 
     assert db_backup_filenames
@@ -58,7 +58,7 @@ def test_task_backup_volume_error(mocker, session):
         **{"return_value.__enter__.return_value": session},
     )
     mock_backup_volume = mocker.patch(
-        "src.apschedule.tasks.backup_volume", side_effect=Exception("test error")
+        "src.apschedule.tasks.backup_volume", side_effect=Exception("test error"),
     )
     mocker.patch("src.apschedule.tasks.BACKUP_DIR", "/backup")
     from src.apschedule.tasks import task_create_backup

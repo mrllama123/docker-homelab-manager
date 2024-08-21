@@ -18,8 +18,8 @@ def db_list_restored_backups(
                 *[
                     RestoredBackups.restore_id == restore_id
                     for restore_id in restore_ids
-                ]
-            )
+                ],
+            ),
         )
 
     if created_at:

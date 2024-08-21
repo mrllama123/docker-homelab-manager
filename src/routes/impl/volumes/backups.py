@@ -12,7 +12,7 @@ def db_list_backups(
     query = select(Backups)
     if backup_ids:
         query = query.where(
-            or_(*[Backups.backup_id == backup_id for backup_id in backup_ids])
+            or_(*[Backups.backup_id == backup_id for backup_id in backup_ids]),
         )
     if successful is not None:
         query = query.where(Backups.successful == successful)

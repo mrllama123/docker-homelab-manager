@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
-import src.apschedule.schedule as schedule
+from src.apschedule import schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
 from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/", description="home page", response_class=HTMLResponse)
-def root(request: Request):
+def root(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
         "index.html",
@@ -33,15 +33,17 @@ def root(request: Request):
 
 
 @router.get("/volumes", description="volumes page", response_class=HTMLResponse)
-def volumes(request: Request):
+def volumes(request: Request) -> HTMLResponse:
     volumes = list_volumes()
     return templates.TemplateResponse(
-        request, "tabs/backup_volumes/components/volume_rows.html", {"volumes": volumes}
+        request,
+        "tabs/backup_volumes/components/volume_rows.html",
+        {"volumes": volumes},
     )
 
 
 @router.get("/tabs/restore-volumes", description="restore volumes tab")
-def restore_volumes_tab(request: Request):
+def restore_volumes_tab(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
         "tabs/restore_volumes/restore_volume_tab.html",
@@ -49,7 +51,7 @@ def restore_volumes_tab(request: Request):
 
 
 @router.get("/tabs/backup-volumes", description="backup volumes tab")
-def backup_volumes_tab(request: Request):
+def backup_volumes_tab(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
         "tabs/backup_volumes/backup_volume_tab.html",
@@ -61,7 +63,7 @@ def backup_volumes_tab(request: Request):
     description="create backup",
     response_class=HTMLResponse,
 )
-def backup_volume(request: Request, volume_name: str):
+def backup_volume(request: Request, volume_name: str) -> HTMLResponse:
 
     logger.info("backing up volume: %s", volume_name)
     if not get_volume(volume_name):
@@ -84,7 +86,8 @@ def backup_volume(request: Request, volume_name: str):
         )
 
     job = schedule.add_backup_job(
-        f"backup-{volume_name}-{str(uuid.uuid4())}", volume_name
+        f"backup-{volume_name}-{uuid.uuid4()!s}",
+        volume_name,
     )
     logger.info(
         "backup %s started task id: %s",
@@ -103,7 +106,7 @@ def backup_volume(request: Request, volume_name: str):
 
 
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
-def backups(request: Request, session: Session = Depends(get_session)):
+def backups(request: Request, session: Session = Depends(get_session)) -> HTMLResponse:
     backups = (
         db_list_backups(session, successful=True)
         if request.headers.get("HX-Target") == "success-backup-rows"
@@ -122,7 +125,7 @@ def backups(request: Request, session: Session = Depends(get_session)):
     description="backup schedules rows",
     response_class=HTMLResponse,
 )
-def backup_schedules(request: Request):
+def backup_schedules(request: Request) -> HTMLResponse:
     schedules = schedule.list_backup_schedules()
     return templates.TemplateResponse(
         request,
@@ -136,7 +139,7 @@ def backup_schedules(request: Request):
     description="create backup schedule",
     response_class=HTMLResponse,
 )
-def create_backup_schedule_form(request: Request, volume_name: str):
+def create_backup_schedule_form(request: Request, volume_name: str) -> HTMLResponse:
     if request.headers.get("HX-Target") == "create-schedule-window":
         return ""
     return templates.TemplateResponse(
@@ -161,7 +164,7 @@ async def create_backup_schedule(
     day: Annotated[str, Form()],
     month: Annotated[str, Form()],
     day_of_week: Annotated[str, Form()],
-):
+) -> HTMLResponse:
 
     new_schedule = CreateBackupSchedule(
         schedule_name=schedule_name,
@@ -176,7 +179,7 @@ async def create_backup_schedule(
         },
     )
 
-    logger.info(f"create_backup_schedule: {new_schedule}")
+    logger.info("create_backup_schedule: %s", new_schedule)
 
     if not get_volume(new_schedule.volume_name):
         return templates.TemplateResponse(
@@ -192,7 +195,7 @@ async def create_backup_schedule(
             new_schedule.crontab,
             is_schedule=True,
         )
-        logger.info(f"create_backup_schedule: job_id: {job.id}")
+        logger.info("create_backup_schedule: job_id: %s", job.id)
 
         return HTMLResponse("", headers={"HX-Trigger": "reload-backup-schedule-rows"})
 
@@ -211,7 +214,10 @@ async def create_backup_schedule(
     description="delete backup schedule",
     response_class=HTMLResponse,
 )
-def delete_backup_schedule(request: Request, schedules: Annotated[list[str], Form()]):
+def delete_backup_schedule(
+    request: Request,
+    schedules: Annotated[list[str], Form()],
+) -> HTMLResponse:
     try:
         for id in schedules:
             logger.info("Removing schedule %s", id)
@@ -224,20 +230,24 @@ def delete_backup_schedule(request: Request, schedules: Annotated[list[str], For
         )
     except JobLookupError as e:
         return templates.TemplateResponse(
-            request, "notification.html", {"message": str(e)}
+            request,
+            "notification.html",
+            {"message": str(e)},
         )
     except Exception:
         raise
 
 
 @router.post(
-    "/volumes/restore", description="restore volumes", response_class=HTMLResponse
+    "/volumes/restore",
+    description="restore volumes",
+    response_class=HTMLResponse,
 )
 def restore_volumes(
     request: Request,
     volumes: Annotated[list[str], Form()],
     session: Session = Depends(get_session),
-):
+) -> HTMLResponse:
     logger.info("restoring volumes: %s", volumes)
     volumes = [json.loads(v) for v in volumes]
     volumes: list[RestoreVolumeHtmlRequest] = [
@@ -264,7 +274,7 @@ def restore_volumes(
     for volume_name, backup in group_backup_by_volume_name.items():
         logger.info("restoring volume: %s", volume_name)
         job = schedule.add_restore_job(
-            f"backup-{volume_name}-{str(uuid.uuid4())}",
+            f"backup-{volume_name}-{uuid.uuid4()!s}",
             volume_name,
             backup.backup_filename,
         )
@@ -283,7 +293,7 @@ def restore_volumes(
     description="list restore backups",
     response_class=HTMLResponse,
 )
-def restores(request: Request, session: Session = Depends(get_session)):
+def restores(request: Request, session: Session = Depends(get_session)) -> HTMLResponse:
     restores = db_list_restored_backups(session)
     return templates.TemplateResponse(
         request,
