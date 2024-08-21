@@ -61,10 +61,10 @@ class BackupSchedule(BaseModel):
 
 
 class BackUpStatus(Enum):
-    Created = "Created" # pylint: disable=invalid-name
-    InProgress = "InProgress" # pylint: disable=invalid-name
-    Processed = "Processed" # pylint: disable=invalid-name
-    Errored = "Errored" # pylint: disable=invalid-name
+    Created = "Created"  # pylint: disable=invalid-name
+    InProgress = "InProgress"  # pylint: disable=invalid-name
+    Processed = "Processed"  # pylint: disable=invalid-name
+    Errored = "Errored"  # pylint: disable=invalid-name
 
 
 class Backups(SQLModel, table=True):
