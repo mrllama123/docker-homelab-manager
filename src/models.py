@@ -61,10 +61,10 @@ class BackupSchedule(BaseModel):
 
 
 class BackUpStatus(Enum):
-    CREATED = "Created"
-    IN_PROGRESS = "InProgress"
-    PROCESSED = "Processed"
-    ERRORED = "Errored"
+    Created = "Created"
+    InProgress = "InProgress"
+    Processed = "Processed"
+    Errored = "Errored"
 
 
 class Backups(SQLModel, table=True):
