@@ -38,7 +38,7 @@ def task_create_backup(
                 successful=True,
                 backup_path=os.path.join(BACKUP_DIR, backup_file),
                 volume_name=volume_name,
-                status=BackUpStatus.PROCESSED,
+                status=BackUpStatus.Processed,
             )
 
             if is_schedule:
@@ -58,8 +58,8 @@ def task_create_backup(
                     created_at=dt_now.isoformat(),
                     successful=False,
                     error_message=str(e),
-                    status=BackUpStatus.ERRORED,
-                )
+                    status=BackUpStatus.Errored,
+                ),
             )
             session.commit()
             raise
