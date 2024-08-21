@@ -61,10 +61,10 @@ class BackupSchedule(BaseModel):
 
 
 class BackUpStatus(Enum):
-    CREATED = "Created"
-    IN_PROGRESS = "InProgress"
-    PROCESSED = "Processed"
-    ERRORED = "Errored"
+    Created = "Created"  # pylint: disable=invalid-name
+    InProgress = "InProgress"  # pylint: disable=invalid-name
+    Processed = "Processed"  # pylint: disable=invalid-name
+    Errored = "Errored"  # pylint: disable=invalid-name
 
 
 class Backups(SQLModel, table=True):
@@ -75,7 +75,7 @@ class Backups(SQLModel, table=True):
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
     successful: bool = True
-    status: BackUpStatus | None = BackUpStatus.CREATED
+    status: BackUpStatus | None = BackUpStatus.Created
     error_message: Optional[str] = Field(default=None)
     created_at: Optional[str] = Field(default=None)
 
