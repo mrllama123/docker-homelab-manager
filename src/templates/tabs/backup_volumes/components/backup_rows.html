@@ -4,7 +4,7 @@
     <td>{{ backup.backup_name }}</td>
     <td>{{ backup.volume_name }}</td>
     <td>{{ backup.schedule_id or "" }}</td>
-    <td>{{ backup.successful }}</td>
+    <td>{{ backup.status.value }}</td>
     <td>{{ backup.error_message or "" }}</td>
     <td>{{ backup.backup_filename }}</td>
     <td>{{ backup.created_at }}</td>

@@ -74,7 +74,6 @@ class Backups(SQLModel, table=True):
     volume_name: Optional[str] = Field(default=None)
     backup_filename: Optional[str] = Field(default=None)
     backup_path: Optional[str] = Field(default=None)
-    successful: bool = True
     status: BackUpStatus | None = BackUpStatus.Created
     error_message: Optional[str] = Field(default=None)
     created_at: Optional[str] = Field(default=None)
