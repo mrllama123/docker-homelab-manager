@@ -58,7 +58,8 @@ def test_task_backup_volume_error(mocker, session):
         **{"return_value.__enter__.return_value": session},
     )
     mock_backup_volume = mocker.patch(
-        "src.apschedule.tasks.backup_volume", side_effect=Exception("test error"),
+        "src.apschedule.tasks.backup_volume",
+        side_effect=Exception("test error"),
     )
     mocker.patch("src.apschedule.tasks.BACKUP_DIR", "/backup")
     from src.apschedule.tasks import task_create_backup

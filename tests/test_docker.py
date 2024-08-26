@@ -88,7 +88,8 @@ def test_backup_volume_failure_backup_not_found(mocker):
 def test_backup_volume_failure_volume_not_found(mocker):
     mock_docker_client = mocker.MagicMock()
     mock_get_docker_client = mocker.patch(
-        "src.docker.get_docker_client", return_value=mock_docker_client,
+        "src.docker.get_docker_client",
+        return_value=mock_docker_client,
     )
     mock_get_volume = mocker.patch("src.docker.get_volume", return_value=None)
     mock_exists = mocker.patch("src.docker.Path", **{"exists.return_value": True})
