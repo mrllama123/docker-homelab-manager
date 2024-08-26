@@ -12,7 +12,7 @@ from sqlmodel import Session
 from src.apschedule import schedule
 from src.db import get_session
 from src.docker import get_volume, is_volume_attached
-from src.models import CreateBackupSchedule, RestoreVolumeHtmlRequest
+from src.models import BackUpStatus, CreateBackupSchedule, RestoreVolumeHtmlRequest
 from src.routes.impl.volumes.backups import db_list_backups
 from src.routes.impl.volumes.resored_backups import db_list_restored_backups
 from src.routes.impl.volumes.volumes import list_volumes
@@ -108,7 +108,7 @@ def backup_volume(request: Request, volume_name: str) -> HTMLResponse:
 @router.get("/volumes/backups", description="backup row", response_class=HTMLResponse)
 def backups(request: Request, session: Session = Depends(get_session)) -> HTMLResponse:
     backups = (
-        db_list_backups(session, successful=True)
+        db_list_backups(session, status=BackUpStatus.Processed)
         if request.headers.get("HX-Target") == "success-backup-rows"
         else db_list_backups(session)
     )
