@@ -12,14 +12,13 @@ from src.models import BackupSchedule, ScheduleCrontab
 
 logger = logging.getLogger(__name__)
 
-
 APSCHEDULE_JOBSTORE_URL = os.environ.get(
     "APSCHEDULE_JOBSTORE_URL",
     "sqlite:///example.sqlite",
 )
 TZ = os.environ.get("TZ", "UTC")
 
-SCHEDULER = None
+SCHEDULER: AsyncIOScheduler | None = None
 
 
 def setup_scheduler() -> AsyncIOScheduler:

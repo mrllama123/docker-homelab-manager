@@ -9,7 +9,8 @@ from sqlmodel import Session
 
 from src.db import engine
 from src.docker import backup_volume, restore_volume
-from src.models import BackupFilenames, Backups, BackUpStatus, RestoredBackups
+from src.models import BackupFilenames, BackUpStatus, RestoredBackups
+from src.routes.impl.volumes.db import db_create_backup
 
 TZ = os.environ.get("TZ", "UTC")
 BACKUP_DIR = os.getenv("BACKUP_DIR")
@@ -26,24 +27,12 @@ def task_create_backup(
     with Session(engine) as session:
         # TODO: hack to get this to work as the current apschedule events have no useful info sent to it
         backup_id = str(uuid.uuid4()) if is_schedule else job_id
-        dt_now = datetime.now(tz=pytz.timezone(TZ))
+
         try:
-            backup_file = f"{volume_name}-{dt_now.isoformat()}.tar.gz"
+            backup = db_create_backup(session, volume_name, job_name)
+            backup_file = f"{volume_name}-{backup.created_at}.tar.gz"
             backup_volume(volume_name, BACKUP_DIR, backup_file)
 
-            backup = Backups(
-                backup_id=backup_id,
-                backup_filename=backup_file,
-                backup_name=job_name,
-                created_at=dt_now.isoformat(),
-                successful=True,
-                backup_path=str(Path(BACKUP_DIR) / backup_file),
-                volume_name=volume_name,
-                status=BackUpStatus.Processed,
-            )
-
-            if is_schedule:
-                backup.schedule_id = job_id
             session.add(
                 BackupFilenames(backup_filename=backup_file, backup_id=backup_id),
             )
@@ -51,17 +40,9 @@ def task_create_backup(
             session.commit()
         except Exception as e:
             session.rollback()
-            session.add(
-                Backups(
-                    backup_id=backup_id,
-                    backup_name=job_name,
-                    created_at=dt_now.isoformat(),
-                    successful=False,
-                    error_message=str(e),
-                    status=BackUpStatus.Errored,
-                ),
+            db_create_backup(
+                backup_id, job_name, status=BackUpStatus.Errored, error_message=str(e),
             )
-            session.commit()
             raise
 
 
