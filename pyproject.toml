@@ -65,9 +65,13 @@ help = "Ruff autofix"
 cmd = "ruff check src"
 help = "Run Ruff on codebase"
 
+[tool.poe.tasks.format-check]
+shell = "ruff format src --check"
+help = "Format code"
+
 
 [tool.poe.tasks.lint]
-sequence = ["check_black", "check_imports", "ruff"]
+sequence = ["format-check", "ruff"]
 
 [tool.poe.tasks.format]
 shell = "ruff format src"
