@@ -67,7 +67,7 @@ help = "Run Ruff on codebase"
 
 [tool.poe.tasks.format-check]
 shell = "ruff format src --check"
-help = "Format code"
+help = "Format code check"
 
 
 [tool.poe.tasks.lint]
