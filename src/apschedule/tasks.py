@@ -41,7 +41,10 @@ def task_create_backup(
         except Exception as e:
             session.rollback()
             db_create_backup(
-                backup_id, job_name, status=BackUpStatus.Errored, error_message=str(e),
+                backup_id,
+                job_name,
+                status=BackUpStatus.Errored,
+                error_message=str(e),
             )
             raise
 
