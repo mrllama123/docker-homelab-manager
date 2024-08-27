@@ -10,9 +10,7 @@ from src.apschedule.schedule import setup_scheduler
 from src.routes import api, html
 
 logger = logging.getLogger(__name__)
-CORS_ORIGINS = (
-    os.getenv("CORS_ORIGINS").split(",") if os.getenv("CORS_ORIGINS") else ["*"]
-)
+CORS_ORIGINS = os.getenv("CORS_ORIGINS").split(",") if os.getenv("CORS_ORIGINS") else ["*"]
 
 logger.info("CORS allow_origins: %s", CORS_ORIGINS)
 

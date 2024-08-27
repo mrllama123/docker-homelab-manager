@@ -64,7 +64,6 @@ def backup_volumes_tab(request: Request) -> HTMLResponse:
     response_class=HTMLResponse,
 )
 def backup_volume(request: Request, volume_name: str) -> HTMLResponse:
-
     logger.info("backing up volume: %s", volume_name)
     if not get_volume(volume_name):
         return templates.TemplateResponse(
@@ -165,7 +164,6 @@ async def create_backup_schedule(
     month: Annotated[str, Form()],
     day_of_week: Annotated[str, Form()],
 ) -> HTMLResponse:
-
     new_schedule = CreateBackupSchedule(
         schedule_name=schedule_name,
         volume_name=volume_name,
@@ -250,9 +248,7 @@ def restore_volumes(
 ) -> HTMLResponse:
     logger.info("restoring volumes: %s", volumes)
     volumes = [json.loads(v) for v in volumes]
-    volumes: list[RestoreVolumeHtmlRequest] = [
-        RestoreVolumeHtmlRequest.model_validate(v) for v in volumes
-    ]
+    volumes: list[RestoreVolumeHtmlRequest] = [RestoreVolumeHtmlRequest.model_validate(v) for v in volumes]
 
     backups = db_list_backups(session, backup_ids=[v.backup_id for v in volumes])
 

@@ -37,11 +37,7 @@ def add_backup_job(
 ):
     job_id = str(uuid.uuid4())
 
-    kwargs = (
-        {"is_schedule": True, "job_name": job_name}
-        if is_schedule
-        else {"job_name": job_name}
-    )
+    kwargs = {"is_schedule": True, "job_name": job_name} if is_schedule else {"job_name": job_name}
 
     if crontab:
         return SCHEDULER.add_job(
