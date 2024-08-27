@@ -7,7 +7,6 @@ def db_create_sftp_backup_source(
     session: Session,
     backup_source: SftpBackupSourceCreate,
 ) -> SftpBackupSource:
-
     db_sftp_backup_source = SftpBackupSource.model_validate(backup_source)
     session.add(db_sftp_backup_source)
     session.commit()
