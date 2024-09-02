@@ -25,7 +25,7 @@ python = ">=3.8.1,<4.0"
 fastapi = { extras = ["all"], version = "^0.111.0" }
 uvicorn = { extras = ["standard"], version = "^0.29.0" }
 python-on-whales = "^0.71.0"
-sqlmodel = "^0.0.19"
+sqlmodel = "^0.0.22"
 apscheduler = "^3.10.4"
 alembic = "^1.13.1"
 jinja2 = "^3.1.3"
